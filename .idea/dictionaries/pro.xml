@@ -1,7 +1,11 @@
 <component name="ProjectDictionaryState">
   <dictionary name="pro">
     <words>
+      <w>footcer</w>
       <w>footcerdb</w>
+      <w>logrus</w>
+      <w>rotatelogs</w>
+      <w>warnf</w>
     </words>
   </dictionary>
 </component>
