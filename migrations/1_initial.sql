@@ -12,6 +12,8 @@ CREATE TABLE "users"
     "position" text NOT NULL,
     "level" text  NOT NULL,
     "verify" text NOT NULL,
+    "created_at" TIMESTAMPTZ NOT NULL,
+    "updated_at" TIMESTAMPTZ NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (user_id)
 );
 -- +migrate Down

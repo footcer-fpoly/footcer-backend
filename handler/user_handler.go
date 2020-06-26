@@ -2,9 +2,12 @@ package handler
 
 import (
 	"footcer-backend/helper"
+	"footcer-backend/message"
 	"footcer-backend/model"
+	req2 "footcer-backend/model/req"
 	"footcer-backend/repository"
 	"footcer-backend/security"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 	uuid "github.com/satori/go.uuid"
@@ -16,7 +19,31 @@ type UserHandler struct {
 }
 
 func (u *UserHandler) Profile(c echo.Context) error {
-	return nil
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	user, err := u.UserRepo.SelectById(c.Request().Context(), claims.UserId)
+	if err != nil {
+		if err == message.UserNotFound{
+			return c.JSON(http.StatusNotFound, model.Response{
+				StatusCode: http.StatusNotFound,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+
+		return c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       user,
+	})
 
 }
 
@@ -61,8 +88,46 @@ func (u *UserHandler) Create(c echo.Context) error {
 	})
 }
 func (u *UserHandler) Update(c echo.Context) error {
-	return nil
+	req := model.User{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
 
+	// validate thông tin gửi lên
+	err := c.Validate(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+		})
+	}
+
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(*model.JwtCustomClaims)
+	user := model.User{
+		UserId:   claims.UserId,
+		DisplayName: req.DisplayName,
+		Email:    req.Email,
+		Phone:req.Phone,
+		Avatar:req.Avatar,
+		Birthday:req.Birthday,
+		Position:req.Position,
+		Level:req.Level,
+	}
+
+	user, err = u.UserRepo.Update(c.Request().Context(), user)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+			StatusCode: http.StatusUnprocessableEntity,
+			Message:    err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, model.Response{
+		StatusCode: http.StatusCreated,
+		Message:    "Xử lý thành công",
+		Data:       user,
+	})
 }
 func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	req := model.User{}
@@ -87,6 +152,7 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	})
 
 }
+
 func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	req := model.User{}
 
@@ -96,7 +162,6 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	}
 
 	req.UserId = uuid.NewV1().String()
-
 	req.Role = 0
 	hash := security.HashAndSalt([]byte(req.Password))
 	req.Password = hash
@@ -128,7 +193,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 }
 
 func (u *UserHandler) HandleSignIn(c echo.Context) error {
-	req := model.ReqSignIn{}
+	req := req2.ReqSignIn{}
 	if err := c.Bind(&req); err != nil {
 		log.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, model.Response{
