@@ -30,3 +30,55 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 		Data:       stadium,
 	})
 }
+
+func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
+	req := model.Stadium{}
+
+	token := c.Get("user").(*jwt.Token)
+	claims := token.Claims.(*model.JwtCustomClaims)
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	// validate thông tin gửi lên
+	err := c.Validate(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+		})
+	}
+
+	stadium := model.Stadium{
+		StadiumName: req.StadiumName,
+		Address:     req.Address,
+		Description: req.Description,
+		Image:       req.Image,
+		PriceNormal: req.PriceNormal,
+		PricePeak:   req.PricePeak,
+		StartTime:   req.StartTime,
+		EndTime:     req.EndTime,
+		Category:    req.Category,
+		Latitude:    req.Latitude,
+		Longitude:   req.Longitude,
+		Ward:        req.Ward,
+		District:    req.District,
+		City:        req.City,
+		UserId:      claims.UserId,
+	}
+
+	stadium, err = s.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+			StatusCode: http.StatusUnprocessableEntity,
+			Message:    err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
+}
