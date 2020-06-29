@@ -37,6 +37,7 @@ func main() {
 		})
 	})
 	router.UserRouter(e, sql)
+	router.StadiumRouter(e, sql)
 
 	e.Logger.Fatal(e.Start(":4000"))
 

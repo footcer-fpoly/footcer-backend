@@ -11,6 +11,7 @@ import (
 	"footcer-backend/model/req"
 	"footcer-backend/repository"
 	"github.com/lib/pq"
+	uuid "github.com/satori/go.uuid"
 	"time"
 )
 
@@ -103,26 +104,65 @@ func (u UserRepoImpl) Update(context context.Context, user model.User) (model.Us
 
 	return user, nil
 }
+
 func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) error {
-	var phone string
-	queryUserExits := `SELECT phone FROM users WHERE users.phone = $1`
+	var role string
+	fmt.Println(phoneReq)
+	queryUserExits := `SELECT role FROM users WHERE users.phone = $1`
 
-	err := u.sql.Db.GetContext(context, &phone, queryUserExits, phoneReq)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return sql.ErrNoRows
-		}
+	err := u.sql.Db.GetContext(context, &role, queryUserExits, phoneReq)
+	if err == sql.ErrNoRows {
+		return nil
 	}
-	return err
-}
-func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (model.User, error) {
+	if role == "0" {
+		return message.UserConflict
 
+	}
+	if role == "1" {
+		return message.UserIsClient
+	}
+	return message.SomeWentWrong
+
+}
+
+func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (model.User, error) {
 	query := `INSERT INTO users(user_id, phone, email,password,role, display_name,birthday,position,level, avatar,verify,created_at, updated_at)
-       VALUES(:user_id, :phone, :email,:password,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
+     VALUES(:user_id, :phone, :email,:password,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
 
 	_, err := u.sql.Db.NamedExecContext(context, query, user)
+	if user.Role == 1 {
+		var stadium = model.Stadium{
+			StadiumId:   uuid.NewV1().String(),
+			StadiumName: "Sân bóng mẫu",
+			Address:     "123",
+			Description: "",
+			Image:       "example.jpg",
+			PriceNormal: 0,
+			PricePeak:   1,
+			StartTime:   "5:30",
+			EndTime:     "10:00",
+			Category:    "Sân cỏ nhân tạo",
+			Latitude:    0,
+			Longitude:   1,
+			Ward:        "",
+			District:    "",
+			City:        "",
+			UserId:      user.UserId,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+		queryCreate := `INSERT INTO stadium(
+		stadium_id, name_stadium, address, description, image, price_normal, price_peak, start_time, end_time, category, latitude, longitude, ward, district, city, user_id, created_at, updated_at)
+		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :price_normal, :price_peak, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city , :user_id, :created_at, :updated_at)`
+
+		_, err := u.sql.Db.NamedExecContext(context, queryCreate, stadium)
+		if err != nil {
+			log.Error(err.Error())
+		}
+	}
 	return user, err
 }
+
 func (u UserRepoImpl) CheckLogin(context context.Context, loginReq req.ReqSignIn) (model.User, error) {
 	var user = model.User{}
 	err := u.sql.Db.GetContext(context, &user, "SELECT * FROM users WHERE phone=$1", loginReq.Phone)
