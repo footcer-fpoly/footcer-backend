@@ -26,6 +26,15 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (mo
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
 
+	query = `SELECT * from users where user_id=$1`
+	user := &model.User{}
+	if err = s.sql.Db.GetContext(context, user, query, userId); err != nil {
+		log.Error(err.Error())
+	}
+
+	log.Printf("%+v", stadium)
+	log.Printf("%+v", stadium.User)
+	log.Printf("%+v", user)
 	if err != nil {
 		log.Error(err.Error())
 		return stadium, err

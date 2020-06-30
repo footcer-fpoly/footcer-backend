@@ -14,6 +14,7 @@ func init() {
 	os.Setenv("APP_NAME", "footcer")
 	log.InitLogger(true)
 }
+
 func main() {
 	sql := &db.Sql{
 		Host:     "localhost",

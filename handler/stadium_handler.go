@@ -16,7 +16,7 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
-	stadium, err := u.StadiumRepo.StadiumInfo(c.Request().Context(), claims.UserId)
+	stadium, err := u.StadiumRepo.StadiumInfo(c.Request().Context(), claims.UserId) // sao may doan nay khong dua vao context, chi can dua user_id vao thoi
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
