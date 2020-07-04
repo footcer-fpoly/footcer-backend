@@ -10,4 +10,9 @@ var (
 	EmailExits     = errors.New("Email đã tồn tại")
 	SignUpFail     = errors.New("Đăng ký thất bại")
 	SomeWentWrong  = errors.New("Có lỗi xảy ra")
+
+	//stadium
+	StadiumNotFound   = errors.New("Sân bóng không tồn tại")
+
+
 )

@@ -18,12 +18,8 @@ type Stadium struct {
 	Ward        string  `json:"ward" db:"ward,omitempty"`
 	District    string  `json:"district" db:"district,omitempty"`
 	City        string  `json:"city" db:"city,omitempty"`
-	UserId      string  `json:"user_id" db:"user_id,omitempty"`
-	User        struct {
-		DisplayName string `json:"display_name" db:"display_name,prefix=users.display_name"`
-		Avatar      string `json:"avatar" db:"avatar,omitempty"`
-		Phone       string `json:"phone" db:"phone,omitempty"`
-	} `json:"user"`
-	CreatedAt time.Time `json:"created_at" db:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"-" db:"updated_at,omitempty"`
+	UserId      string  `json:"-" db:"user_id,omitempty"`
+	User        `json:"user"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at,omitempty"`
+	UpdatedAt   time.Time `json:"-" db:"updated_at,omitempty"`
 }
