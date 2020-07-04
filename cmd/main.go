@@ -6,6 +6,7 @@ import (
 	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/router"
+	"footcer-backend/security"
 	"github.com/labstack/echo"
 	"os"
 )
@@ -14,13 +15,14 @@ func init() {
 	os.Setenv("APP_NAME", "footcer")
 	log.InitLogger(true)
 }
+
 func main() {
 	sql := &db.Sql{
-		Host:     "localhost",
-		Port:     5432,
-		UserName: "postgres",
-		Password: "123456",
-		DbName:   "footcerdb",
+		Host:     security.HOST,
+		Port:     security.PORT,
+		UserName: security.USERNAME,
+		Password: security.PASSWORD,
+		DbName:   security.DB_NAME,
 	}
 	sql.Connect()
 	defer sql.Close()
@@ -37,6 +39,7 @@ func main() {
 		})
 	})
 	router.UserRouter(e, sql)
+	router.StadiumRouter(e, sql)
 
 	e.Logger.Fatal(e.Start(":4000"))
 

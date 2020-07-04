@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-const JWT_KEY = "footcer6969696969969696996969699696996"
-
 func GenToken(user model.User) (string, error) {
 	claims := &model.JwtCustomClaims{
 		UserId: user.UserId,
