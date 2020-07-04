@@ -6,6 +6,6 @@ import (
 )
 
 type StadiumRepository interface {
-	StadiumInfo(context context.Context, userId string) (model.Stadium, error)
+	StadiumInfo(context context.Context, userId string) (interface{}, error)
 	StadiumUpdate(context context.Context, stadium model.Stadium) (model.Stadium, error)
 }

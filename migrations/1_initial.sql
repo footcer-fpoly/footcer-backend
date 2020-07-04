@@ -63,7 +63,7 @@ CONSTRAINT service_pkey PRIMARY KEY (service_id)
 );
 
 -- +migrate Down
-DROP TABLE "users";
+-- DROP TABLE "users";
 -- DROP TABLE "orders";
 -- DROP TABLE "product";
 -- DROP TABLE "cate";

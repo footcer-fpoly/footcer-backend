@@ -107,7 +107,6 @@ func (u UserRepoImpl) Update(context context.Context, user model.User) (model.Us
 
 func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) error {
 	var role string
-	fmt.Println(phoneReq)
 	queryUserExits := `SELECT role FROM users WHERE users.phone = $1`
 
 	err := u.sql.Db.GetContext(context, &role, queryUserExits, phoneReq)
@@ -119,7 +118,7 @@ func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) error
 
 	}
 	if role == "1" {
-		return message.UserIsClient
+		return message.UserIsAdmin
 	}
 	return message.SomeWentWrong
 
@@ -130,9 +129,15 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
      VALUES(:user_id, :phone, :email,:password,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
 
 	_, err := u.sql.Db.NamedExecContext(context, query, user)
+	if err != nil {
+		log.Error(err.Error())
+		return user, message.SignUpFail
+	}
 	if user.Role == 1 {
+		var stadiumId = uuid.NewV1().String()
+
 		var stadium = model.Stadium{
-			StadiumId:   uuid.NewV1().String(),
+			StadiumId:   stadiumId,
 			StadiumName: "Sân bóng mẫu",
 			Address:     "123",
 			Description: "",
@@ -151,13 +156,31 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
-		queryCreate := `INSERT INTO stadium(
+
+		queryCreateStadium := `INSERT INTO stadium(
 		stadium_id, name_stadium, address, description, image, price_normal, price_peak, start_time, end_time, category, latitude, longitude, ward, district, city, user_id, created_at, updated_at)
 		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :price_normal, :price_peak, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city , :user_id, :created_at, :updated_at)`
 
-		_, err := u.sql.Db.NamedExecContext(context, queryCreate, stadium)
+		_, err := u.sql.Db.NamedExecContext(context, queryCreateStadium, stadium)
+
 		if err != nil {
 			log.Error(err.Error())
+			return user, message.SignUpFail
+		}
+		var stadiumCollage = model.StadiumCollage{
+			StadiumCollageId:   uuid.NewV1().String(),
+			NameStadiumCollage: "Sân số 1",
+			AmountPeople:       "5",
+			StadiumId:          stadiumId,
+			CreatedAt:          time.Time{},
+			UpdatedAt:          time.Time{},
+		}
+		queryCreateStadiumCollage := `INSERT INTO public.stadium_collage(
+		stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at)
+		VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :stadium_id, :created_at, :updated_at);`
+		_, errCreateStadiumCollage := u.sql.Db.NamedExecContext(context, queryCreateStadiumCollage, stadiumCollage)
+		if errCreateStadiumCollage != nil {
+			log.Error(errCreateStadiumCollage.Error())
 		}
 	}
 	return user, err

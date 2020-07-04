@@ -5,7 +5,7 @@ import "errors"
 var (
 	UserConflict   = errors.New("Người dùng đã tồn tại")
 	UserNotFound   = errors.New("Người dùng không tồn tại")
-	UserIsClient   = errors.New("Bạn đã là người dùng, không thể tạo chủ sân ")
+	UserIsAdmin   = errors.New("Bạn đã chủ sân, không thể tạo người dùng ")
 	UserNotUpdated = errors.New("Cập nhật thông tin người dùng thất bại")
 	EmailExits     = errors.New("Email đã tồn tại")
 	SignUpFail     = errors.New("Đăng ký thất bại")

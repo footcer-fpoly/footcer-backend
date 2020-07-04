@@ -19,16 +19,21 @@ func NewStadiumRepo(sql *db.Sql) repository.StadiumRepository {
 	return &StadiumRepoImpl{sql: sql}
 }
 
-func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (model.Stadium, error) {
-	stadium := model.Stadium{}
+func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (interface{}, error) {
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.price_normal, stadium.price_peak, stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city, stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
-	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id WHERE stadium.user_id =  $1`
+	type StadiumInfo struct {
+		model.Stadium
+		model.StadiumCollage `json:"stadiumCollage"`
+		model.User `json:"user"`
+	}
+	stadium := StadiumInfo{}
+
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.price_normal, stadium.price_peak, stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium_collage.stadium_collage_id,stadium_collage.name_stadium_collage,stadium_collage.amount_people ,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id INNER JOIN stadium_collage ON stadium_collage.stadium_id = stadium.stadium_id WHERE stadium.user_id =  $1`
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
-
 	if err != nil {
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			log.Error(err.Error())
 			return stadium, message.StadiumNotFound
 		}
