@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"footcer-backend/helper"
 	"footcer-backend/model"
 	"footcer-backend/repository"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	uuid "github.com/satori/go.uuid"
 	"net/http"
 )
 
@@ -80,5 +82,67 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       nil,
+	})
+}
+
+func (s *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
+	req := model.StadiumCollage{}
+
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	// validate thông tin gửi lên
+	err := c.Validate(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+		})
+	}
+
+	stadiumColl := model.StadiumCollage{
+		StadiumCollageId:   req.StadiumCollageId,
+		NameStadiumCollage: req.NameStadiumCollage,
+		AmountPeople:       req.AmountPeople,
+	}
+
+	stadiumColl, err = s.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+			StatusCode: http.StatusUnprocessableEntity,
+			Message:    err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
+}
+
+func (s *StadiumHandler) AddStadiumCollage(c echo.Context) error {
+	req := model.StadiumCollage{}
+	req.StadiumCollageId = uuid.NewV1().String()
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+	user, err := s.StadiumRepo.StadiumCollageAdd(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       user,
 	})
 }

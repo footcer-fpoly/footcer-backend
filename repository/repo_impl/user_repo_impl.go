@@ -172,8 +172,8 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			NameStadiumCollage: "Sân số 1",
 			AmountPeople:       "5",
 			StadiumId:          stadiumId,
-			CreatedAt:          time.Time{},
-			UpdatedAt:          time.Time{},
+			CreatedAt:          time.Now(),
+			UpdatedAt:          time.Now(),
 		}
 		queryCreateStadiumCollage := `INSERT INTO public.stadium_collage(
 		stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at)

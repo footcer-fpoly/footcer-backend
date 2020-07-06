@@ -14,4 +14,6 @@ func StadiumRouter(e *echo.Echo, sql *db.Sql) {
 	}
 	e.GET("/stadium/info", stadiumHandler.StadiumInfo, middleware.JWTMiddleware())
 	e.PUT("/stadium/update", stadiumHandler.UpdateStadium, middleware.JWTMiddleware())
+	e.PUT("/stadium/update-collage", stadiumHandler.UpdateStadiumCollage, middleware.JWTMiddleware())
+	e.POST("/stadium/add-collage", stadiumHandler.AddStadiumCollage, middleware.JWTMiddleware())
 }

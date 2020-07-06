@@ -23,13 +23,13 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 
 	type StadiumInfo struct {
 		model.Stadium
-		model.StadiumCollage `json:"stadiumCollage"`
-		model.User `json:"user"`
+		ArrayStadiumCollage `json:"stadium_collage"`
+		model.User          `json:"user"`
 	}
 	stadium := StadiumInfo{}
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.price_normal, stadium.price_peak, stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium_collage.stadium_collage_id,stadium_collage.name_stadium_collage,stadium_collage.amount_people ,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
-	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id INNER JOIN stadium_collage ON stadium_collage.stadium_id = stadium.stadium_id WHERE stadium.user_id =  $1`
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.price_normal, stadium.price_peak, stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.user_id =  $1`
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
 	if err != nil {
@@ -40,6 +40,20 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 		log.Error(err.Error())
 		return stadium, err
 	}
+
+	var stadiumColl = []model.StadiumCollage{}
+	queryColl := `SELECT stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at
+	FROM public.stadium_collage WHERE stadium_id = $1`
+	errColl := s.sql.Db.SelectContext(context, &stadiumColl, queryColl, stadium.StadiumId)
+	if errColl != nil {
+		if errColl == sql.ErrNoRows {
+			log.Error(errColl.Error())
+			return stadiumColl, message.StadiumNotFound
+		}
+		log.Error(errColl.Error())
+		return stadiumColl, errColl
+	}
+	stadium.ArrayStadiumCollage = stadiumColl
 
 	return stadium, nil
 
@@ -78,11 +92,59 @@ func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.St
 	count, err := result.RowsAffected()
 	if err != nil {
 		log.Error(err.Error())
-		return stadium, message.UserNotUpdated
+		return stadium, message.StadiumNotUpdated
 	}
 	if count == 0 {
-		return stadium, message.UserNotUpdated
+		return stadium, message.StadiumNotUpdated
 	}
 
 	return stadium, nil
 }
+
+func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumColl model.StadiumCollage) (model.StadiumCollage, error) {
+	sqlStatement := `
+		UPDATE stadium_collage
+		SET 
+			name_stadium_collage  = (CASE WHEN LENGTH(:name_stadium_collage) = 0 THEN name_stadium_collage ELSE :name_stadium_collage END),
+			amount_people = (CASE WHEN LENGTH(:amount_people) = 0 THEN amount_people ELSE :amount_people END),
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE stadium_collage_id    = :stadium_collage_id
+	`
+
+	stadiumColl.UpdatedAt = time.Now()
+
+	result, err := s.sql.Db.NamedExecContext(context, sqlStatement, stadiumColl)
+	if err != nil {
+		log.Error(err.Error())
+		return stadiumColl, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return stadiumColl, message.StadiumNotUpdated
+	}
+	if count == 0 {
+		return stadiumColl, message.StadiumNotUpdated
+	}
+
+	return stadiumColl, nil
+}
+
+func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl model.StadiumCollage) (model.StadiumCollage, error) {
+
+	queryCreate := `INSERT INTO public.stadium_collage(
+	stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at)
+	VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :stadium_id, :created_at, :updated_at)`
+
+	_, err := s.sql.Db.NamedExecContext(context, queryCreate, stadiumColl)
+	if err != nil {
+		log.Error(err.Error())
+		return stadiumColl, message.SignUpFail
+	}
+	return stadiumColl, nil
+
+}
+
+//TODO chưa hợp lí -> xử lí sau
+type ArrayStadiumCollage []model.StadiumCollage

@@ -51,6 +51,7 @@ func (u *UserHandler) List(c echo.Context) error {
 	return nil
 
 }
+
 func (u *UserHandler) Create(c echo.Context) error {
 	req := model.User{}
 
