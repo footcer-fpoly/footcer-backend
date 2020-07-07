@@ -41,6 +41,9 @@ func main() {
 	router.UserRouter(e, sql)
 	router.StadiumRouter(e, sql)
 
+	//upload
+	e.Static("/static", "../images/")
+
 	e.Logger.Fatal(e.Start(":4000"))
 
 }
