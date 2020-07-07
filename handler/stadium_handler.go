@@ -4,6 +4,7 @@ import (
 	"footcer-backend/helper"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/upload"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
@@ -34,6 +35,13 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 }
 
 func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
+	urls, errUpload := upload.Upload(c)
+	if errUpload != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
 	req := model.Stadium{}
 
 	token := c.Get("user").(*jwt.Token)
@@ -56,7 +64,7 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 		StadiumName: req.StadiumName,
 		Address:     req.Address,
 		Description: req.Description,
-		Image:       req.Image,
+		Image:       urls[0],
 		PriceNormal: req.PriceNormal,
 		PricePeak:   req.PricePeak,
 		StartTime:   req.StartTime,
