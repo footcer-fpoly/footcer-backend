@@ -8,6 +8,7 @@ type Stadium struct {
 	Address     string    `json:"address" db:"address"`
 	Description string    `json:"description" db:"description,omitempty"`
 	Image       string    `json:"image" db:"image,omitempty"`
+	RateCount   float64   `json:"rateCount" db:"_,omitempty"`
 	PriceNormal int       `json:"priceNormal" db:"price_normal,omitempty"`
 	PricePeak   int       `json:"pricePeak" db:"price_peak,omitempty" `
 	StartTime   string    `json:"start_time" db:"start_time,omitempty"`

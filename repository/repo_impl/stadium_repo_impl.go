@@ -24,6 +24,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	type StadiumInfo struct {
 		model.Stadium
 		ArrayStadiumCollage `json:"stadium_collage"`
+		ArrayStadiumReview  `json:"review"`
 		model.User          `json:"user"`
 	}
 	stadium := StadiumInfo{}
@@ -41,6 +42,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 		return stadium, err
 	}
 
+	//stadium collage
 	var stadiumColl = []model.StadiumCollage{}
 	queryColl := `SELECT stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at
 	FROM public.stadium_collage WHERE stadium_id = $1`
@@ -54,6 +56,29 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 		return stadiumColl, errColl
 	}
 	stadium.ArrayStadiumCollage = stadiumColl
+
+	//review
+	var review = []model.Review{}
+	queryReview := `SELECT review_id, content, rate, stadium_id, review.user_id, review.created_at, review.updated_at, users.display_name,users.avatar
+FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE review.stadium_id = $1;`
+	errReview := s.sql.Db.SelectContext(context, &review, queryReview, stadium.StadiumId)
+	if errReview != nil {
+		if errReview == sql.ErrNoRows {
+			log.Error(errReview.Error())
+			return review, message.StadiumNotFound
+		}
+		log.Error(errReview.Error())
+		return review, errReview
+	}
+	var sumRate float64 = 0
+	for _, rate := range review {
+		sumRate += rate.Rate
+	}
+	if sumRate > 0 {
+		stadium.Stadium.RateCount = sumRate / float64(len(review))
+	}
+
+	stadium.ArrayStadiumReview = review
 
 	return stadium, nil
 
@@ -148,3 +173,4 @@ func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl 
 
 //TODO chưa hợp lí -> xử lí sau
 type ArrayStadiumCollage []model.StadiumCollage
+type ArrayStadiumReview []model.Review
