@@ -15,4 +15,9 @@ var (
 	//stadium
 	StadiumNotFound   = errors.New("Sân bóng không tồn tại")
 	StadiumNotUpdated = errors.New("Cập nhật thông tin sân thất bại")
+
+
+	//team
+	TeamMemberExits = errors.New("Thành viên đã tồn tại")
+
 )

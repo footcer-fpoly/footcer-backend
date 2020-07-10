@@ -20,7 +20,10 @@ func NewReviewRepo(sql *db.Sql) repository.ReviewRepository {
 func (r ReviewRepoImpl) AddReview(context context.Context, review model.Review) (model.Review, error) {
 	query := `INSERT INTO public.review(
 	review_id, content, rate, stadium_id, user_id, created_at, updated_at)
-	VALUES (:review_id, :content, :rate, :stadium_id, :user_id, :created_at,:updated_at );`
+	VALUES (:review_id, :content, :rate, :stadium_id, :user_id, :created_at,:updated_at);`
+
+	//review.CreatedAt = time.Now()
+	//review.UpdatedAt = time.Now()
 
 	_, err := r.sql.Db.NamedExecContext(context, query, review)
 	if err != nil {

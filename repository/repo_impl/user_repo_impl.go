@@ -128,6 +128,8 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 	query := `INSERT INTO users(user_id, phone, email,password,role, display_name,birthday,position,level, avatar,verify,created_at, updated_at)
      VALUES(:user_id, :phone, :email,:password,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
 
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 	_, err := u.sql.Db.NamedExecContext(context, query, user)
 	if err != nil {
 		log.Error(err.Error())

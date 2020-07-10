@@ -59,6 +59,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 
 	//review
 	var review = []model.Review{}
+
 	queryReview := `SELECT review_id, content, rate, stadium_id, review.user_id, review.created_at, review.updated_at, users.display_name,users.avatar
 FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE review.stadium_id = $1;`
 	errReview := s.sql.Db.SelectContext(context, &review, queryReview, stadium.StadiumId)
@@ -71,11 +72,13 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 		return review, errReview
 	}
 	var sumRate float64 = 0
-	for _, rate := range review {
-		sumRate += rate.Rate
-	}
-	if sumRate > 0 {
-		stadium.Stadium.RateCount = sumRate / float64(len(review))
+	if len(review) > 0 {
+		for _, rate := range review {
+			sumRate += rate.Rate
+		}
+		if sumRate > 0 {
+			stadium.Stadium.RateCount = sumRate / float64(len(review))
+		}
 	}
 
 	stadium.ArrayStadiumReview = review
