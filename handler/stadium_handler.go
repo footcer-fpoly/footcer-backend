@@ -5,10 +5,11 @@ import (
 	"footcer-backend/model"
 	"footcer-backend/repository"
 	"footcer-backend/upload"
+	"net/http"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
-	"net/http"
 )
 
 type StadiumHandler struct {
@@ -65,8 +66,6 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 		Address:     req.Address,
 		Description: req.Description,
 		Image:       urls[0],
-		PriceNormal: req.PriceNormal,
-		PricePeak:   req.PricePeak,
 		StartTime:   req.StartTime,
 		EndTime:     req.EndTime,
 		Category:    req.Category,
@@ -75,6 +74,8 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 		Ward:        req.Ward,
 		District:    req.District,
 		City:        req.City,
+		TimePeak:    req.TimePeak,
+		TimeOrder:   req.TimeOrder,
 		UserId:      claims.UserId,
 	}
 

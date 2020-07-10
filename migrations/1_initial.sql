@@ -23,8 +23,6 @@ CREATE TABLE "stadium"(
 "address" text NOT NULL,
 "description" text NOT NULL,
 "image" text NOT NULL,
-"price_normal" numeric NOT NULL,
-"price_peak" numeric NOT NULL,
 "start_time" text NOT NULL,
 "end_time" text NOT NULL,
 "category" text NOT NULL,
@@ -33,6 +31,8 @@ CREATE TABLE "stadium"(
 "ward" text NOT NULL,
 "district" text NOT NULL,
 "city" text NOT NULL,
+"time_peak" text NOT NULL,
+"time_order" text NOT NULL,
 "user_id" text NOT NULL,
 "created_at" TIMESTAMPTZ NOT NULL,
 "updated_at" TIMESTAMPTZ NOT NULL,
@@ -45,6 +45,8 @@ CREATE TABLE "stadium_collage"(
 "stadium_collage_id" text NOT NULL UNIQUE,
 "name_stadium_collage" text NOT NULL,
 "amount_people" text NOT NULL,
+"price_normal" numeric NOT NULL,
+"price_peak" numeric NOT NULL,
 "stadium_id" text NOT NULL,
 "created_at" TIMESTAMPTZ NOT NULL,
 "updated_at" TIMESTAMPTZ NOT NULL,
@@ -98,6 +100,7 @@ CREATE TABLE "team_details"
 "team_details_id" text NOT NULL UNIQUE,
 "team_id" text NOT NULL,
 "user_id" text NOT NULL,
+"role" text NOT NULL,
 "accept" text NOT NULL,
 "created_at" DATE NOT NULL,
 "updated_at" DATE NOT NULL,
@@ -112,10 +115,11 @@ DROP TABLE "review";
 DROP TABLE "service";
 DROP TABLE "stadium_collage";
 DROP TABLE "stadium";
+DROP TABLE "team_details";
+
 DROP TABLE "team";
 DROP TABLE "users";
 
--- DROP TABLE "team_details";
 -- DROP TABLE "game";
 
 

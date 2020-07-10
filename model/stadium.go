@@ -9,8 +9,6 @@ type Stadium struct {
 	Description string    `json:"description" db:"description,omitempty"`
 	Image       string    `json:"image" db:"image,omitempty"`
 	RateCount   float64   `json:"rateCount" db:"_,omitempty"`
-	PriceNormal int       `json:"priceNormal" db:"price_normal,omitempty"`
-	PricePeak   int       `json:"pricePeak" db:"price_peak,omitempty" `
 	StartTime   string    `json:"start_time" db:"start_time,omitempty"`
 	EndTime     string    `json:"end_time" db:"end_time,omitempty"`
 	Category    string    `json:"category" db:"category,omitempty"`
@@ -19,6 +17,8 @@ type Stadium struct {
 	Ward        string    `json:"ward" db:"ward,omitempty"`
 	District    string    `json:"district" db:"district,omitempty"`
 	City        string    `json:"city" db:"city,omitempty"`
+	TimePeak    string    `json:"timePeak" db:"time_peak,omitempty"`
+	TimeOrder   string    `json:"timeOrder" db:"time_order,omitempty" `
 	UserId      string    `json:"userId,omitempty" db:"user_id,omitempty"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at,omitempty"`

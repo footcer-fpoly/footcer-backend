@@ -10,9 +10,10 @@ import (
 	"footcer-backend/model"
 	"footcer-backend/model/req"
 	"footcer-backend/repository"
+	"time"
+
 	"github.com/lib/pq"
 	uuid "github.com/satori/go.uuid"
-	"time"
 )
 
 type UserRepoImpl struct {
@@ -144,8 +145,6 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			Address:     "123",
 			Description: "",
 			Image:       "example.jpg",
-			PriceNormal: 0,
-			PricePeak:   1,
 			StartTime:   "5:30",
 			EndTime:     "10:00",
 			Category:    "Sân cỏ nhân tạo",
@@ -154,14 +153,16 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			Ward:        "",
 			District:    "",
 			City:        "",
+			TimePeak:    "0",
+			TimeOrder:   "0",
 			UserId:      user.UserId,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
 
 		queryCreateStadium := `INSERT INTO stadium(
-		stadium_id, name_stadium, address, description, image, price_normal, price_peak, start_time, end_time, category, latitude, longitude, ward, district, city, user_id, created_at, updated_at)
-		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :price_normal, :price_peak, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city , :user_id, :created_at, :updated_at)`
+		stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak,time_order,user_id, created_at, updated_at)
+		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city,:time_peak,:time_order, :user_id, :created_at, :updated_at)`
 
 		_, err := u.sql.Db.NamedExecContext(context, queryCreateStadium, stadium)
 
@@ -173,13 +174,15 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			StadiumCollageId:   uuid.NewV1().String(),
 			NameStadiumCollage: "Sân số 1",
 			AmountPeople:       "5",
+			PriceNormal:        0,
+			PricePeak:          0,
 			StadiumId:          stadiumId,
 			CreatedAt:          time.Now(),
 			UpdatedAt:          time.Now(),
 		}
 		queryCreateStadiumCollage := `INSERT INTO public.stadium_collage(
-		stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at)
-		VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :stadium_id, :created_at, :updated_at);`
+		stadium_collage_id, name_stadium_collage, amount_people, price_normal, price_peak,stadium_id, created_at, updated_at)
+		VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people,  :price_normal, :price_peak,:stadium_id, :created_at, :updated_at);`
 		_, errCreateStadiumCollage := u.sql.Db.NamedExecContext(context, queryCreateStadiumCollage, stadiumCollage)
 		if errCreateStadiumCollage != nil {
 			log.Error(errCreateStadiumCollage.Error())

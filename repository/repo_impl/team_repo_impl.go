@@ -38,17 +38,40 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 		TeamId:        team.TeamId,
 		UserId:        team.LeaderId,
 		Accept:        "1",
+		Role:          "1",
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
 	queryCreateMemberTeam := `INSERT INTO public.team_details(
-	team_details_id, team_id, user_id, accept, created_at, updated_at)
-	VALUES (:team_details_id, :team_id, :user_id, :accept, :created_at, :updated_at);`
+	team_details_id, team_id, user_id, accept,role, created_at, updated_at)
+	VALUES (:team_details_id, :team_id, :user_id, :accept,:role, :created_at, :updated_at);`
 	_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, memberTeam)
 	if errMemberTeam != nil {
 		log.Error(errMemberTeam.Error())
 		return team, message.SomeWentWrong
 	}
+	if len(team.MemberList) > 0 {
+		for _, element := range team.MemberList {
+			memberTeam = model.TeamDetails{
+				TeamDetailsId: uuid.NewV1().String(),
+				TeamId:        team.TeamId,
+				UserId:        element,
+				Accept:        "0",
+				Role:          "0",
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
+			}
+			queryCreateMemberTeam := `INSERT INTO public.team_details(
+				team_details_id, team_id, user_id, accept,role, created_at, updated_at)
+				VALUES (:team_details_id, :team_id, :user_id, :accept,:role, :created_at, :updated_at);`
+			_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, memberTeam)
+			if errMemberTeam != nil {
+				log.Error(errMemberTeam.Error())
+				return team, message.SomeWentWrong
+			}
+		}
+	}
+
 	return team, nil
 }
 
@@ -94,8 +117,63 @@ func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.T
 
 }
 
-func (t TeamRepoImpl) GetTeam(context context.Context, teamId string) (interface{}, error) {
+func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (interface{}, error) {
 
-	return nil, nil
+	type teamTemp struct {
+		model.Team
+		model.TeamDetails `json:"member"`
+	}
 
+	var team = []teamTemp{}
+
+	queryTeam := `SELECT team.*, team_details.role
+	FROM public.team INNER JOIN public.team_details ON team_details.team_id = team.team_id WHERE team_details.user_id = $1;`
+
+	err := t.sql.Db.SelectContext(context, &team,
+		queryTeam, userId)
+	if err != nil {
+		log.Error(err.Error())
+		return team, err
+	}
+
+	return team, nil
+}
+func (t TeamRepoImpl) GetTeamForID(context context.Context, teamId string) (interface{}, error) {
+
+	type userMembertemp struct {
+		model.TeamDetails 
+		model.User `json:"user"`
+	}
+	type MemberList []userMembertemp
+
+
+	type teamTemp struct {
+		model.Team
+		MemberList `json:"member"`
+	}
+
+	var team = teamTemp{}
+
+	queryTeam := `SELECT team.* 
+	FROM public.team WHERE team.team_id = $1;`
+
+	err := t.sql.Db.GetContext(context, &team,
+		queryTeam, teamId)
+	if err != nil {
+		log.Error(err.Error())
+		return team, err
+	}
+
+	var memberList = []userMembertemp{}
+	queryMemberTeam := `SELECT team_details.*, users.display_name, users.avatar
+	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.team_id = $1;`
+	errMember := t.sql.Db.SelectContext(context, &memberList, queryMemberTeam, teamId)
+	if errMember != nil {
+		log.Error(errMember.Error())
+		return memberList, errMember
+	}
+	team.MemberList = memberList
+
+
+	return team, nil
 }
