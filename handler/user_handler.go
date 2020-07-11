@@ -7,6 +7,7 @@ import (
 	req "footcer-backend/model/req"
 	"footcer-backend/repository"
 	"footcer-backend/security"
+	"footcer-backend/upload"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
@@ -51,6 +52,7 @@ func (u *UserHandler) List(c echo.Context) error {
 	return nil
 
 }
+
 func (u *UserHandler) Create(c echo.Context) error {
 	req := model.User{}
 
@@ -89,6 +91,19 @@ func (u *UserHandler) Create(c echo.Context) error {
 }
 
 func (u *UserHandler) Update(c echo.Context) error {
+	urls, errUpload := upload.Upload(c)
+	if errUpload != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+	avatar := ""
+
+	if len(urls) > 0 {
+		avatar =  urls[0]
+	}
+
 	req := model.User{}
 	if err := c.Bind(&req); err != nil {
 		return err
@@ -110,7 +125,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 		DisplayName: req.DisplayName,
 		Email:       req.Email,
 		Phone:       req.Phone,
-		Avatar:      req.Avatar,
+		Avatar:      avatar,
 		Birthday:    req.Birthday,
 		Position:    req.Position,
 		Level:       req.Level,
