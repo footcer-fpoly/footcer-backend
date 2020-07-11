@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"footcer-backend/upload"
 	"footcer-backend/helper"
 	"footcer-backend/model"
 	"footcer-backend/repository"
@@ -167,3 +168,43 @@ func (t *TeamHandler) DeleteTeam(c echo.Context) error {
 	})
 
 }
+func (t * TeamHandler) UpdateTeam(c echo.Context) error{
+	urls, errUpload := upload.Upload(c)
+	if errUpload != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+
+	req := model.Team{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	// token := c.Get("user").(*jwt.Token)
+	// claims := token.Claims.(*model.JwtCustomClaims)
+	team := model.Team{
+		TeamId: req.TeamId,
+		Name: req.Name,
+		Level:req.Level,
+		Place:req.Place,
+		Description:req.Description,
+		Avatar: urls[0],
+		Background: urls[1],
+	}
+	team, err := t.TeamRepo.UpdateTeam(c.Request().Context(), team)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+			StatusCode: http.StatusUnprocessableEntity,
+			Message:    err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, model.Response{
+		StatusCode: http.StatusCreated,
+		Message:    "Xử lý thành công",
+		Data:       team,
+	})
+}
+

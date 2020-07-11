@@ -210,7 +210,39 @@ func (t TeamRepoImpl) DeleteTeam(context context.Context, teamID string) error {
 	return nil
 
 }
-func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (interface{}, error) {
+func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (model.Team, error) {
 
-	return nil, nil
+sqlStatement := `
+		UPDATE team
+		SET 
+			name  = (CASE WHEN LENGTH(:name) = 0 THEN name ELSE :name END),
+			level = (CASE WHEN LENGTH(:level) = 0 THEN level ELSE :level END),
+			place = (CASE WHEN LENGTH(:place) = 0 THEN place ELSE :place END),
+			description = (CASE WHEN LENGTH(:description) = 0 THEN description ELSE :description END),
+			avatar = (CASE WHEN LENGTH(:avatar) = 0 THEN avatar ELSE :avatar END),
+			background = (CASE WHEN LENGTH(:background) = 0 THEN background ELSE :background END),
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE team_id    = :team_id
+	`
+
+	
+	team.UpdatedAt = time.Now()
+
+	result, err := t.sql.Db.NamedExecContext(context, sqlStatement, team)
+	if err != nil {
+		log.Error(err.Error())
+		return team, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return team, message.SomeWentWrong
+	}
+	if count == 0 {
+		return team, message.UserNotUpdated
+	}
+
+	return team, nil
+
 }

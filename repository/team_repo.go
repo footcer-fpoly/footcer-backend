@@ -16,7 +16,7 @@ type TeamRepository interface {
 	DeleteMember(context context.Context, userID string) (error)
 	DeleteTeam(context context.Context, teamID string) ( error)
 
-	UpdateTeam(context context.Context, team model.Team) (interface{}, error)
+	UpdateTeam(context context.Context, team model.Team) (model.Team, error)
 
 
 }

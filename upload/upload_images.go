@@ -2,11 +2,12 @@ package upload
 
 import (
 	"fmt"
-	"github.com/labstack/echo"
-	uuid "github.com/satori/go.uuid"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/labstack/echo"
+	uuid "github.com/satori/go.uuid"
 )
 
 func Upload(c echo.Context) ([]string, error) {
@@ -51,4 +52,5 @@ func Upload(c echo.Context) ([]string, error) {
 		images = append(images, url)
 	}
 	return images, err
+
 }
