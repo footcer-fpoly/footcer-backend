@@ -29,7 +29,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	}
 	stadium := StadiumInfo{}
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.price_normal, stadium.price_peak, stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.time_order,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
 	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.user_id =  $1`
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
@@ -44,7 +44,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 
 	//stadium collage
 	var stadiumColl = []model.StadiumCollage{}
-	queryColl := `SELECT stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at
+	queryColl := `SELECT stadium_collage_id, name_stadium_collage, amount_people, price_normal, price_peak,stadium_id, created_at, updated_at
 	FROM public.stadium_collage WHERE stadium_id = $1`
 	errColl := s.sql.Db.SelectContext(context, &stadiumColl, queryColl, stadium.StadiumId)
 	if errColl != nil {

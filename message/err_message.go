@@ -10,14 +10,18 @@ var (
 	UserNotUpdated = errors.New("Cập nhật thông tin người dùng thất bại")
 	EmailExits     = errors.New("Email đã tồn tại")
 	SignUpFail     = errors.New("Đăng ký thất bại")
-	SomeWentWrong  = errors.New("Có lỗi xảy ra")
 
 	//stadium
 	StadiumNotFound   = errors.New("Sân bóng không tồn tại")
 	StadiumNotUpdated = errors.New("Cập nhật thông tin sân thất bại")
 
-
 	//team
-	TeamMemberExits = errors.New("Thành viên đã tồn tại")
+	TeamMemberExits  = errors.New("Thành viên đã tồn tại")
+	TeamMemberDelete = errors.New("Xoá thành viên thành công")
+	TeamDelete       = errors.New("Xoá nhóm thành công")
+	AdminIsTeam      = errors.New("Bạn là trưởng nhóm, không thể rời nhóm")
 
+	//
+	Permission    = errors.New("Lỗi quyền truy cập")
+	SomeWentWrong = errors.New("Có lỗi xảy ra")
 )

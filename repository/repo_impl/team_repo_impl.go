@@ -18,9 +18,7 @@ type TeamRepoImpl struct {
 }
 
 func NewTeamRepo(sql *db.Sql) repository.TeamRepository {
-	return &TeamRepoImpl{
-		sql: sql,
-	}
+	return &TeamRepoImpl{sql: sql}
 }
 
 func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.Team, error) {
@@ -126,8 +124,8 @@ func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (in
 
 	var team = []teamTemp{}
 
-	queryTeam := `SELECT team.*, team_details.role
-	FROM public.team INNER JOIN public.team_details ON team_details.team_id = team.team_id WHERE team_details.user_id = $1;`
+	queryTeam := `SELECT team.*, team_details.role_team
+	FROM public.team INNER JOIN public.team_details ON team_details.teams_id = team.team_id WHERE team_details.user_id = $1;`
 
 	err := t.sql.Db.SelectContext(context, &team,
 		queryTeam, userId)
@@ -141,11 +139,10 @@ func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (in
 func (t TeamRepoImpl) GetTeamForID(context context.Context, teamId string) (interface{}, error) {
 
 	type userMembertemp struct {
-		model.TeamDetails 
+		model.TeamDetails
 		model.User `json:"user"`
 	}
 	type MemberList []userMembertemp
-
 
 	type teamTemp struct {
 		model.Team
@@ -163,10 +160,11 @@ func (t TeamRepoImpl) GetTeamForID(context context.Context, teamId string) (inte
 		log.Error(err.Error())
 		return team, err
 	}
+	println(team.Team.TeamId)
 
 	var memberList = []userMembertemp{}
 	queryMemberTeam := `SELECT team_details.*, users.display_name, users.avatar
-	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.team_id = $1;`
+	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.teams_id = $1;`
 	errMember := t.sql.Db.SelectContext(context, &memberList, queryMemberTeam, teamId)
 	if errMember != nil {
 		log.Error(errMember.Error())
@@ -174,6 +172,45 @@ func (t TeamRepoImpl) GetTeamForID(context context.Context, teamId string) (inte
 	}
 	team.MemberList = memberList
 
-
 	return team, nil
+}
+func (t TeamRepoImpl) DeleteMember(context context.Context, userID string) error {
+
+	queryDelete := `DELETE FROM public.team_details
+	WHERE user_id = $1 AND role_team = $2;`
+	row, err := t.sql.Db.ExecContext(context, queryDelete, userID, "0")
+	if err != nil {
+		log.Error(err.Error())
+		return message.SomeWentWrong
+	}
+	count, _ := row.RowsAffected()
+	if count == 0 {
+		return message.AdminIsTeam
+	}
+
+	return nil
+
+}
+func (t TeamRepoImpl) DeleteTeam(context context.Context, teamID string) error {
+	queryDeleteMember := `DELETE FROM public.team_details
+	WHERE teams_id = $1;`
+	_, err := t.sql.Db.ExecContext(context, queryDeleteMember, teamID)
+	if err != nil {
+		log.Error(err.Error())
+		return message.SomeWentWrong
+	}
+	queryDeleteTeam := `DELETE FROM public.team
+	WHERE team_id = $1;`
+	_, errDeleteTeam := t.sql.Db.ExecContext(context, queryDeleteTeam, teamID)
+	if errDeleteTeam != nil {
+		log.Error(errDeleteTeam.Error())
+		return message.SomeWentWrong
+	}
+
+	return nil
+
+}
+func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (interface{}, error) {
+
+	return nil, nil
 }
