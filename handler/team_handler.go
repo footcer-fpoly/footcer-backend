@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"footcer-backend/upload"
 	"footcer-backend/helper"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/upload"
 	"net/http"
 	"time"
 
@@ -168,7 +168,7 @@ func (t *TeamHandler) DeleteTeam(c echo.Context) error {
 	})
 
 }
-func (t * TeamHandler) UpdateTeam(c echo.Context) error{
+func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
 		return c.JSON(http.StatusBadRequest, model.Response{
@@ -181,17 +181,32 @@ func (t * TeamHandler) UpdateTeam(c echo.Context) error{
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
+	avatar := ""
+	background := ""
 
-	// token := c.Get("user").(*jwt.Token)
-	// claims := token.Claims.(*model.JwtCustomClaims)
+	if len(urls) == 2 {
+		avatar = urls[0]
+		background = urls[1]
+	}
+
+	if len(urls) == 1 {
+		if req.Avatar != "" {
+			avatar = req.Avatar
+			background = urls[0]
+		} else {
+			background = req.Background
+			avatar = urls[0]
+		}
+	}
+
 	team := model.Team{
-		TeamId: req.TeamId,
-		Name: req.Name,
-		Level:req.Level,
-		Place:req.Place,
-		Description:req.Description,
-		Avatar: urls[0],
-		Background: urls[1],
+		TeamId:      req.TeamId,
+		Name:        req.Name,
+		Level:       req.Level,
+		Place:       req.Place,
+		Description: req.Description,
+		Avatar:      avatar,
+		Background:  background,
 	}
 	team, err := t.TeamRepo.UpdateTeam(c.Request().Context(), team)
 	if err != nil {
@@ -207,4 +222,3 @@ func (t * TeamHandler) UpdateTeam(c echo.Context) error{
 		Data:       team,
 	})
 }
-

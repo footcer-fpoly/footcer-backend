@@ -43,6 +43,11 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 			Message:    errUpload.Error(),
 		})
 	}
+	image := ""
+
+	if len(urls) > 0 {
+		image =  urls[0]
+	}
 	req := model.Stadium{}
 
 	token := c.Get("user").(*jwt.Token)
@@ -65,7 +70,7 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 		StadiumName: req.StadiumName,
 		Address:     req.Address,
 		Description: req.Description,
-		Image:       urls[0],
+		Image:       image,
 		StartTime:   req.StartTime,
 		EndTime:     req.EndTime,
 		Category:    req.Category,

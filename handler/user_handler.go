@@ -98,6 +98,11 @@ func (u *UserHandler) Update(c echo.Context) error {
 			Message:    errUpload.Error(),
 		})
 	}
+	avatar := ""
+
+	if len(urls) > 0 {
+		avatar =  urls[0]
+	}
 
 	req := model.User{}
 	if err := c.Bind(&req); err != nil {
@@ -120,7 +125,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 		DisplayName: req.DisplayName,
 		Email:       req.Email,
 		Phone:       req.Phone,
-		Avatar:      urls[0],
+		Avatar:      avatar,
 		Birthday:    req.Birthday,
 		Position:    req.Position,
 		Level:       req.Level,
