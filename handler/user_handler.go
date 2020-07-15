@@ -265,3 +265,25 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 		Data:       user,
 	})
 }
+func (u * UserHandler) CheckValidEmail(c echo.Context) error{
+	req := model.User{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+	valid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
+	if valid != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    valid.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Email is valid",
+		Data:       nil,
+	})
+}

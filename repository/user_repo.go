@@ -14,4 +14,6 @@ type UserRepository interface {
 	SelectById(context context.Context, userId string) (model.User, error)
 	SelectAll(context context.Context, userId string) ([]model.User, error)
 	Update(context context.Context, user model.User) (model.User, error)
+	ValidEmail(context context.Context, email string) error
+
 }
