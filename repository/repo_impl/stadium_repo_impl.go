@@ -95,8 +95,8 @@ func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.St
 			address = (CASE WHEN LENGTH(:address) = 0 THEN address ELSE :address END),
 			description = (CASE WHEN LENGTH(:description) = 0 THEN description ELSE :description END),
 			image = (CASE WHEN LENGTH(:image) = 0 THEN image ELSE :image END),
-			price_normal = (CASE WHEN LENGTH(:price_normal) = 0 THEN price_normal ELSE :price_normal END),
-			price_peak = (CASE WHEN LENGTH(:price_peak) = 0 THEN price_peak ELSE :price_peak END),
+			time_peak = (CASE WHEN LENGTH(:time_peak) = 0 THEN time_peak ELSE :time_peak END),
+			time_order = (CASE WHEN LENGTH(:time_order) = 0 THEN time_order ELSE :time_order END),
 			start_time = (CASE WHEN LENGTH(:start_time) = 0 THEN start_time ELSE :start_time END),
 			end_time = (CASE WHEN LENGTH(:end_time) = 0 THEN end_time ELSE :end_time END),
 			category = (CASE WHEN LENGTH(:category) = 0 THEN category ELSE :category END),
@@ -135,6 +135,8 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 		SET 
 			name_stadium_collage  = (CASE WHEN LENGTH(:name_stadium_collage) = 0 THEN name_stadium_collage ELSE :name_stadium_collage END),
 			amount_people = (CASE WHEN LENGTH(:amount_people) = 0 THEN amount_people ELSE :amount_people END),
+			price_normal = (CASE WHEN LENGTH(:price_normal) = 0 THEN price_normal ELSE :price_normal END),
+			price_peak = (CASE WHEN LENGTH(:price_peak) = 0 THEN price_peak ELSE :price_peak END),
 			updated_at 	  = COALESCE (:updated_at, updated_at)
 		WHERE stadium_collage_id    = :stadium_collage_id
 	`
@@ -162,13 +164,13 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl model.StadiumCollage) (model.StadiumCollage, error) {
 
 	queryCreate := `INSERT INTO public.stadium_collage(
-	stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at)
-	VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :stadium_id, :created_at, :updated_at)`
+	stadium_collage_id, name_stadium_collage, amount_people,price_normal, price_peak,stadium_id, created_at, updated_at)
+	VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :price_normal,:price_peak,:stadium_id, :created_at, :updated_at)`
 
 	_, err := s.sql.Db.NamedExecContext(context, queryCreate, stadiumColl)
 	if err != nil {
 		log.Error(err.Error())
-		return stadiumColl, message.SignUpFail
+		return stadiumColl, message.StadiumNotUpdated
 	}
 	return stadiumColl, nil
 

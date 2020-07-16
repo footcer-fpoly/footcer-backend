@@ -8,11 +8,12 @@ import (
 	"footcer-backend/repository"
 	"footcer-backend/security"
 	"footcer-backend/upload"
+	"net/http"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 	uuid "github.com/satori/go.uuid"
-	"net/http"
 )
 
 type UserHandler struct {
@@ -101,7 +102,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 	avatar := ""
 
 	if len(urls) > 0 {
-		avatar =  urls[0]
+		avatar = urls[0]
 	}
 
 	req := model.User{}
@@ -239,6 +240,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 	}
 
 	// check pass
+
 	isTheSame := security.ComparePasswords(user.Password, []byte(req.Password))
 	if !isTheSame {
 		return c.JSON(http.StatusUnauthorized, model.Response{
@@ -265,7 +267,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 		Data:       user,
 	})
 }
-func (u * UserHandler) CheckValidEmail(c echo.Context) error{
+func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	req := model.User{}
 
 	defer c.Request().Body.Close()
