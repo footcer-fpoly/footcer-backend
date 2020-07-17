@@ -159,15 +159,14 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			District:    "",
 			City:        "",
 			TimePeak:    "0",
-			TimeOrder:   "0",
 			UserId:      user.UserId,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
 
 		queryCreateStadium := `INSERT INTO stadium(
-		stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak,time_order,user_id, created_at, updated_at)
-		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city,:time_peak,:time_order, :user_id, :created_at, :updated_at)`
+		stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak,user_id, created_at, updated_at)
+		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city,:time_peak, :user_id, :created_at, :updated_at)`
 
 		_, err := u.sql.Db.NamedExecContext(context, queryCreateStadium, stadium)
 

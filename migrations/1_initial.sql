@@ -32,7 +32,6 @@ CREATE TABLE "stadium"(
 "district" text NOT NULL,
 "city" text NOT NULL,
 "time_peak" text NOT NULL,
-"time_order" text NOT NULL,
 "user_id" text NOT NULL,
 "created_at" TIMESTAMPTZ NOT NULL,
 "updated_at" TIMESTAMPTZ NOT NULL,
@@ -109,6 +108,25 @@ FOREIGN KEY (team_id) REFERENCES team (team_id),
 FOREIGN KEY (user_id) REFERENCES users (user_id),
 CONSTRAINT team_details_pkey PRIMARY KEY (team_details_id)
 );
+CREATE TABLE "orders"
+(
+"order_id" text NOT NULL UNIQUE,
+"time_slot" text NOT NULL,
+"stadium_id" text NOT NULL,
+"stadium_collage_id" text NOT NULL,
+"user_id" text NOT NULL,
+"finish" text NOT NULL,
+"accept" text NOT NULL,
+"created_at" TIMESTAMPTZ NOT NULL,
+"updated_at" TIMESTAMPTZ NOT NULL,
+
+FOREIGN KEY (stadium_id) REFERENCES stadium (stadium_id),
+FOREIGN KEY (stadium_collage_id) REFERENCES stadium_collage (stadium_collage_id),
+FOREIGN KEY (user_id) REFERENCES users (user_id),
+
+CONSTRAINT order_id_pkey PRIMARY KEY (order_id)
+);
+
 
 -- +migrate Down
 DROP TABLE "review";

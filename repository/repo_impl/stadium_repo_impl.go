@@ -29,7 +29,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	}
 	stadium := StadiumInfo{}
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.time_order,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
 	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.user_id =  $1`
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
@@ -96,7 +96,6 @@ func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.St
 			description = (CASE WHEN LENGTH(:description) = 0 THEN description ELSE :description END),
 			image = (CASE WHEN LENGTH(:image) = 0 THEN image ELSE :image END),
 			time_peak = (CASE WHEN LENGTH(:time_peak) = 0 THEN time_peak ELSE :time_peak END),
-			time_order = (CASE WHEN LENGTH(:time_order) = 0 THEN time_order ELSE :time_order END),
 			start_time = (CASE WHEN LENGTH(:start_time) = 0 THEN start_time ELSE :start_time END),
 			end_time = (CASE WHEN LENGTH(:end_time) = 0 THEN end_time ELSE :end_time END),
 			category = (CASE WHEN LENGTH(:category) = 0 THEN category ELSE :category END),

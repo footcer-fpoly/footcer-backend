@@ -18,7 +18,7 @@ type Stadium struct {
 	District    string    `json:"district" db:"district,omitempty"`
 	City        string    `json:"city" db:"city,omitempty"`
 	TimePeak    string    `json:"timePeak" db:"time_peak,omitempty"`
-	TimeOrder   string    `json:"timeOrder" db:"time_order,omitempty" `
+	TimeOrder   string    `json:"timeOrder" db:"_,omitempty" `
 	UserId      string    `json:"userId,omitempty" db:"user_id,omitempty"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at,omitempty"`
