@@ -8,6 +8,7 @@ import (
 	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"strings"
 	"time"
 )
 
@@ -82,6 +83,27 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 	}
 
 	stadium.ArrayStadiumReview = review
+
+	//get order time
+	var timeOrder = []string{}
+
+	queryTimeOrder := `SELECT time_slot
+FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
+	errTimeOrder := s.sql.Db.SelectContext(context, &timeOrder, queryTimeOrder, "1", "0", stadium.StadiumId)
+	if errTimeOrder != nil {
+		if errTimeOrder == sql.ErrNoRows {
+			log.Error(errTimeOrder.Error())
+			return review, message.StadiumNotFound
+		}
+		log.Error(errTimeOrder.Error())
+		return review, errTimeOrder
+	}
+	var sumTimeOrder = "null"
+	if len(timeOrder) > 0 {
+		sumTimeOrder = strings.Join(timeOrder, ",")
+	}
+
+	stadium.Stadium.TimeOrder = sumTimeOrder
 
 	return stadium, nil
 

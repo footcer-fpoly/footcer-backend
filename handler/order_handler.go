@@ -51,6 +51,7 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 
 
 }
+
 func (o * OrderHandler) AcceptOrder(c echo.Context) error{
 	req := model.Order{}
 
@@ -76,6 +77,33 @@ func (o * OrderHandler) AcceptOrder(c echo.Context) error{
 	})
 
 }
+
+func (o * OrderHandler) RefuseOrder(c echo.Context) error{
+	req := model.Order{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+	req.Accept = "-1"
+
+	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
+
+}
+
 func (o * OrderHandler) FinishOrder(c echo.Context) error{
 	req := model.Order{}
 
@@ -101,6 +129,7 @@ func (o * OrderHandler) FinishOrder(c echo.Context) error{
 	})
 
 }
+
 func (o * OrderHandler) ListOrderForStadium(c echo.Context) error{
 	stadiumID := c.Param("id")
 	
@@ -118,6 +147,7 @@ func (o * OrderHandler) ListOrderForStadium(c echo.Context) error{
 		Data:       orders,
 	})
 }
+
 func (o * OrderHandler) ListOrderForUser(c echo.Context) error{
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)

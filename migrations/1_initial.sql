@@ -112,13 +112,14 @@ CREATE TABLE "orders"
 (
 "order_id" text NOT NULL UNIQUE,
 "time_slot" text NOT NULL,
+"time" text NOT NULL,
 "stadium_id" text NOT NULL,
 "stadium_collage_id" text NOT NULL,
 "user_id" text NOT NULL,
 "finish" text NOT NULL,
 "accept" text NOT NULL,
-"created_at" TIMESTAMPTZ NOT NULL,
-"updated_at" TIMESTAMPTZ NOT NULL,
+"order_created_at" TIMESTAMPTZ NOT NULL,
+"order_updated_at" TIMESTAMPTZ NOT NULL,
 
 FOREIGN KEY (stadium_id) REFERENCES stadium (stadium_id),
 FOREIGN KEY (stadium_collage_id) REFERENCES stadium_collage (stadium_collage_id),
@@ -129,15 +130,15 @@ CONSTRAINT order_id_pkey PRIMARY KEY (order_id)
 
 
 -- +migrate Down
-DROP TABLE "review";
-DROP TABLE "service";
-DROP TABLE "stadium_collage";
-DROP TABLE "stadium";
-DROP TABLE "team_details";
+-- DROP TABLE "review";
+-- DROP TABLE "service";
+-- DROP TABLE "stadium_collage";
+-- DROP TABLE "stadium";
+-- DROP TABLE "team_details";
+--
+-- DROP TABLE "team";
+-- DROP TABLE "users";
 
-DROP TABLE "team";
-DROP TABLE "users";
-
--- DROP TABLE "game";
+DROP TABLE "orders";
 
 
