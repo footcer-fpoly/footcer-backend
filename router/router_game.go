@@ -15,5 +15,8 @@ func GameRouter(e *echo.Echo, sql *db.Sql) {
 		GameRepo: repo.NewGameRepo(sql),
 	}
 	e.POST("/game/add", gameHandler.AddGame, middleware.JWTMiddleware())
+	e.POST("/game/join", gameHandler.JoinGame, middleware.JWTMiddleware())
+	e.POST("/game/accept", gameHandler.AcceptJoin, middleware.JWTMiddleware())
+	e.POST("/game/refuse", gameHandler.RefuseJoin, middleware.JWTMiddleware())
 
 }

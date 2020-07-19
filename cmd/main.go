@@ -43,6 +43,7 @@ func main() {
 	router.ReviewRouter(e, sql)
 	router.OrderRouter(e, sql)
 	router.TeamRouter(e, sql)
+	router.GameRouter(e, sql)
 
 	//upload
 	e.Static("/static", "../images/")

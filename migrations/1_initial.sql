@@ -97,14 +97,14 @@ CONSTRAINT team_pkey PRIMARY KEY (team_id)
 CREATE TABLE "team_details"
 (
 "team_details_id" text NOT NULL UNIQUE,
-"team_id" text NOT NULL,
+"teams_id" text NOT NULL,
 "user_id" text NOT NULL,
-"role" text NOT NULL,
+"role_team" text NOT NULL,
 "accept" text NOT NULL,
 "created_at" DATE NOT NULL,
 "updated_at" DATE NOT NULL,
 
-FOREIGN KEY (team_id) REFERENCES team (team_id),
+FOREIGN KEY (team_id) REFERENCES team (teams_id),
 FOREIGN KEY (user_id) REFERENCES users (user_id),
 CONSTRAINT team_details_pkey PRIMARY KEY (team_details_id)
 );
@@ -113,6 +113,7 @@ CREATE TABLE "orders"
 "order_id" text NOT NULL UNIQUE,
 "time_slot" text NOT NULL,
 "time" text NOT NULL,
+"price" text NOT NULL,
 "stadium_id" text NOT NULL,
 "stadium_collage_id" text NOT NULL,
 "user_id" text NOT NULL,
@@ -128,17 +129,51 @@ FOREIGN KEY (user_id) REFERENCES users (user_id),
 CONSTRAINT order_id_pkey PRIMARY KEY (order_id)
 );
 
+CREATE TABLE "game"
+(
+"game_id" text NOT NULL UNIQUE,
+"date" DATE NOT NULL,
+"hour" TIME NOT NULL,
+"type" text NOT NULL,
+"score" text NOT NULL,
+"description" text NOT NULL,
+"finish" text NOT NULL,
+"stadium_id" text NOT NULL,
+"team_id_host" text NOT NULL,
+"team_id_guest" text NOT NULL,
+"game_created_at" TIMESTAMPTZ NOT NULL,
+"game_updated_at" TIMESTAMPTZ NOT NULL,
+
+FOREIGN KEY (stadium_id) REFERENCES stadium (stadium_id),
+FOREIGN KEY (team_id_host) REFERENCES team (team_id),
+FOREIGN KEY (team_id_guest) REFERENCES team (team_id),
+
+CONSTRAINT game_id_pkey PRIMARY KEY (game_id)
+);
+
+
+CREATE TABLE "game_temp"
+(
+"game_temp_id" text NOT NULL UNIQUE,
+"game_id" text NOT NULL,
+"team_id" text NOT NULL,
+
+FOREIGN KEY (game_id) REFERENCES game (game_id),
+FOREIGN KEY (team_id) REFERENCES team (team_id),
+
+CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
+);
 
 -- +migrate Down
--- DROP TABLE "review";
--- DROP TABLE "service";
--- DROP TABLE "stadium_collage";
--- DROP TABLE "stadium";
--- DROP TABLE "team_details";
---
--- DROP TABLE "team";
--- DROP TABLE "users";
-
+DROP TABLE "review";
+DROP TABLE "service";
 DROP TABLE "orders";
+DROP TABLE "stadium_collage";
+DROP TABLE "stadium";
+DROP TABLE "team_details";
+DROP TABLE "team";
+DROP TABLE "users";
+DROP TABLE "game_temp";
+DROP TABLE "game";
 
 

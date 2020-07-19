@@ -41,8 +41,8 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 		UpdatedAt:     time.Now(),
 	}
 	queryCreateMemberTeam := `INSERT INTO public.team_details(
-	team_details_id, team_id, user_id, accept,role, created_at, updated_at)
-	VALUES (:team_details_id, :team_id, :user_id, :accept,:role, :created_at, :updated_at);`
+	team_details_id, teams_id, user_id, accept,role_team, created_at, updated_at)
+	VALUES (:team_details_id, :teams_id, :user_id, :accept,:role_team, :created_at, :updated_at);`
 	_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, memberTeam)
 	if errMemberTeam != nil {
 		log.Error(errMemberTeam.Error())
@@ -60,8 +60,8 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 				UpdatedAt:     time.Now(),
 			}
 			queryCreateMemberTeam := `INSERT INTO public.team_details(
-				team_details_id, team_id, user_id, accept,role, created_at, updated_at)
-				VALUES (:team_details_id, :team_id, :user_id, :accept,:role, :created_at, :updated_at);`
+				team_details_id, teams_id, user_id, accept,role_team, created_at, updated_at)
+				VALUES (:team_details_id, :teams_id, :user_id, :accept,:role_team, :created_at, :updated_at);`
 			_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, memberTeam)
 			if errMemberTeam != nil {
 				log.Error(errMemberTeam.Error())
@@ -98,8 +98,8 @@ func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.T
 	if err != nil {
 		if err == sql.ErrNoRows {
 			queryCreateMemberTeam := `INSERT INTO public.team_details(
-				team_details_id, team_id, user_id, accept, created_at, updated_at)
-				VALUES (:team_details_id, :team_id, :user_id, :accept, :created_at, :updated_at);`
+				team_details_id, teams_id, user_id, accept, created_at, updated_at)
+				VALUES (:team_details_id, :teams_id, :user_id, :accept, :created_at, :updated_at);`
 			_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, teamDetails)
 			if errMemberTeam != nil {
 				log.Error(errMemberTeam.Error())
@@ -136,6 +136,7 @@ func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (in
 
 	return team, nil
 }
+
 func (t TeamRepoImpl) GetTeamForID(context context.Context, teamId string) (interface{}, error) {
 
 	type userMembertemp struct {

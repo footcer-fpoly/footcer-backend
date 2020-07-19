@@ -22,8 +22,8 @@ func NewOrderRepo(sql *db.Sql) repository.OrderRepository {
 
 func (o OrderRepoImpl) AddOrder(context context.Context, order model.Order) (model.Order, error) {
 	queryCreateOrder := `INSERT INTO public.orders(
-		order_id, time_slot,time, stadium_id, stadium_collage_id, user_id, finish, accept, created_at, updated_at)
-		VALUES (:order_id, :time_slot, :time,:stadium_id, :stadium_collage_id, :user_id, :finish, :accept, :order_created_at,:order_updated_at );`
+		order_id, time_slot,time,price, stadium_id, stadium_collage_id, user_id, finish, accept, created_at, updated_at)
+		VALUES (:order_id, :time_slot, :time,:price,:stadium_id, :stadium_collage_id, :user_id, :finish, :accept, :order_created_at,:order_updated_at );`
 	_, err := o.sql.Db.NamedExecContext(context, queryCreateOrder, order)
 	if err != nil {
 		log.Error(err.Error())
