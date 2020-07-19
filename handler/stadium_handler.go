@@ -46,7 +46,7 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 	image := ""
 
 	if len(urls) > 0 {
-		image =  urls[0]
+		image = urls[0]
 	}
 	req := model.Stadium{}
 
@@ -119,6 +119,8 @@ func (s *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 		StadiumCollageId:   req.StadiumCollageId,
 		NameStadiumCollage: req.NameStadiumCollage,
 		AmountPeople:       req.AmountPeople,
+		PriceNormal:        req.PriceNormal,
+		PricePeak:          req.PricePeak,
 	}
 
 	stadiumColl, err = s.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)

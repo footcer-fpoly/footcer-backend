@@ -8,6 +8,7 @@ import (
 	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"strings"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	}
 	stadium := StadiumInfo{}
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.time_order,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
 	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.user_id =  $1`
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
@@ -83,6 +84,27 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 
 	stadium.ArrayStadiumReview = review
 
+	//get order time
+	var timeOrder = []string{}
+
+	queryTimeOrder := `SELECT time_slot
+FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
+	errTimeOrder := s.sql.Db.SelectContext(context, &timeOrder, queryTimeOrder, "1", "0", stadium.StadiumId)
+	if errTimeOrder != nil {
+		if errTimeOrder == sql.ErrNoRows {
+			log.Error(errTimeOrder.Error())
+			return review, message.StadiumNotFound
+		}
+		log.Error(errTimeOrder.Error())
+		return review, errTimeOrder
+	}
+	var sumTimeOrder = "null"
+	if len(timeOrder) > 0 {
+		sumTimeOrder = strings.Join(timeOrder, ",")
+	}
+
+	stadium.Stadium.TimeOrder = sumTimeOrder
+
 	return stadium, nil
 
 }
@@ -95,8 +117,7 @@ func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.St
 			address = (CASE WHEN LENGTH(:address) = 0 THEN address ELSE :address END),
 			description = (CASE WHEN LENGTH(:description) = 0 THEN description ELSE :description END),
 			image = (CASE WHEN LENGTH(:image) = 0 THEN image ELSE :image END),
-			price_normal = (CASE WHEN LENGTH(:price_normal) = 0 THEN price_normal ELSE :price_normal END),
-			price_peak = (CASE WHEN LENGTH(:price_peak) = 0 THEN price_peak ELSE :price_peak END),
+			time_peak = (CASE WHEN LENGTH(:time_peak) = 0 THEN time_peak ELSE :time_peak END),
 			start_time = (CASE WHEN LENGTH(:start_time) = 0 THEN start_time ELSE :start_time END),
 			end_time = (CASE WHEN LENGTH(:end_time) = 0 THEN end_time ELSE :end_time END),
 			category = (CASE WHEN LENGTH(:category) = 0 THEN category ELSE :category END),
@@ -135,6 +156,8 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 		SET 
 			name_stadium_collage  = (CASE WHEN LENGTH(:name_stadium_collage) = 0 THEN name_stadium_collage ELSE :name_stadium_collage END),
 			amount_people = (CASE WHEN LENGTH(:amount_people) = 0 THEN amount_people ELSE :amount_people END),
+			price_normal = (CASE WHEN LENGTH(:price_normal) = 0 THEN price_normal ELSE :price_normal END),
+			price_peak = (CASE WHEN LENGTH(:price_peak) = 0 THEN price_peak ELSE :price_peak END),
 			updated_at 	  = COALESCE (:updated_at, updated_at)
 		WHERE stadium_collage_id    = :stadium_collage_id
 	`
@@ -162,13 +185,13 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl model.StadiumCollage) (model.StadiumCollage, error) {
 
 	queryCreate := `INSERT INTO public.stadium_collage(
-	stadium_collage_id, name_stadium_collage, amount_people, stadium_id, created_at, updated_at)
-	VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :stadium_id, :created_at, :updated_at)`
+	stadium_collage_id, name_stadium_collage, amount_people,price_normal, price_peak,stadium_id, created_at, updated_at)
+	VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :price_normal,:price_peak,:stadium_id, :created_at, :updated_at)`
 
 	_, err := s.sql.Db.NamedExecContext(context, queryCreate, stadiumColl)
 	if err != nil {
 		log.Error(err.Error())
-		return stadiumColl, message.SignUpFail
+		return stadiumColl, message.StadiumNotUpdated
 	}
 	return stadiumColl, nil
 

@@ -40,7 +40,12 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 			user.UpdatedAt = time.Now()
 			_, err := u.sql.Db.NamedExecContext(context, query, userReq)
 			return userReq, err
+		} else {
+			fmt.Println("User Exits -> Return User")
+			return user, nil
+
 		}
+
 	}
 	return user, err
 
@@ -154,15 +159,14 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			District:    "",
 			City:        "",
 			TimePeak:    "0",
-			TimeOrder:   "0",
 			UserId:      user.UserId,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
 
 		queryCreateStadium := `INSERT INTO stadium(
-		stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak,time_order,user_id, created_at, updated_at)
-		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city,:time_peak,:time_order, :user_id, :created_at, :updated_at)`
+		stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak,user_id, created_at, updated_at)
+		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city,:time_peak, :user_id, :created_at, :updated_at)`
 
 		_, err := u.sql.Db.NamedExecContext(context, queryCreateStadium, stadium)
 
@@ -204,4 +208,22 @@ func (u UserRepoImpl) CheckLogin(context context.Context, loginReq req.ReqSignIn
 	}
 
 	return user, nil
+}
+func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) error {
+	var role string
+	queryUserExits := `SELECT role FROM users WHERE users.email = $1`
+
+	err := u.sql.Db.GetContext(context, &role, queryUserExits, emailReq)
+	if err == sql.ErrNoRows {
+		return nil
+	}
+	if role == "0" {
+		return message.UserConflict
+
+	}
+	if role == "1" {
+		return message.UserIsAdmin
+	}
+	return message.SomeWentWrong
+
 }

@@ -15,4 +15,10 @@ func OrderRouter(e *echo.Echo, sql *db.Sql) {
 	}
 
 	e.POST("/order/add", orderHandler.AddOrder, middleware.JWTMiddleware())
+	e.PUT("/order/accept", orderHandler.AcceptOrder, middleware.JWTMiddleware())
+	e.PUT("/order/finish", orderHandler.FinishOrder, middleware.JWTMiddleware())
+	e.GET("/order/stadium/:id", orderHandler.ListOrderForStadium, middleware.JWTMiddleware())
+	e.GET("/order/user", orderHandler.ListOrderForUser, middleware.JWTMiddleware())
+
+
 }
