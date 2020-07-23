@@ -140,7 +140,7 @@ CREATE TABLE "game"
 "finish" text NOT NULL,
 "stadium_id" text NOT NULL,
 "team_id_host" text NOT NULL,
-"team_id_guest" text NOT NULL,
+"team_id_guest" text  NULL,
 "game_created_at" TIMESTAMPTZ NOT NULL,
 "game_updated_at" TIMESTAMPTZ NOT NULL,
 

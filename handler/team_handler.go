@@ -154,6 +154,7 @@ func (t *TeamHandler) DeleteMember(c echo.Context) error {
 	})
 
 }
+
 func (t *TeamHandler) DeleteTeam(c echo.Context) error {
 
 	err := t.TeamRepo.DeleteTeam(c.Request().Context(), c.Param("id"))
@@ -168,6 +169,7 @@ func (t *TeamHandler) DeleteTeam(c echo.Context) error {
 	})
 
 }
+
 func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {

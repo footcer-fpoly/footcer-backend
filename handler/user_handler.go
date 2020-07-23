@@ -147,30 +147,6 @@ func (u *UserHandler) Update(c echo.Context) error {
 	})
 }
 
-func (u *UserHandler) CheckValidPhone(c echo.Context) error {
-	req := model.User{}
-
-	defer c.Request().Body.Close()
-	if err := c.Bind(&req); err != nil {
-		return helper.ResponseErr(c, http.StatusBadRequest)
-	}
-	valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
-	if valid != nil {
-		return c.JSON(http.StatusConflict, model.Response{
-			StatusCode: http.StatusConflict,
-			Message:    valid.Error(),
-			Data:       nil,
-		})
-	}
-
-	return c.JSON(http.StatusOK, model.Response{
-		StatusCode: http.StatusOK,
-		Message:    "Phone is valid",
-		Data:       nil,
-	})
-
-}
-
 func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	req := model.User{}
 
@@ -267,6 +243,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 		Data:       user,
 	})
 }
+
 func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	req := model.User{}
 
@@ -274,7 +251,41 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	valid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
+	user,errValid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
+
+	token, err := security.GenToken(user)
+	if err != nil {
+		log.Error(err.Error())
+		return c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	user.Token =  token
+
+	if errValid != nil {
+		return c.JSON(http.StatusAccepted, model.Response{
+			StatusCode: http.StatusAccepted,
+			Message:    errValid.Error(),
+			Data:       user.Token,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Cho phép đăng ký",
+		Data:       nil,
+	})
+}
+
+func (u *UserHandler) CheckValidPhone(c echo.Context) error {
+	req := model.User{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+	valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
 	if valid != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -285,7 +296,32 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message:    "Email is valid",
+		Message:    "Cho phép đăng ký",
 		Data:       nil,
 	})
+
 }
+
+func (u *UserHandler) CheckValidUUID(c echo.Context) error {
+	req := model.User{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+	valid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
+	if valid != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    valid.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Cho phép đăng ký",
+		Data:       nil,
+	})
+
+}
+

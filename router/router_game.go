@@ -18,5 +18,6 @@ func GameRouter(e *echo.Echo, sql *db.Sql) {
 	e.POST("/game/join", gameHandler.JoinGame, middleware.JWTMiddleware())
 	e.POST("/game/accept", gameHandler.AcceptJoin, middleware.JWTMiddleware())
 	e.POST("/game/refuse", gameHandler.RefuseJoin, middleware.JWTMiddleware())
+	e.GET("/game/get/:date", gameHandler.GetGame, middleware.JWTMiddleware())
 
 }

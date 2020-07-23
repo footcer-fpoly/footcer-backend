@@ -120,3 +120,22 @@ func (g * GameHandler) RefuseJoin(c echo.Context) error{
 		Data:       nil,
 	})
 }
+
+func (g * GameHandler) GetGame(c echo.Context) error{
+	date := c.Param("date")
+
+	games,err := g.GameRepo.GetGame(c.Request().Context(), date)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       games,
+	})
+}
