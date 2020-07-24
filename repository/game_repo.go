@@ -13,7 +13,9 @@ type GameRepository interface {
 
 	RefuseJoin(context context.Context, gameTemp model.GameTemp) error
 
-	GetGame(context context.Context, date string) (interface{},error)
+	GetGames(context context.Context, date string) (interface{},error)
+
+	GetGame(context context.Context, gameId string) (interface{},error)
 
 	UpdateScore(context context.Context, game model.Game) (interface{}, error)
 

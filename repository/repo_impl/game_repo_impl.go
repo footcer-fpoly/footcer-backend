@@ -101,22 +101,8 @@ func (g *GameRepoImpl) UpdateScore(context context.Context, game model.Game) (in
 	panic("implement me")
 }
 
-func (g *GameRepoImpl) GetGame(context context.Context, date string) (interface{}, error) {
-	type TeamHost struct {
-		Name   string `json:"teamNameHost,omitempty" db:"team_name_host,omitempty"`
-		Avatar string `json:"teamAvatarHost,omitempty" db:"team_avatar_host,omitempty"`
-	}
+func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface{}, error) {
 
-	type TeamGuest struct {
-		Name   string `json:"teamNameGuest,omitempty" db:"team_name_guest,omitempty"`
-		Avatar string `json:"teamAvatarGuest,omitempty" db:"team_avatar_guest,omitempty"`
-	}
-	type ListGame struct {
-		model.Game
-		model.Stadium `json:"stadium"`
-		TeamHost      `json:"teamHost"`
-		TeamGuest     `json:"teamGuest"`
-	}
 	var listGame = []ListGame{}
 	if (date == "all") {
 		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description_game, game.finish,
@@ -157,4 +143,70 @@ func (g *GameRepoImpl) GetGame(context context.Context, date string) (interface{
 
 	return listGame, nil
 
+}
+func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interface{}, error) {
+	var game = ListGame{}
+
+	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description_game, 
+	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, 'null') name_stadium, 
+	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
+	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
+	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
+	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
+	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest  WHERE game_id = $1;`
+	err := g.sql.Db.GetContext(context, &game, sqlGetGame, gameId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return game, message.NotData
+		}
+		log.Error(err.Error())
+		return game, err
+	}
+	inviteTeam := game.TeamIdGuest == "null"
+	if inviteTeam {
+		var inviteTeams = []TeamTemp{}
+		sqlGetTeamInvate := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp 
+	FROM public.game_temp INNER JOIN team ON team.team_id = game_temp.team_id WHERE game_id =$1;`
+
+		err := g.sql.Db.SelectContext(context, &inviteTeams, sqlGetTeamInvate, gameId)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				log.Error(err.Error())
+				return game, message.NotData
+			}
+			log.Error(err.Error())
+			return game, err
+		}
+		game.ArrayTeamTemp = inviteTeams
+
+
+	}
+
+	return game, nil
+
+}
+
+type TeamHost struct {
+	Name   string `json:"teamNameHost,omitempty" db:"team_name_host,omitempty"`
+	Avatar string `json:"teamAvatarHost,omitempty" db:"team_avatar_host,omitempty"`
+}
+
+type TeamGuest struct {
+	Name   string `json:"teamNameGuest,omitempty" db:"team_name_guest,omitempty"`
+	Avatar string `json:"teamAvatarGuest,omitempty" db:"team_avatar_guest,omitempty"`
+}
+
+type TeamTemp struct {
+	TeamId string `json:"teamIdTemp,omitempty" db:"team_id_temp,omitempty"`
+	Name   string `json:"teamNameTemp,omitempty" db:"team_name_temp,omitempty"`
+	Avatar string `json:"teamAvatarTemp,omitempty" db:"team_avatar_temp,omitempty"`
+}
+type ArrayTeamTemp [] TeamTemp
+type ListGame struct {
+	model.Game
+	model.Stadium `json:"stadium"`
+	TeamHost      `json:"teamHost"`
+	TeamGuest     `json:"teamGuest"`
+	ArrayTeamTemp `json:"teamInvite"`
 }

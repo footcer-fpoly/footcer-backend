@@ -14,7 +14,8 @@ import (
 type GameHandler struct {
 	GameRepo repository.GameRepository
 }
-func (g *GameHandler) AddGame (c echo.Context) error{
+
+func (g *GameHandler) AddGame(c echo.Context) error {
 	req := model.Game{}
 
 	defer c.Request().Body.Close()
@@ -45,8 +46,7 @@ func (g *GameHandler) AddGame (c echo.Context) error{
 
 }
 
-
-func (g * GameHandler) JoinGame(c echo.Context) error{
+func (g *GameHandler) JoinGame(c echo.Context) error {
 	req := model.GameTemp{}
 
 	req.GameTempId = uuid.NewV1().String()
@@ -71,8 +71,7 @@ func (g * GameHandler) JoinGame(c echo.Context) error{
 	})
 }
 
-
-func (g * GameHandler) AcceptJoin(c echo.Context) error{
+func (g *GameHandler) AcceptJoin(c echo.Context) error {
 	req := model.GameTemp{}
 
 	defer c.Request().Body.Close()
@@ -97,7 +96,7 @@ func (g * GameHandler) AcceptJoin(c echo.Context) error{
 
 }
 
-func (g * GameHandler) RefuseJoin(c echo.Context) error{
+func (g *GameHandler) RefuseJoin(c echo.Context) error {
 	req := model.GameTemp{}
 
 	defer c.Request().Body.Close()
@@ -121,10 +120,10 @@ func (g * GameHandler) RefuseJoin(c echo.Context) error{
 	})
 }
 
-func (g * GameHandler) GetGame(c echo.Context) error{
+func (g *GameHandler) GetGames(c echo.Context) error {
 	date := c.Param("date")
 
-	games,err := g.GameRepo.GetGame(c.Request().Context(), date)
+	games, err := g.GameRepo.GetGames(c.Request().Context(), date)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -137,5 +136,22 @@ func (g * GameHandler) GetGame(c echo.Context) error{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       games,
+	})
+}
+func (g *GameHandler) GetGame(c echo.Context) error {
+	gameId := c.Param("id")
+	game, err := g.GameRepo.GetGame(c.Request().Context(), gameId)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       game,
 	})
 }
