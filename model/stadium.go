@@ -20,6 +20,6 @@ type Stadium struct {
 	TimePeak    string    `json:"timePeak,omitempty" db:"time_peak,omitempty"`
 	TimeOrder   string    `json:"timeOrder,omitempty" db:"_,omitempty" `
 	UserId      string    `json:"userId,omitempty" db:"user_id,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty" db:"created_at,omitempty"`
+	CreatedAt   time.Time `json:"-" db:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at,omitempty"`
 }

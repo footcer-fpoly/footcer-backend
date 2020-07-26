@@ -25,6 +25,7 @@ func NewUserRepo(sql *db.Sql) repository.UserRepository {
 		sql: sql,
 	}
 }
+
 func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model.User, error) {
 	var user model.User
 
@@ -34,8 +35,8 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("New user -> Insert Data")
-			query := `INSERT INTO users(user_id, phone, email,role, display_name,birthday,position,level, avatar,verify,created_at, updated_at)
-       VALUES(:user_id, :phone, :email,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
+			query := `INSERT INTO users(user_id, phone,password, email,role, display_name,birthday,position,level, avatar,verify,created_at, updated_at)
+       VALUES(:user_id, :phone, :password,:email,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = time.Now()
 			_, err := u.sql.Db.NamedExecContext(context, query, userReq)
@@ -209,11 +210,30 @@ func (u UserRepoImpl) CheckLogin(context context.Context, loginReq req.ReqSignIn
 
 	return user, nil
 }
-func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) error {
-	var role string
-	queryUserExits := `SELECT role FROM users WHERE users.email = $1`
 
-	err := u.sql.Db.GetContext(context, &role, queryUserExits, emailReq)
+func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) (model.User,error) {
+	var user model.User
+	queryUserExits := `SELECT * FROM users WHERE users.email = $1`
+
+	err := u.sql.Db.GetContext(context, &user, queryUserExits, emailReq)
+	if err == sql.ErrNoRows {
+		return user,nil
+	}
+	if user.Role == 0 {
+		return user,message.UserConflict
+	}
+	if user.Role == 1 {
+		return user,message.UserIsAdmin
+	}
+	return user,message.SomeWentWrong
+
+}
+
+func (u UserRepoImpl) ValidUUID(context context.Context, uuidReq string) error {
+	var role string
+	queryUserExits := `SELECT role FROM users WHERE users.user_id = $1`
+
+	err := u.sql.Db.GetContext(context, &role, queryUserExits, uuidReq)
 	if err == sql.ErrNoRows {
 		return nil
 	}

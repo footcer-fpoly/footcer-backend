@@ -175,6 +175,7 @@ func (t TeamRepoImpl) GetTeamForID(context context.Context, teamId string) (inte
 
 	return team, nil
 }
+
 func (t TeamRepoImpl) DeleteMember(context context.Context, userID string) error {
 
 	queryDelete := `DELETE FROM public.team_details
@@ -192,6 +193,7 @@ func (t TeamRepoImpl) DeleteMember(context context.Context, userID string) error
 	return nil
 
 }
+
 func (t TeamRepoImpl) DeleteTeam(context context.Context, teamID string) error {
 	queryDeleteMember := `DELETE FROM public.team_details
 	WHERE teams_id = $1;`
@@ -211,6 +213,7 @@ func (t TeamRepoImpl) DeleteTeam(context context.Context, teamID string) error {
 	return nil
 
 }
+
 func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (model.Team, error) {
 
 sqlStatement := `

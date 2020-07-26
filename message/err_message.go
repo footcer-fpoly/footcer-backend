@@ -21,6 +21,10 @@ var (
 	TeamDelete       = errors.New("Xoá nhóm thành công")
 	AdminIsTeam      = errors.New("Bạn là trưởng nhóm, không thể rời nhóm")
 
+	//game
+	NotData      = errors.New("Không có dữ liệu")
+	UpdateFail      = errors.New("Update không thành công")
+
 	//
 	Permission    = errors.New("Lỗi quyền truy cập")
 	SomeWentWrong = errors.New("Có lỗi xảy ra")
