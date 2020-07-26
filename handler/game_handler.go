@@ -138,6 +138,7 @@ func (g *GameHandler) GetGames(c echo.Context) error {
 		Data:       games,
 	})
 }
+
 func (g *GameHandler) GetGame(c echo.Context) error {
 	gameId := c.Param("id")
 	game, err := g.GameRepo.GetGame(c.Request().Context(), gameId)
@@ -153,5 +154,25 @@ func (g *GameHandler) GetGame(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       game,
+	})
+}
+
+func (g *GameHandler) UpdateScore(c echo.Context) error {
+	req := model.Game{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+	_, err := g.GameRepo.UpdateScore(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+			StatusCode: http.StatusUnprocessableEntity,
+			Message:    err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, model.Response{
+		StatusCode: http.StatusCreated,
+		Message:    "Xử lý thành công",
+		Data:       nil,
 	})
 }

@@ -23,6 +23,7 @@ var (
 
 	//game
 	NotData      = errors.New("Không có dữ liệu")
+	UpdateFail      = errors.New("Update không thành công")
 
 	//
 	Permission    = errors.New("Lỗi quyền truy cập")

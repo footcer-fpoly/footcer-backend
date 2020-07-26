@@ -98,7 +98,32 @@ func (g *GameRepoImpl) RefuseJoin(context context.Context, gameTemp model.GameTe
 }
 
 func (g *GameRepoImpl) UpdateScore(context context.Context, game model.Game) (interface{}, error) {
-	panic("implement me")
+
+	sqlStatement := `
+		UPDATE game
+		SET 
+			score  = (CASE WHEN LENGTH(:score) = 0 THEN score ELSE :score END),
+			game_updated_at 	  = COALESCE (:game_updated_at, game_updated_at)
+		WHERE game_id    = :game_id
+	`
+	game.UpdatedAt = time.Now()
+
+	result, err := g.sql.Db.NamedExecContext(context, sqlStatement, game)
+	if err != nil {
+		log.Error(err.Error())
+		return game, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return game, message.SomeWentWrong
+	}
+	if count == 0 {
+		return game, message.UpdateFail
+	}
+
+	return game, nil
 }
 
 func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface{}, error) {
@@ -111,7 +136,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
   COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
-	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest;`
+	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest ORDER BY game_created_at DESC;`
 		err := g.sql.Db.SelectContext(context, &listGame, sqlSearch)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -144,6 +169,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 	return listGame, nil
 
 }
+
 func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interface{}, error) {
 	var game = ListGame{}
 
@@ -179,7 +205,6 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 			return game, err
 		}
 		game.ArrayTeamTemp = inviteTeams
-
 
 	}
 
