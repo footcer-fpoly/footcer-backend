@@ -1,13 +1,17 @@
 package repo_impl
 
 import (
-	"context"
 	"database/sql"
 	"footcer-backend/db"
 	"footcer-backend/log"
 	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/security"
+	"golang.org/x/net/context"
+	"googlemaps.github.io/maps"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -110,6 +114,7 @@ FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
 }
 
 func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.Stadium) (model.Stadium, error) {
+
 	sqlStatement := `
 		UPDATE stadium
 		SET 
@@ -194,6 +199,74 @@ func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl 
 		return stadiumColl, message.StadiumNotUpdated
 	}
 	return stadiumColl, nil
+
+}
+
+func (s StadiumRepoImpl) SearchStadiumLocation(context context.Context, latitude string, longitude string) ([]model.Stadium, error) {
+	var stadium = []model.Stadium{}
+
+	querySQL := `SELECT stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak, user_id, created_at, updated_at
+	FROM public.stadium;`
+	err := s.sql.Db.SelectContext(context, &stadium, querySQL)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return stadium, message.StadiumNotFound
+		}
+		log.Error(err.Error())
+		return stadium, err
+	}
+	for i, v := range stadium {
+		c, err := maps.NewClient(maps.WithAPIKey(security.GOOGLE_MAP_KEY))
+		if err != nil {
+			log.Fatalf("fatal error: %s", err)
+		}
+		latitudeStadium := strconv.FormatFloat(v.Latitude, 'f', -1, 64)
+		longitudeStadium := strconv.FormatFloat(v.Longitude, 'f', -1, 64)
+		locationStadium := latitudeStadium + "," + longitudeStadium
+		locationClient := latitude + "," + longitude
+		r := &maps.DistanceMatrixRequest{
+			Origins:       []string{locationStadium},
+			Destinations:  []string{locationClient},
+			Units:         maps.UnitsImperial,
+			Language:      "en",
+			DepartureTime: "now",
+		}
+		route, err := c.DistanceMatrix(context, r)
+
+		if err != nil {
+			log.Fatalf("fatal error: %s", err)
+		}
+		//print(route.Rows[0].Elements[0].Distance.Meters / 1000)
+		stadium[i].Distance = route.Rows[0].Elements[0].Distance.Meters / 1000
+		stadium[i].Timer = int(route.Rows[0].Elements[0].DurationInTraffic.Minutes())
+
+
+	}
+
+	sort.Slice(stadium, func(i, j int) bool {
+		return stadium[i].Distance < stadium[j].Distance
+	})
+
+	return stadium, nil
+}
+
+func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string) ([]model.Stadium, error) {
+
+	var stadium = []model.Stadium{}
+
+	querySQL := `SELECT stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak, user_id, created_at, updated_at
+	FROM public.stadium WHERE name_stadium ILIKE $1`
+	err := s.sql.Db.SelectContext(context, &stadium, querySQL,"%"+name+"%")
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return stadium, message.StadiumNotFound
+		}
+		log.Error(err.Error())
+		return stadium, err
+	}
+	return stadium, nil
 
 }
 

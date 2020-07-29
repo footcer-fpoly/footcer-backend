@@ -13,7 +13,7 @@ import (
 
 func init() {
 	os.Setenv("APP_NAME", "footcer")
-	log.InitLogger(true)
+	log.InitLogger(false)
 }
 
 func main() {
@@ -41,6 +41,7 @@ func main() {
 	router.UserRouter(e, sql)
 	router.StadiumRouter(e, sql)
 	router.ReviewRouter(e, sql)
+	router.ServiceRouter(e, sql)
 	router.OrderRouter(e, sql)
 	router.TeamRouter(e, sql)
 	router.GameRouter(e, sql)
