@@ -181,6 +181,7 @@ func (s *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
 	})
 
 }
+
 func (s *StadiumHandler) SearchStadiumName(c echo.Context) error {
 	name := c.Param("name")
 
