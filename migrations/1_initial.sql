@@ -104,7 +104,7 @@ CREATE TABLE "team_details"
 "created_at" DATE NOT NULL,
 "updated_at" DATE NOT NULL,
 
-FOREIGN KEY (team_id) REFERENCES team (teams_id),
+FOREIGN KEY (teams_id) REFERENCES team (team_id),
 FOREIGN KEY (user_id) REFERENCES users (user_id),
 CONSTRAINT team_details_pkey PRIMARY KEY (team_details_id)
 );

@@ -1,5 +1,5 @@
 development:
   dialect: postgres
-  datasource: host=localhost port=5432 user=postgres password=123456 dbname=footcerdb sslmode=disable
+  datasource: host=35.226.61.216 port=5432 user=footcer password=LMwEB4e4btINkoo7a dbname=footcerdb sslmode=disable
   dir: migrations
   table: migrations
