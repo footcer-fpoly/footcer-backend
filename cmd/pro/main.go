@@ -31,10 +31,12 @@ func main() {
 	structValidator.RegisterValidate()
 	e.Validator = structValidator
 
+
+
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, model.Response{
 			StatusCode: 200,
-			Message:    "Home Page",
+			Message:    "This is the website Footer Team :=))",
 		})
 	})
 	router.UserRouter(e, sql)
@@ -48,6 +50,6 @@ func main() {
 	//upload
 	e.Static("/static", "../images/")
 
-	e.Logger.Fatal(e.Start(":4000"))
+	e.Logger.Fatal(e.Start(":80"))
 
 }
