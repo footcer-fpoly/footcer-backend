@@ -162,3 +162,39 @@ func (s *StadiumHandler) AddStadiumCollage(c echo.Context) error {
 		Data:       user,
 	})
 }
+
+func (s *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
+	latitude := c.Param("latitude")
+	longitude := c.Param("longitude")
+	stadium, err := s.StadiumRepo.SearchStadiumLocation(c.Request().Context(), latitude, longitude)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       stadium,
+	})
+
+}
+func (s *StadiumHandler) SearchStadiumName(c echo.Context) error {
+	name := c.Param("name")
+
+	stadium, err := s.StadiumRepo.SearchStadiumName(c.Request().Context(), name)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       stadium,
+	})
+}
