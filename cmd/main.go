@@ -13,7 +13,7 @@ import (
 
 func init() {
 	os.Setenv("APP_NAME", "footcer")
-	log.InitLogger(true)
+	log.InitLogger(false)
 }
 
 func main() {

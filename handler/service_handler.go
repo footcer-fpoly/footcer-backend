@@ -32,7 +32,7 @@ func (s *ServiceHandler) AddService(c echo.Context) error {
 	req.ServiceId = uuid.NewV1().String()
 	req.Image = urls[0]
 
-	_, err := s.ServiceRepo.AddService(c.Request().Context(), req)
+	service, err := s.ServiceRepo.AddService(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -44,7 +44,7 @@ func (s *ServiceHandler) AddService(c echo.Context) error {
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
-		Data:       nil,
+		Data:       service,
 	})
 }
 
