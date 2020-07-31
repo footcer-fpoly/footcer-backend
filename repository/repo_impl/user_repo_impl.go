@@ -211,21 +211,21 @@ func (u UserRepoImpl) CheckLogin(context context.Context, loginReq req.ReqSignIn
 	return user, nil
 }
 
-func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) (model.User,error) {
+func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) (model.User, error) {
 	var user model.User
 	queryUserExits := `SELECT * FROM users WHERE users.email = $1`
 
 	err := u.sql.Db.GetContext(context, &user, queryUserExits, emailReq)
 	if err == sql.ErrNoRows {
-		return user,nil
+		return user, nil
 	}
 	if user.Role == 0 {
-		return user,message.UserConflict
+		return user, message.UserConflict
 	}
 	if user.Role == 1 {
-		return user,message.UserIsAdmin
+		return user, message.UserIsAdmin
 	}
-	return user,message.SomeWentWrong
+	return user, message.SomeWentWrong
 
 }
 

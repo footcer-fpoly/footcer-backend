@@ -22,8 +22,5 @@ func TeamRouter(e *echo.Echo, sql *db.Sql) {
 	e.DELETE("/team/delete-member/:id", teamHandler.DeleteMember, middleware.JWTMiddleware())
 	e.DELETE("/team/delete-team/:id", teamHandler.DeleteTeam, middleware.JWTMiddleware())
 	e.PUT("/team/update", teamHandler.UpdateTeam, middleware.JWTMiddleware())
-	
-
-
 
 }

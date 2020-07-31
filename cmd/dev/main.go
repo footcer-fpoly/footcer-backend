@@ -6,22 +6,23 @@ import (
 	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/router"
-	"footcer-backend/security"
+	dev "footcer-backend/security/dev"
 	"github.com/labstack/echo"
+	"os"
 )
 
 func init() {
-	//os.Setenv("APP_NAME", "footcer")
+	os.Setenv("APP_NAME", "footcer")
 	log.InitLogger(false)
 }
 
 func main() {
 	sql := &db.Sql{
-		Host:     security.HOST,
-		Port:     security.PORT,
-		UserName: security.USERNAME,
-		Password: security.PASSWORD,
-		DbName:   security.DB_NAME,
+		Host:     dev.HOST,
+		Port:     dev.PORT,
+		UserName: dev.USERNAME,
+		Password: dev.PASSWORD,
+		DbName:   dev.DB_NAME,
 	}
 	sql.Connect()
 	defer sql.Close()

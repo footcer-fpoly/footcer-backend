@@ -216,7 +216,7 @@ func (t TeamRepoImpl) DeleteTeam(context context.Context, teamID string) error {
 
 func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (model.Team, error) {
 
-sqlStatement := `
+	sqlStatement := `
 		UPDATE team
 		SET 
 			name  = (CASE WHEN LENGTH(:name) = 0 THEN name ELSE :name END),
@@ -229,7 +229,6 @@ sqlStatement := `
 		WHERE team_id    = :team_id
 	`
 
-	
 	team.UpdatedAt = time.Now()
 
 	result, err := t.sql.Db.NamedExecContext(context, sqlStatement, team)

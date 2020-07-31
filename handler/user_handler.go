@@ -4,7 +4,7 @@ import (
 	"footcer-backend/helper"
 	"footcer-backend/message"
 	"footcer-backend/model"
-	req "footcer-backend/model/req"
+	"footcer-backend/model/req"
 	"footcer-backend/repository"
 	"footcer-backend/security"
 	"footcer-backend/upload"
@@ -251,7 +251,7 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	user,errValid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
+	user, errValid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
 
 	token, err := security.GenToken(user)
 	if err != nil {
@@ -262,7 +262,7 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	user.Token =  token
+	user.Token = token
 
 	if errValid != nil {
 		return c.JSON(http.StatusAccepted, model.Response{
@@ -324,4 +324,3 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 	})
 
 }
-

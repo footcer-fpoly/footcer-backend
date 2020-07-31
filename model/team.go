@@ -13,7 +13,7 @@ type Team struct {
 	LeaderId    string    `json:"leaderId,omitempty" db:"leader_id,omitempty"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at, omitempty"`
-	MemberList   []string `json:"member,omitempty" db:"omitempty"`
+	MemberList  []string  `json:"member,omitempty" db:"omitempty"`
 
 	//User        `json:"user,omitempty"`
 }

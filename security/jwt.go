@@ -2,6 +2,7 @@ package security
 
 import (
 	"footcer-backend/model"
+	"footcer-backend/security/pro"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -16,7 +17,7 @@ func GenToken(user model.User) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(JWT_KEY))
+	tokenString, err := token.SignedString([]byte(pro.JWT_KEY))
 	if err != nil {
 		return "", err
 	}

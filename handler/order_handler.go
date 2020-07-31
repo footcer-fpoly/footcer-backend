@@ -1,15 +1,14 @@
 package handler
 
 import (
-	"time"
-	"net/http"
 	"footcer-backend/helper"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
-	"github.com/dgrijalva/jwt-go"
-
+	"net/http"
+	"time"
 )
 
 type OrderHandler struct {
@@ -49,10 +48,9 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 		Data:       teamDetails,
 	})
 
-
 }
 
-func (o * OrderHandler) AcceptOrder(c echo.Context) error{
+func (o *OrderHandler) AcceptOrder(c echo.Context) error {
 	req := model.Order{}
 
 	defer c.Request().Body.Close()
@@ -61,7 +59,7 @@ func (o * OrderHandler) AcceptOrder(c echo.Context) error{
 	}
 	req.Accept = "1"
 
-	 err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
+	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -78,7 +76,7 @@ func (o * OrderHandler) AcceptOrder(c echo.Context) error{
 
 }
 
-func (o * OrderHandler) RefuseOrder(c echo.Context) error{
+func (o *OrderHandler) RefuseOrder(c echo.Context) error {
 	req := model.Order{}
 
 	defer c.Request().Body.Close()
@@ -104,7 +102,7 @@ func (o * OrderHandler) RefuseOrder(c echo.Context) error{
 
 }
 
-func (o * OrderHandler) FinishOrder(c echo.Context) error{
+func (o *OrderHandler) FinishOrder(c echo.Context) error {
 	req := model.Order{}
 
 	defer c.Request().Body.Close()
@@ -113,7 +111,7 @@ func (o * OrderHandler) FinishOrder(c echo.Context) error{
 	}
 	req.Finish = "1"
 
-	 err := o.OrderRepo.FinishOrder(c.Request().Context(), req)
+	err := o.OrderRepo.FinishOrder(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -130,10 +128,10 @@ func (o * OrderHandler) FinishOrder(c echo.Context) error{
 
 }
 
-func (o * OrderHandler) ListOrderForStadium(c echo.Context) error{
+func (o *OrderHandler) ListOrderForStadium(c echo.Context) error {
 	stadiumID := c.Param("id")
-	
-	 orders,err := o.OrderRepo.ListOrderForStadium(c.Request().Context(), stadiumID)
+
+	orders, err := o.OrderRepo.ListOrderForStadium(c.Request().Context(), stadiumID)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -148,12 +146,11 @@ func (o * OrderHandler) ListOrderForStadium(c echo.Context) error{
 	})
 }
 
-func (o * OrderHandler) ListOrderForUser(c echo.Context) error{
+func (o *OrderHandler) ListOrderForUser(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
-	
-	 orders,err := o.OrderRepo.ListOrderForUser(c.Request().Context(), claims.UserId)
+	orders, err := o.OrderRepo.ListOrderForUser(c.Request().Context(), claims.UserId)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
