@@ -8,7 +8,7 @@ import (
 
 type UserRepository interface {
 	CheckLogin(context context.Context, loginReq req.ReqSignIn) (model.User, error)
-	ValidPhone(context context.Context, phone string) error
+	ValidPhone(context context.Context, phone string) (int,error)
 	CreateForPhone(context context.Context, user model.User) (model.User, error)
 	Create(context context.Context, user model.User) (model.User, error)
 	SelectById(context context.Context, userId string) (model.User, error)

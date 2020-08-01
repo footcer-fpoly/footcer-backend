@@ -44,10 +44,10 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 		} else {
 			fmt.Println("User Exits -> Return User")
 			return user, nil
-
 		}
-
 	}
+	fmt.Println("User Error -> Return User")
+
 	return user, err
 
 }
@@ -112,22 +112,21 @@ func (u UserRepoImpl) Update(context context.Context, user model.User) (model.Us
 	return user, nil
 }
 
-func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) error {
+func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) (int,error) {
 	var role string
 	queryUserExits := `SELECT role FROM users WHERE users.phone = $1`
 
 	err := u.sql.Db.GetContext(context, &role, queryUserExits, phoneReq)
 	if err == sql.ErrNoRows {
-		return nil
+		return 200,nil
 	}
 	if role == "0" {
-		return message.UserConflict
-
+		return 409,message.UserConflict
 	}
 	if role == "1" {
-		return message.UserIsAdmin
+		return 403,message.UserIsAdmin
 	}
-	return message.SomeWentWrong
+	return 404,message.SomeWentWrong
 
 }
 

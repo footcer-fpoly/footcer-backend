@@ -61,8 +61,8 @@ func (u *UserHandler) Create(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-
-	req.UserId = uuid.NewV1().String()
+	print(req.UserId)
+	//req.UserId = uuid.NewV1().String()
 	req.Role = 0
 
 	user, err := u.UserRepo.Create(c.Request().Context(), req)
@@ -285,10 +285,10 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
+	code,valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
 	if valid != nil {
-		return c.JSON(http.StatusConflict, model.Response{
-			StatusCode: http.StatusConflict,
+		return c.JSON(code, model.Response{
+			StatusCode: code,
 			Message:    valid.Error(),
 			Data:       nil,
 		})
