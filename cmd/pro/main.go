@@ -44,6 +44,7 @@ func main() {
 	router.OrderRouter(e, sql)
 	router.TeamRouter(e, sql)
 	router.GameRouter(e, sql)
+	router.NotificationRouter(e, sql)
 
 	//upload
 	e.Static("/static", "../images/")

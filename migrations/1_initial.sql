@@ -163,7 +163,21 @@ FOREIGN KEY (team_id) REFERENCES team (team_id),
 
 CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
 );
-
+--
+-- CREATE TABLE "notification"
+-- (
+-- "notification_id" text NOT NULL UNIQUE,
+-- "event" text NOT NULL,
+-- "receiver_id" text NOT NULL,
+-- "title" text NOT NULL,
+-- "content" text NOT NULL,
+-- "user_id" text NOT NULL,
+--
+-- FOREIGN KEY (game_id) REFERENCES game (game_id),
+-- FOREIGN KEY (team_id) REFERENCES team (team_id),
+--
+-- CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
+-- );
 -- +migrate Down
 DROP TABLE "review";
 DROP TABLE "service";
