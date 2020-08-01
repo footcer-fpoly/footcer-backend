@@ -16,4 +16,5 @@ type UserRepository interface {
 	Update(context context.Context, user model.User) (model.User, error)
 	ValidEmail(context context.Context, email string) (model.User, error)
 	ValidUUID(context context.Context, uuid string) error
+	UpdatePassword(context context.Context, user model.User) error
 }

@@ -29,9 +29,10 @@ func NewUserRepo(sql *db.Sql) repository.UserRepository {
 func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model.User, error) {
 	var user model.User
 
-	queryUserExits := `SELECT * FROM users WHERE users.email = $1`
+	queryUserExits := `SELECT * FROM users WHERE users.phone = $1`
 
-	err := u.sql.Db.GetContext(context, &user, queryUserExits, userReq.Email)
+	user.Email = ""
+	err := u.sql.Db.GetContext(context, &user, queryUserExits, userReq.Phone)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("New user -> Insert Data")
@@ -112,21 +113,21 @@ func (u UserRepoImpl) Update(context context.Context, user model.User) (model.Us
 	return user, nil
 }
 
-func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) (int,error) {
+func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) (int, error) {
 	var role string
 	queryUserExits := `SELECT role FROM users WHERE users.phone = $1`
 
 	err := u.sql.Db.GetContext(context, &role, queryUserExits, phoneReq)
 	if err == sql.ErrNoRows {
-		return 200,nil
+		return 200, nil
 	}
 	if role == "0" {
-		return 409,message.UserConflict
+		return 409, message.UserConflict
 	}
 	if role == "1" {
-		return 403,message.UserIsAdmin
+		return 403, message.UserIsAdmin
 	}
-	return 404,message.SomeWentWrong
+	return 404, message.SomeWentWrong
 
 }
 
@@ -245,4 +246,33 @@ func (u UserRepoImpl) ValidUUID(context context.Context, uuidReq string) error {
 	}
 	return message.SomeWentWrong
 
+}
+
+func (u UserRepoImpl) UpdatePassword(context context.Context, user model.User) error {
+	sqlStatement := `
+		UPDATE users
+		SET 
+			password = (CASE WHEN LENGTH(:password) = 0 THEN password ELSE :password END),
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE user_id    = :user_id
+	`
+
+	user.UpdatedAt = time.Now()
+
+	result, err := u.sql.Db.NamedExecContext(context, sqlStatement, user)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return message.UserNotUpdated
+	}
+	if count == 0 {
+		return message.UserNotUpdated
+	}
+
+	return nil
 }

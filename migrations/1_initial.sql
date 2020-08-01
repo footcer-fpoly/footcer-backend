@@ -3,7 +3,7 @@ CREATE TABLE "users"
 (
     "user_id" text NOT NULL UNIQUE,
     "phone" text NOT NULL UNIQUE ,
-    "email" text NOT NULL UNIQUE ,
+    "email" text NOT NULL,
     "password" text NULL ,
     "avatar" text NOT NULL,
     "display_name" text NOT NULL,
@@ -189,5 +189,3 @@ DROP TABLE "team";
 DROP TABLE "users";
 DROP TABLE "game_temp";
 DROP TABLE "game";
-
-

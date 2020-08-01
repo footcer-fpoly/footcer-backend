@@ -324,3 +324,35 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 	})
 
 }
+
+func (u * UserHandler) UpdatePassword (c echo.Context) error{
+	req := model.User{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	req.UserId = claims.UserId
+	hash := security.HashAndSalt([]byte(req.Password))
+	req.Password = hash
+
+
+	err := u.UserRepo.UpdatePassword(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lí thành công",
+		Data:       nil,
+	})
+}
