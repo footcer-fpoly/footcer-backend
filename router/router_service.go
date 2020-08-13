@@ -17,4 +17,3 @@ func ServiceRouter(e *echo.Echo, sql *db.Sql) {
 	e.POST("/service/add", serviceHandler.AddService, middleware.JWTMiddleware())
 	e.DELETE("/service/delete/:id", serviceHandler.DeleteService, middleware.JWTMiddleware())
 }
-

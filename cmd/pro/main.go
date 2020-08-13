@@ -6,7 +6,7 @@ import (
 	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/router"
-	"footcer-backend/security"
+	"footcer-backend/security/pro"
 	"github.com/labstack/echo"
 )
 
@@ -17,11 +17,11 @@ func init() {
 
 func main() {
 	sql := &db.Sql{
-		Host:     security.HOST,
-		Port:     security.PORT,
-		UserName: security.USERNAME,
-		Password: security.PASSWORD,
-		DbName:   security.DB_NAME,
+		Host:     pro.HOST,
+		Port:     pro.PORT,
+		UserName: pro.USERNAME,
+		Password: pro.PASSWORD,
+		DbName:   pro.DB_NAME,
 	}
 	sql.Connect()
 	defer sql.Close()
@@ -30,8 +30,6 @@ func main() {
 	structValidator := helper.NewStructValidator()
 	structValidator.RegisterValidate()
 	e.Validator = structValidator
-
-
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(200, model.Response{
@@ -46,6 +44,8 @@ func main() {
 	router.OrderRouter(e, sql)
 	router.TeamRouter(e, sql)
 	router.GameRouter(e, sql)
+	router.NotificationRouter(e, sql)
+	router.AdRouter(e, sql)
 
 	//upload
 	e.Static("/static", "../images/")

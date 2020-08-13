@@ -29,9 +29,10 @@ func NewUserRepo(sql *db.Sql) repository.UserRepository {
 func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model.User, error) {
 	var user model.User
 
-	queryUserExits := `SELECT * FROM users WHERE users.email = $1`
+	queryUserExits := `SELECT * FROM users WHERE users.phone = $1`
 
-	err := u.sql.Db.GetContext(context, &user, queryUserExits, userReq.Email)
+	user.Email = ""
+	err := u.sql.Db.GetContext(context, &user, queryUserExits, userReq.Phone)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("New user -> Insert Data")
@@ -44,10 +45,10 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 		} else {
 			fmt.Println("User Exits -> Return User")
 			return user, nil
-
 		}
-
 	}
+	fmt.Println("User Error -> Return User")
+
 	return user, err
 
 }
@@ -112,22 +113,22 @@ func (u UserRepoImpl) Update(context context.Context, user model.User) (model.Us
 	return user, nil
 }
 
-func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) error {
-	var role string
-	queryUserExits := `SELECT role FROM users WHERE users.phone = $1`
+func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) (int, model.User, error) {
+	var user model.User
+	queryUserExits := `SELECT * FROM users WHERE users.phone = $1`
 
-	err := u.sql.Db.GetContext(context, &role, queryUserExits, phoneReq)
+	err := u.sql.Db.GetContext(context, &user, queryUserExits, phoneReq)
 	if err == sql.ErrNoRows {
-		return nil
+		return 200, user, nil
 	}
-	if role == "0" {
-		return message.UserConflict
+	if user.Role == 0 {
+		return 409, user, message.UserConflict
+	}
+	if user.Role == 1 {
+		return 403, user, message.UserIsAdmin
+	}
 
-	}
-	if role == "1" {
-		return message.UserIsAdmin
-	}
-	return message.SomeWentWrong
+	return 409, user, message.SomeWentWrong
 
 }
 
@@ -211,16 +212,36 @@ func (u UserRepoImpl) CheckLogin(context context.Context, loginReq req.ReqSignIn
 	return user, nil
 }
 
-func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) (model.User,error) {
+func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) (model.User, error) {
 	var user model.User
 	queryUserExits := `SELECT * FROM users WHERE users.email = $1`
 
 	err := u.sql.Db.GetContext(context, &user, queryUserExits, emailReq)
 	if err == sql.ErrNoRows {
+		return user, nil
+	}
+	if user.Role == 0 {
+		return user, message.UserConflict
+	}
+	if user.Role == 1 {
+		return user, message.UserIsAdmin
+	}
+	return user, message.SomeWentWrong
+
+}
+
+func (u UserRepoImpl) ValidUUID(context context.Context, uuidReq string) (model.User, error) {
+	var user model.User
+	queryUserExits := `SELECT * FROM users WHERE users.user_id = $1`
+
+	err := u.sql.Db.GetContext(context, &user, queryUserExits, uuidReq)
+
+	if err == sql.ErrNoRows {
 		return user,nil
 	}
 	if user.Role == 0 {
 		return user,message.UserConflict
+
 	}
 	if user.Role == 1 {
 		return user,message.UserIsAdmin
@@ -229,21 +250,31 @@ func (u UserRepoImpl) ValidEmail(context context.Context, emailReq string) (mode
 
 }
 
-func (u UserRepoImpl) ValidUUID(context context.Context, uuidReq string) error {
-	var role string
-	queryUserExits := `SELECT role FROM users WHERE users.user_id = $1`
+func (u UserRepoImpl) UpdatePassword(context context.Context, user model.User) error {
+	sqlStatement := `
+		UPDATE users
+		SET 
+			password = (CASE WHEN LENGTH(:password) = 0 THEN password ELSE :password END),
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE phone    = :phone
+	`
 
-	err := u.sql.Db.GetContext(context, &role, queryUserExits, uuidReq)
-	if err == sql.ErrNoRows {
-		return nil
-	}
-	if role == "0" {
-		return message.UserConflict
+	user.UpdatedAt = time.Now()
 
+	result, err := u.sql.Db.NamedExecContext(context, sqlStatement, user)
+	if err != nil {
+		log.Error(err.Error())
+		return err
 	}
-	if role == "1" {
-		return message.UserIsAdmin
-	}
-	return message.SomeWentWrong
 
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return message.UserNotUpdated
+	}
+	if count == 0 {
+		return message.UserNotUpdated
+	}
+
+	return nil
 }

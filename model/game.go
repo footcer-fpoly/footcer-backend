@@ -4,9 +4,9 @@ import "time"
 
 type Game struct {
 	GameId      string    `json:"gameId,omitempty" db:"game_id,omitempty"`
-	Date        string `json:"date,omitempty" db:"date,omitempty"`
-	Hour        string `json:"hour,omitempty" db:"hour,omitempty"`
-	Score        string `json:"score,omitempty" db:"score,omitempty"`
+	Date        string    `json:"date,omitempty" db:"date,omitempty"`
+	Hour        string    `json:"hour,omitempty" db:"hour,omitempty"`
+	Score       string    `json:"score,omitempty" db:"score,omitempty"`
 	Type        string    `json:"type,omitempty" db:"type,omitempty"`
 	Description string    `json:"description,omitempty" db:"description_game,omitempty"`
 	Finish      string    `json:"finish,omitempty" db:"finish,omitempty"`

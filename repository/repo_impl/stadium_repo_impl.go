@@ -7,7 +7,7 @@ import (
 	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
-	"footcer-backend/security"
+	"footcer-backend/security/pro"
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 	"sort"
@@ -217,7 +217,7 @@ func (s StadiumRepoImpl) SearchStadiumLocation(context context.Context, latitude
 		return stadium, err
 	}
 	for i, v := range stadium {
-		c, err := maps.NewClient(maps.WithAPIKey(security.GOOGLE_MAP_KEY))
+		c, err := maps.NewClient(maps.WithAPIKey(pro.GOOGLE_MAP_KEY))
 		if err != nil {
 			log.Fatalf("fatal error: %s", err)
 		}
@@ -241,7 +241,6 @@ func (s StadiumRepoImpl) SearchStadiumLocation(context context.Context, latitude
 		stadium[i].Distance = route.Rows[0].Elements[0].Distance.Meters / 1000
 		stadium[i].Timer = int(route.Rows[0].Elements[0].DurationInTraffic.Minutes())
 
-
 	}
 
 	sort.Slice(stadium, func(i, j int) bool {
@@ -257,7 +256,7 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 
 	querySQL := `SELECT stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak, user_id, created_at, updated_at
 	FROM public.stadium WHERE name_stadium ILIKE $1`
-	err := s.sql.Db.SelectContext(context, &stadium, querySQL,"%"+name+"%")
+	err := s.sql.Db.SelectContext(context, &stadium, querySQL, "%"+name+"%")
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error(err.Error())

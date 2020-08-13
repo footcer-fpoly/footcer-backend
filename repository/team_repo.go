@@ -13,10 +13,8 @@ type TeamRepository interface {
 	GetTeamForUser(context context.Context, userId string) (interface{}, error)
 	GetTeamForID(context context.Context, teamId string) (interface{}, error)
 
-	DeleteMember(context context.Context, userID string) (error)
-	DeleteTeam(context context.Context, teamID string) ( error)
+	DeleteMember(context context.Context, userID string) error
+	DeleteTeam(context context.Context, teamID string) error
 
 	UpdateTeam(context context.Context, team model.Team) (model.Team, error)
-
-
 }

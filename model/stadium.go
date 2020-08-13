@@ -23,5 +23,5 @@ type Stadium struct {
 	CreatedAt   time.Time `json:"-" db:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at,omitempty"`
 	Distance    int       `json:"distance" db:"_,omitempty"`
-	Timer       int `json:"timer" db:"_,omitempty"`
+	Timer       int       `json:"timer" db:"_,omitempty"`
 }

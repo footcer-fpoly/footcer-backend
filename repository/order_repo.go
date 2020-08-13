@@ -10,6 +10,6 @@ type OrderRepository interface {
 	AcceptOrder(context context.Context, order model.Order) error
 	RefuseOrder(context context.Context, order model.Order) error
 	FinishOrder(context context.Context, order model.Order) error
-	ListOrderForStadium(context context.Context, stadiumId string) (interface{},error)
-	ListOrderForUser(context context.Context, userId string) (interface{},error)
+	ListOrderForStadium(context context.Context, stadiumId string) (interface{}, error)
+	ListOrderForUser(context context.Context, userId string) (interface{}, error)
 }

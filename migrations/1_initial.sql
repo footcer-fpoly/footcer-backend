@@ -3,7 +3,7 @@ CREATE TABLE "users"
 (
     "user_id" text NOT NULL UNIQUE,
     "phone" text NOT NULL UNIQUE ,
-    "email" text NOT NULL UNIQUE ,
+    "email" text NOT NULL ,
     "password" text NULL ,
     "avatar" text NOT NULL,
     "display_name" text NOT NULL,
@@ -163,7 +163,6 @@ FOREIGN KEY (team_id) REFERENCES team (team_id),
 
 CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
 );
-
 -- +migrate Down
 DROP TABLE "review";
 DROP TABLE "service";
@@ -175,5 +174,3 @@ DROP TABLE "team";
 DROP TABLE "users";
 DROP TABLE "game_temp";
 DROP TABLE "game";
-
-

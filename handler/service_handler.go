@@ -48,8 +48,8 @@ func (s *ServiceHandler) AddService(c echo.Context) error {
 	})
 }
 
-func (s * ServiceHandler) DeleteService(c echo.Context) error  {
-	 err := s.ServiceRepo.DeleteService(c.Request().Context(), c.Param("id"))
+func (s *ServiceHandler) DeleteService(c echo.Context) error {
+	err := s.ServiceRepo.DeleteService(c.Request().Context(), c.Param("id"))
 
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{

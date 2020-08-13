@@ -4,9 +4,8 @@ import (
 	"footcer-backend/db"
 	"footcer-backend/handler"
 	"footcer-backend/middleware"
-	"github.com/labstack/echo"
 	repo "footcer-backend/repository/repo_impl"
-
+	"github.com/labstack/echo"
 )
 
 func GameRouter(e *echo.Echo, sql *db.Sql) {

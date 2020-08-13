@@ -27,7 +27,6 @@ func (u *ReviewHandler) AddReview(c echo.Context) error {
 	req.UpdatedAt = time.Now()
 	req.User.UserId = claims.UserId
 
-
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)

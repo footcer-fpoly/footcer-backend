@@ -4,7 +4,7 @@ import (
 	"footcer-backend/helper"
 	"footcer-backend/message"
 	"footcer-backend/model"
-	req "footcer-backend/model/req"
+	"footcer-backend/model/req"
 	"footcer-backend/repository"
 	"footcer-backend/security"
 	"footcer-backend/upload"
@@ -61,8 +61,8 @@ func (u *UserHandler) Create(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-
-	req.UserId = uuid.NewV1().String()
+	print(req.UserId)
+	//req.UserId = uuid.NewV1().String()
 	req.Role = 0
 
 	user, err := u.UserRepo.Create(c.Request().Context(), req)
@@ -251,7 +251,7 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	user,errValid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
+	user, errValid := u.UserRepo.ValidEmail(c.Request().Context(), req.Email)
 
 	token, err := security.GenToken(user)
 	if err != nil {
@@ -262,7 +262,7 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	user.Token =  token
+	user.Token = token
 
 	if errValid != nil {
 		return c.JSON(http.StatusAccepted, model.Response{
@@ -285,12 +285,12 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
+	code, user, valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
 	if valid != nil {
-		return c.JSON(http.StatusConflict, model.Response{
-			StatusCode: http.StatusConflict,
+		return c.JSON(code, model.Response{
+			StatusCode: code,
 			Message:    valid.Error(),
-			Data:       nil,
+			Data:       user,
 		})
 	}
 
@@ -303,18 +303,49 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 }
 
 func (u *UserHandler) CheckValidUUID(c echo.Context) error {
+	//req := model.User{}
+	//
+	//defer c.Request().Body.Close()
+	//if err := c.Bind(&req); err != nil {
+	//	return helper.ResponseErr(c, http.StatusBadRequest)
+	//}
+	//valid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
+	//if valid != nil {
+	//	return c.JSON(http.StatusConflict, model.Response{
+	//		StatusCode: http.StatusConflict,
+	//		Message:    valid.Error(),
+	//		Data:       nil,
+	//	})
+	//}
+	//return c.JSON(http.StatusOK, model.Response{
+	//	StatusCode: http.StatusOK,
+	//	Message:    "Cho phép đăng ký",
+	//	Data:       nil,
+	//})
 	req := model.User{}
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	valid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
-	if valid != nil {
+	user, errValid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
+
+	token, err := security.GenToken(user)
+	if err != nil {
+		log.Error(err.Error())
+		return c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	user.Token = token
+
+	if errValid != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
-			Message:    valid.Error(),
-			Data:       nil,
+			Message:    errValid.Error(),
+			Data:       user.Token,
 		})
 	}
 	return c.JSON(http.StatusOK, model.Response{
@@ -325,3 +356,28 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 
 }
 
+func (u *UserHandler) UpdatePassword(c echo.Context) error {
+	req := model.User{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+	hash := security.HashAndSalt([]byte(req.Password))
+	req.Password = hash
+
+	err := u.UserRepo.UpdatePassword(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lí thành công",
+		Data:       nil,
+	})
+}
