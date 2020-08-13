@@ -50,6 +50,6 @@ func main() {
 	//upload
 	e.Static("/static", "../images/")
 
-	e.Logger.Fatal(e.Start(":80"))
+	e.Logger.Fatal(e.Start(":4000"))
 
 }
