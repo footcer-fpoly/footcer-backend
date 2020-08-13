@@ -10,10 +10,9 @@ type NotificationHandler struct {
 }
 
 func (n *NotificationHandler) AddNotification(c echo.Context) error {
-return  nil
+	return nil
 }
 
-
 func (n *NotificationHandler) GetNotification(c echo.Context) error {
-	return  nil
+	return nil
 }

@@ -1,5 +1,4 @@
 # env
 dbconfig.yml
 security/key.go
-images
 model/get_review.go

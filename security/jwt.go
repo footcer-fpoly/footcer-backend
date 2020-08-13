@@ -12,7 +12,7 @@ func GenToken(user model.User) (string, error) {
 		UserId: user.UserId,
 		Role:   user.Role,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 3600).Unix(),
 		},
 	}
 

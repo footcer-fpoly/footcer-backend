@@ -129,7 +129,7 @@ func (g *GameRepoImpl) UpdateScore(context context.Context, game model.Game) (in
 func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface{}, error) {
 
 	var listGame = []ListGame{}
-	if (date == "all") {
+	if date == "all" {
 		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description_game, game.finish,
  COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium,
   game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,

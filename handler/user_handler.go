@@ -285,12 +285,12 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	code,valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
+	code, user, valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
 	if valid != nil {
 		return c.JSON(code, model.Response{
 			StatusCode: code,
 			Message:    valid.Error(),
-			Data:       nil,
+			Data:       user,
 		})
 	}
 
@@ -303,18 +303,49 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 }
 
 func (u *UserHandler) CheckValidUUID(c echo.Context) error {
+	//req := model.User{}
+	//
+	//defer c.Request().Body.Close()
+	//if err := c.Bind(&req); err != nil {
+	//	return helper.ResponseErr(c, http.StatusBadRequest)
+	//}
+	//valid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
+	//if valid != nil {
+	//	return c.JSON(http.StatusConflict, model.Response{
+	//		StatusCode: http.StatusConflict,
+	//		Message:    valid.Error(),
+	//		Data:       nil,
+	//	})
+	//}
+	//return c.JSON(http.StatusOK, model.Response{
+	//	StatusCode: http.StatusOK,
+	//	Message:    "Cho phép đăng ký",
+	//	Data:       nil,
+	//})
 	req := model.User{}
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	valid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
-	if valid != nil {
+	user, errValid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
+
+	token, err := security.GenToken(user)
+	if err != nil {
+		log.Error(err.Error())
+		return c.JSON(http.StatusInternalServerError, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	user.Token = token
+
+	if errValid != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
-			Message:    valid.Error(),
-			Data:       nil,
+			Message:    errValid.Error(),
+			Data:       user.Token,
 		})
 	}
 	return c.JSON(http.StatusOK, model.Response{
@@ -325,7 +356,7 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 
 }
 
-func (u * UserHandler) UpdatePassword (c echo.Context) error{
+func (u *UserHandler) UpdatePassword(c echo.Context) error {
 	req := model.User{}
 
 	defer c.Request().Body.Close()
@@ -333,14 +364,8 @@ func (u * UserHandler) UpdatePassword (c echo.Context) error{
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
 
-
-	tokenData := c.Get("user").(*jwt.Token)
-	claims := tokenData.Claims.(*model.JwtCustomClaims)
-
-	req.UserId = claims.UserId
 	hash := security.HashAndSalt([]byte(req.Password))
 	req.Password = hash
-
 
 	err := u.UserRepo.UpdatePassword(c.Request().Context(), req)
 	if err != nil {
