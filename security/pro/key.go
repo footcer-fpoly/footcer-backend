@@ -2,7 +2,7 @@ package pro
 
 var (
 	JWT_KEY        = "footcer6969696969969696996969699696996"
-	HOST           = "35.184.207.203" //35.226.61.216
+	HOST           = "35.184.70.223" //35.226.61.216
 	PORT           = 5432
 	USERNAME       = "footcerdb"
 	PASSWORD       = "PMa45PqnMHiHCn40"
