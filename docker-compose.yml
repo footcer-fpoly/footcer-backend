@@ -6,6 +6,6 @@ services:
     build: .
     image: web-service:1.0
     ports:
-      - "80:80"
+      - "4000:4000"
     environment:
       - APP_NAME=footcer
