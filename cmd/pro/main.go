@@ -4,15 +4,28 @@ import (
 	"footcer-backend/db"
 	"footcer-backend/helper"
 	"footcer-backend/log"
-	"footcer-backend/model"
+	//"footcer-backend/model"
 	"footcer-backend/router"
 	"footcer-backend/security/pro"
 	"github.com/labstack/echo"
+	"html/template"
+	"io"
+	"net/http"
 )
 
 func init() {
-	//os.Setenv("APP_NAME", "footcer")
 	log.InitLogger(false)
+}
+
+type Template struct {
+	templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+func Web(c echo.Context) error {
+	return c.Render(http.StatusOK, "index.html", "Footcer")
 }
 
 func main() {
@@ -31,12 +44,12 @@ func main() {
 	structValidator.RegisterValidate()
 	e.Validator = structValidator
 
-	e.GET("/", func(c echo.Context) error {
-		return c.JSON(200, model.Response{
-			StatusCode: 200,
-			Message:    "This is the website Footer Team :=))",
-		})
-	})
+	t := &Template{
+		templates: template.Must(template.ParseGlob("../../public/views/*.html")),
+	}
+	e.Renderer = t
+
+	e.GET("/", Web)
 	router.UserRouter(e, sql)
 	router.StadiumRouter(e, sql)
 	router.ReviewRouter(e, sql)
@@ -48,7 +61,7 @@ func main() {
 	router.AdRouter(e, sql)
 
 	//upload
-	e.Static("/static", "../images/")
+	e.Static("/static", "../../images/")
 
 	e.Logger.Fatal(e.Start(":4000"))
 

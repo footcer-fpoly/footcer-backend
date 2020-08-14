@@ -2,3 +2,6 @@
 dbconfig.yml
 security/key.go
 model/get_review.go
+
+# idea
+.idea

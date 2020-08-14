@@ -31,7 +31,7 @@ func Upload(c echo.Context) ([]string, error) {
 
 			}
 			defer src.Close()
-			path := "../images/" + folder + "/%s%s"
+			path := "../../images/" + folder + "/%s%s"
 			fileName := uuid.NewV4()
 			filePath := fmt.Sprintf(path, fileName, filepath.Ext(file.Filename))
 			// Destination
