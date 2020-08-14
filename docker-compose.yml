@@ -3,9 +3,17 @@ version: '2'
 services:
   web-service:
     container_name: web-service
-    build: .
+    build:
+        dockerfile: Dockerfile
+        context: .
     image: web-service:1.0
     ports:
       - "4000:4000"
     environment:
       - APP_NAME=footcer
+  nginx:
+    build: "./nginx"
+    ports:
+      - "80:80"
+    depends_on:
+      - "web-service"
