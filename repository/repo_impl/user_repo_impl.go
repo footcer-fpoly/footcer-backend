@@ -149,9 +149,9 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 		var stadium = model.Stadium{
 			StadiumId:   stadiumId,
 			StadiumName: "Sân bóng mẫu",
-			Address:     "123",
-			Description: "",
-			Image:       "example.jpg",
+			Address:     "01 Đường Tô Kí, Quận 12, Tp.HCM",
+			Description: "Sân cỏ nhân tao",
+			Image:       "http://footcer.tk/static/stadium/example.jpg",
 			StartTime:   "5:30",
 			EndTime:     "10:00",
 			Category:    "Sân cỏ nhân tạo",

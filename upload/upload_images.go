@@ -48,7 +48,7 @@ func Upload(c echo.Context) ([]string, error) {
 
 			}
 
-			url := "/" + folder + "/%s%s"
+			url := "http://footcer.tk/static/" + folder + "/%s%s"
 			url = fmt.Sprintf(url, fileName, filepath.Ext(file.Filename))
 			images = append(images, url)
 		}
