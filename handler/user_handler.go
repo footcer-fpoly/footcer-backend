@@ -158,6 +158,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	req.UserId = uuid.NewV1().String()
 	hash := security.HashAndSalt([]byte(req.Password))
 	req.Password = hash
+	req.Avatar = "http://footcer.tk:4000/static/user.png"
 
 	user, err := u.UserRepo.CreateForPhone(c.Request().Context(), req)
 	if err != nil {

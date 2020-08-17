@@ -151,7 +151,7 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			StadiumName: "Sân bóng mẫu",
 			Address:     "01 Đường Tô Kí, Quận 12, Tp.HCM",
 			Description: "Sân cỏ nhân tao",
-			Image:       "http://footcer.tk/static/stadium/example.jpg",
+			Image:       "http://footcer.tk:4000/static/stadium/example.jpg",
 			StartTime:   "5:30",
 			EndTime:     "10:00",
 			Category:    "Sân cỏ nhân tạo",
