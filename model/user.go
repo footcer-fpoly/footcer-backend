@@ -4,8 +4,8 @@ import "time"
 
 type User struct {
 	UserId      string    `json:"userId,omitempty" db:"user_id,omitempty"`
-	Phone       string    `json:"phone,omitempty" db:"phone,omitempty" valid:"required"`
-	Email       string    `json:"email,omitempty" db:"email,omitempty" valid:"required"`
+	Phone       string    `json:"phone,omitempty" db:"phone,omitempty"  validate:"required,phone"`
+	Email       string    `json:"email,omitempty" db:"email,omitempty"`
 	Password    string    `json:"password" db:"password,omitempty"`
 	Avatar      string    `json:"avatar,omitempty" db:"avatar,omitempty" valid:"required"`
 	DisplayName string    `json:"displayName,omitempty" db:"display_name,omitempty" valid:"required"`
