@@ -391,7 +391,7 @@ func (u *UserHandler) UpdatePassword(c echo.Context) error {
 	hash := security.HashAndSalt([]byte(req.Password))
 	req.Password = hash
 
-	err := u.UserRepo.UpdatePassword(c.Request().Context(), req)
+	err = u.UserRepo.UpdatePassword(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
