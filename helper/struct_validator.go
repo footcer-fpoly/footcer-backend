@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 	"github.com/pkg/errors"
+	"regexp"
 	"strings"
 )
 
@@ -33,8 +34,13 @@ func (cv *StructValidator) RegisterValidate() {
 		log.Error(err.Error())
 	}
 
-	cv.Validator.RegisterValidation("pwd", func(fl validator.FieldLevel) bool {
-		return len(fl.Field().String()) >= 8
+
+	cv.Validator.RegisterValidation("phone", func(fl validator.FieldLevel) bool {
+		if len(fl.Field().String()) != 10 {
+			return false
+		}
+		valid, _ := regexp.MatchString(`^[0-9]+$`, fl.Field().String())
+		return valid
 	})
 
 	cv.Validator.RegisterTranslation("required", cv.Trans, func(ut ut.Translator) error {
@@ -51,10 +57,10 @@ func (cv *StructValidator) RegisterValidate() {
 		return t
 	})
 
-	cv.Validator.RegisterTranslation("pwd", cv.Trans, func(ut ut.Translator) error {
-		return ut.Add("pwd", "Mật khẩu tối thiểu 8 kí tự", true)
+	cv.Validator.RegisterTranslation("phone", cv.Trans, func(ut ut.Translator) error {
+		return ut.Add("phone", "Số điện thoại sai định dạng", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
-		t, _ := ut.T("pwd", fe.Field())
+		t, _ := ut.T("phone", fe.Field())
 		return t
 	})
 }
