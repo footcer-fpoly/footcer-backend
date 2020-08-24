@@ -389,3 +389,34 @@ func (u *UserHandler) UpdatePassword(c echo.Context) error {
 		Data:       nil,
 	})
 }
+
+func (u * UserHandler) DeleteUser(c echo.Context) error{
+	req := model.User{}
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+	err := c.Validate(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+		})
+	}
+
+	err = u.UserRepo.DeleteUser(c.Request().Context(), req.Phone)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lí thành công",
+		Data:       nil,
+	})
+
+
+}

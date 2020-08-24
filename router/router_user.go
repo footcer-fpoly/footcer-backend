@@ -23,6 +23,7 @@ func UserRouter(e *echo.Echo, sql *db.Sql) {
 	e.PUT("/users/update", userHandler.Update, middleware.JWTMiddleware())
 	e.GET("/users/profile", userHandler.Profile, middleware.JWTMiddleware())
 	e.PUT("/users/change-password", userHandler.UpdatePassword)
+	e.POST("/users/delete", userHandler.DeleteUser)
 
 	//e.GET("/user/list", userHandler.List, middleware.JWTMiddleware())
 }
