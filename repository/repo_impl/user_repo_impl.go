@@ -237,16 +237,16 @@ func (u UserRepoImpl) ValidUUID(context context.Context, uuidReq string) (model.
 	err := u.sql.Db.GetContext(context, &user, queryUserExits, uuidReq)
 
 	if err == sql.ErrNoRows {
-		return user,nil
+		return user, nil
 	}
 	if user.Role == 0 {
-		return user,message.UserConflict
+		return user, message.UserConflict
 
 	}
 	if user.Role == 1 {
-		return user,message.UserIsAdmin
+		return user, message.UserIsAdmin
 	}
-	return user,message.SomeWentWrong
+	return user, message.SomeWentWrong
 
 }
 
@@ -274,6 +274,30 @@ func (u UserRepoImpl) UpdatePassword(context context.Context, user model.User) e
 	}
 	if count == 0 {
 		return message.UserNotUpdated
+	}
+
+	return nil
+}
+
+func (u UserRepoImpl) DeleteUser(context context.Context, phone string) error {
+	sqlStatement := `
+		DELETE FROM public.users
+	WHERE phone = $1;
+	`
+
+	result, err := u.sql.Db.ExecContext(context, sqlStatement, phone)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return message.SomeWentWrong
+	}
+	if count == 0 {
+		return message.SomeWentWrong
 	}
 
 	return nil
