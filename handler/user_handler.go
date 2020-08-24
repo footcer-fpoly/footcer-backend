@@ -150,7 +150,6 @@ func (u *UserHandler) Update(c echo.Context) error {
 func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	req := model.User{}
 
-
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
@@ -320,25 +319,7 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 }
 
 func (u *UserHandler) CheckValidUUID(c echo.Context) error {
-	//req := model.User{}
-	//
-	//defer c.Request().Body.Close()
-	//if err := c.Bind(&req); err != nil {
-	//	return helper.ResponseErr(c, http.StatusBadRequest)
-	//}
-	//valid := u.UserRepo.ValidUUID(c.Request().Context(), req.UserId)
-	//if valid != nil {
-	//	return c.JSON(http.StatusConflict, model.Response{
-	//		StatusCode: http.StatusConflict,
-	//		Message:    valid.Error(),
-	//		Data:       nil,
-	//	})
-	//}
-	//return c.JSON(http.StatusOK, model.Response{
-	//	StatusCode: http.StatusOK,
-	//	Message:    "Cho phép đăng ký",
-	//	Data:       nil,
-	//})
+
 	req := model.User{}
 
 	defer c.Request().Body.Close()
@@ -356,13 +337,16 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-	user.Token = token
+
+	type customDataToken struct {
+		Token string `json:"token"`
+	}
 
 	if errValid != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    errValid.Error(),
-			Data:       user.Token,
+			Data:       customDataToken{Token: token},
 		})
 	}
 	return c.JSON(http.StatusOK, model.Response{

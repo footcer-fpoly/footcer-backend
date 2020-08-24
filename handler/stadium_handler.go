@@ -35,6 +35,24 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 	})
 }
 
+func (u *StadiumHandler) StadiumInfoForID(c echo.Context) error {
+	stadiumID := c.Param("id")
+
+	stadium, err := u.StadiumRepo.StadiumInfoForID(c.Request().Context(), stadiumID)
+	if err != nil {
+		return c.JSON(http.StatusConflict, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       stadium,
+	})
+}
+
 func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {

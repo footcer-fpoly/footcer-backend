@@ -113,6 +113,96 @@ FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
 
 }
 
+func (s StadiumRepoImpl) StadiumInfoForID(context context.Context, stadiumID string) (interface{}, error) {
+
+	type StadiumInfo struct {
+		model.Stadium
+		ArrayStadiumCollage `json:"stadium_collage"`
+		ArrayStadiumReview  `json:"review"`
+		model.User          `json:"user"`
+	}
+	stadium := StadiumInfo{}
+
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.stadium_id =  $1`
+	err := s.sql.Db.GetContext(context, &stadium,
+		query, stadiumID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return stadium, message.StadiumNotFound
+		}
+		log.Error(err.Error())
+		return stadium, err
+	}
+
+	//stadium collage
+	var stadiumColl = []model.StadiumCollage{}
+	queryColl := `SELECT stadium_collage_id, name_stadium_collage, amount_people, price_normal, price_peak,stadium_id, created_at, updated_at
+	FROM public.stadium_collage WHERE stadium_id = $1`
+	errColl := s.sql.Db.SelectContext(context, &stadiumColl, queryColl, stadium.StadiumId)
+	if errColl != nil {
+		if errColl == sql.ErrNoRows {
+			log.Error(errColl.Error())
+			return stadiumColl, message.StadiumNotFound
+		}
+		log.Error(errColl.Error())
+		return stadiumColl, errColl
+	}
+	stadium.ArrayStadiumCollage = stadiumColl
+
+	//review
+	var review = []model.Review{}
+
+	queryReview := `SELECT review_id, content, rate, stadium_id, review.user_id, review.created_at, review.updated_at, users.display_name,users.avatar
+FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE review.stadium_id = $1;`
+	errReview := s.sql.Db.SelectContext(context, &review, queryReview, stadium.StadiumId)
+	if errReview != nil {
+		if errReview == sql.ErrNoRows {
+			log.Error(errReview.Error())
+			return review, message.StadiumNotFound
+		}
+		log.Error(errReview.Error())
+		return review, errReview
+	}
+	var sumRate float64 = 0
+	if len(review) > 0 {
+		for _, rate := range review {
+			sumRate += rate.Rate
+		}
+		if sumRate > 0 {
+			stadium.Stadium.RateCount = sumRate / float64(len(review))
+		}
+	}
+
+	stadium.ArrayStadiumReview = review
+
+	//get order time
+	var timeOrder = []string{}
+
+	queryTimeOrder := `SELECT time_slot
+FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
+	errTimeOrder := s.sql.Db.SelectContext(context, &timeOrder, queryTimeOrder, "1", "0", stadium.StadiumId)
+	if errTimeOrder != nil {
+		if errTimeOrder == sql.ErrNoRows {
+			log.Error(errTimeOrder.Error())
+			return review, message.StadiumNotFound
+		}
+		log.Error(errTimeOrder.Error())
+		return review, errTimeOrder
+	}
+	var sumTimeOrder = "null"
+	if len(timeOrder) > 0 {
+		sumTimeOrder = strings.Join(timeOrder, ",")
+	}
+
+	stadium.Stadium.TimeOrder = sumTimeOrder
+
+	return stadium, nil
+
+}
+
+
 func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.Stadium) (model.Stadium, error) {
 
 	sqlStatement := `
