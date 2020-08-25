@@ -55,6 +55,14 @@ func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
+	err := c.Validate(req)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+		})
+	}
+
 	user, err := t.TeamRepo.SearchWithPhoneMemberTeam(c.Request().Context(), req.Phone)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
@@ -80,7 +88,6 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 	}
 
 	req.TeamDetailsId = uuid.NewV1().String()
-	req.Accept = "0"
 	req.Accept = "0"
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
@@ -140,6 +147,7 @@ func (t *TeamHandler) GetTeamForID(c echo.Context) error {
 	})
 
 }
+
 func (t *TeamHandler) DeleteMember(c echo.Context) error {
 
 	err := t.TeamRepo.DeleteMember(c.Request().Context(), c.Param("id"))
@@ -213,14 +221,36 @@ func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 	team, err := t.TeamRepo.UpdateTeam(c.Request().Context(), team)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, model.Response{
-			StatusCode: http.StatusUnprocessableEntity,
+			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusCreated, model.Response{
-		StatusCode: http.StatusCreated,
+		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       team,
+	})
+}
+
+func (t *TeamHandler) AcceptInvite(c echo.Context) error {
+
+	req := model.TeamDetails{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	err := t.TeamRepo.AcceptInvite(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusCreated, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
 	})
 }
