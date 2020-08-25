@@ -249,3 +249,36 @@ func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (mode
 	return team, nil
 
 }
+
+func (t TeamRepoImpl) AcceptInvite(context context.Context, teamDetails model.TeamDetails) error {
+
+	print(teamDetails.TeamId)
+	sqlStatement := `
+		UPDATE team_details
+		SET 
+			accept = :accept,
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE teams_id    = :teams_id AND user_id = :user_id
+	`
+
+	teamDetails.UpdatedAt = time.Now()
+	teamDetails.Accept = "1"
+
+	result, err := t.sql.Db.NamedExecContext(context, sqlStatement, teamDetails)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return message.SomeWentWrong
+	}
+	if count == 0 {
+		log.Error(err.Error())
+
+		return message.SomeWentWrong
+	}
+	return nil
+}

@@ -17,4 +17,5 @@ type TeamRepository interface {
 	DeleteTeam(context context.Context, teamID string) error
 
 	UpdateTeam(context context.Context, team model.Team) (model.Team, error)
+	AcceptInvite(context context.Context, teamDetails model.TeamDetails) error
 }
