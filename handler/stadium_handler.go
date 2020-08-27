@@ -182,8 +182,8 @@ func (s *StadiumHandler) AddStadiumCollage(c echo.Context) error {
 }
 
 func (s *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
-	latitude := c.Param("latitude")
-	longitude := c.Param("longitude")
+	latitude := c.QueryParam("latitude")
+	longitude := c.QueryParam("longitude")
 	stadium, err := s.StadiumRepo.SearchStadiumLocation(c.Request().Context(), latitude, longitude)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{

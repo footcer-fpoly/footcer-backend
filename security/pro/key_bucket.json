@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "durable-firefly-286302",
+  "private_key_id": "5c4c193990e4f7cc0a9207f246e06bbc1cc9f58e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC/aZHd7Cujc+T+\np1H4LSEVv79PaXWTjaMDll5VDgUgu+p/18DvTgJqeB+ZD5dCyqsQ5c5G2TNvCGTd\nEVNXxO6fftrXZfTkMSoOqAdKPr5kO5/KObWPTAIDY0bpStl2BpX+XrJ5uhz4a7/i\n8mz2kR8P+7Lf8fZiSphnWuquaAysruRN7z8zE4Z/prmwoGVHaK+OT/e9m219fpdF\nSRws9+fkcw+LuDNpnjTvX+dvbDgdh2BLL2D9PEt9In77nz2CfLRHFDKjnERJsxIy\nXMNDw9rW/GcP7GE8GdIdf9TB1h4kZDdt5oGBw6sP5TgvsBjV6yUipewksTx/+lxK\nNZr2fAAXAgMBAAECggEAWcwzl9q3oD97IzKo5FZ7qoHhxOYTOE1euAyfpaRlqHUw\nLpiv1TSSMpO3My3axwVgWpWM/7TfCcx00TdTE556Wg3/qcSVrkYYVnbisKSd2lUU\ngiEvuZGtchxthH3OZi3xyTtw3GWBONQH2fbkQopTecKZqLERZwxa0kYXSgnbRFka\nRIP30RY5D/qBdXuVFx+XwJtqwn2j0O2AiaJzkJyuz71ZWqV1H2/7nae+AwpZX/Qw\n5nvAc/IOO0V7Y5oxPcm62U6zEXFkFLbrcyB6xO5cHhRYIsd6D8DwNzvqn3tY/GfU\npxaYc/fx8F5eGV2H9Xot0hBNGc3p5McMjMH7io/NUQKBgQDlG30hmfL82otEa574\nI+Tik8iivGHrkEhhs+H32+3C13ksZB4BW9RxjqaZf2dZkBnK/23Go5IYrUVMllst\npoKxYWm/oy0AxK2mQndB+7DQqklZee0y7NTdFPzz8KAO8i8L1eWQ7aAVrVI4FsIJ\n4n8cPL60v8LgVZJDmBCeIry4ZwKBgQDV4V+kA+nC1VMzKGmMML53LWbTqbTaQtRn\nOcJSpf32vFEVwjE2uMDw30uCx2MiKzaUfsEbqG7Ghz5Oe+rO5H2Yxs20Tw2T9dX7\nAFRMF9WMeJuJlx2i2CW8zKBjYnuExXuZTanOvVOU+5cp8r1c36VGw/jVbtsnSpFi\nbH1R87Js0QKBgHIrv7DF+iv9cJd5FjBMGty6jqpiPF3aeeeOb9ZHl/WX0T/I6Jb+\nvyCT2Pv3XHZqdCAQKBFsI/r+JeGjr+5Q4yIoDD2+wEd4u5x11N5h4dwqcAER3J2b\nHfzKX7/ksq6gC8fXIN6XPEZxJ97hoHKyl2tn7hU+1otauVfL6MQVRXyTAoGAe/iF\nekk2XtNNxXJgM30xeVzcpEVS6cwg17B3/XXvjeu7yDPmWMSgOT4Ew8oUoQKRQWNz\nRTfM9dAAgnd7M+7nCf35z9Cemyu8mx+mvPB3vFNQPGFWMUS+IwAs206DMANT0Blf\nGtFMuCdYiF0F++Y6I5mGCxiVeOHVAUrHHRB3VHECgYAKF7WZ9K2zUD8+Vi7G1kWz\n+5AT+rlE3m9L6ggCB5YLPlGsrPuYViM80PBG6FRgkHQcn7vLnD4Z44sXHb1n1/4j\n/36SRYtbNBryd6ezku/A31KEIDjVkOPCKHAyuX6rUVERxF0v7j+C1oOYn3s7LMLC\nG0+2Ya2pT1Z8DEj41Z2Kgg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "footcer-bucket@durable-firefly-286302.iam.gserviceaccount.com",
+  "client_id": "117086452416018745629",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/footcer-bucket%40durable-firefly-286302.iam.gserviceaccount.com"
+}

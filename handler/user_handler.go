@@ -390,7 +390,7 @@ func (u *UserHandler) UpdatePassword(c echo.Context) error {
 	})
 }
 
-func (u * UserHandler) DeleteUser(c echo.Context) error{
+func (u *UserHandler) DeleteUser(c echo.Context) error {
 	req := model.User{}
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
@@ -417,6 +417,5 @@ func (u * UserHandler) DeleteUser(c echo.Context) error{
 		Message:    "Xử lí thành công",
 		Data:       nil,
 	})
-
 
 }
