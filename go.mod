@@ -3,6 +3,7 @@ module footcer-backend
 go 1.13
 
 require (
+	cloud.google.com/go/storage v1.10.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/go-playground/locales v0.13.0
@@ -28,7 +29,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381
-	golang.org/x/sys v0.0.0-20200724161237-0e2f3a69832c // indirect
-	golang.org/x/text v0.3.3 // indirect
+	google.golang.org/api v0.30.0
+	google.golang.org/appengine v1.6.6
 	googlemaps.github.io/maps v1.2.1
 )

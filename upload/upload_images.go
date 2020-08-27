@@ -1,20 +1,32 @@
 package upload
 
 import (
-	"fmt"
-	"io"
-	"os"
-	"path/filepath"
-
+	"cloud.google.com/go/storage"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/api/option"
+	"google.golang.org/appengine"
+	"io"
+	"net/url"
 )
 
+var (
+	storageClient *storage.Client
+)
 func Upload(c echo.Context) ([]string, error) {
+	bucket := "footcer" //your bucket name
 
+	var err error
+
+	ctx := appengine.NewContext(c.Request())
+
+	storageClient, err = storage.NewClient(ctx, option.WithCredentialsFile("../../security/pro/key_bucket.json"))
+	if err != nil {
+		return nil,err
+	}
 	images := make([]string, 0)
-
-	// Multipart form
+	//
+	//	// Multipart form
 	form, err := c.MultipartForm()
 	if err != nil {
 		return nil, err
@@ -31,28 +43,20 @@ func Upload(c echo.Context) ([]string, error) {
 
 			}
 			defer src.Close()
-			path := "../../images/" + folder + "/%s%s"
-			fileName := uuid.NewV4()
-			filePath := fmt.Sprintf(path, fileName, filepath.Ext(file.Filename))
-			// Destination
-			dst, err := os.Create(filePath)
-			if err != nil {
+			fileName := folder + "/"+uuid.NewV1().String()
+			sw := storageClient.Bucket(bucket).Object(fileName).NewWriter(ctx)
+
+			if _, err := io.Copy(sw, src); err != nil {
+
 				return nil, err
-
-			}
-			defer dst.Close()
-
-			// Copy
-			if _, err = io.Copy(dst, src); err != nil {
-				return nil, err
-
 			}
 
-			url := "http://footcer.tk:4000/static/" + folder + "/%s%s"
-			url = fmt.Sprintf(url, fileName, filepath.Ext(file.Filename))
-			images = append(images, url)
+			if err := sw.Close(); err != nil {
+				return nil, err
+			}
+			u, err := url.Parse("https://storage.cloud.google.com/" + bucket + "/" + sw.Attrs().Name)
+			images = append(images, u.String())
 		}
 	}
 	return images, err
-
 }

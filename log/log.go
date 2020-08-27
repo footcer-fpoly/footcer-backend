@@ -47,7 +47,7 @@ func InitLogger(forTest bool) *MyLogger {
 
 	if !forTest {
 		writerInfo, err := rotatelogs.New(
-			"../log_files/info/"+os.Getenv("APP_NAME")+"_%Y%m%d_info.log",
+			"../../log_files/info/"+os.Getenv("APP_NAME")+"_%Y%m%d_info.log",
 			rotatelogs.WithMaxAge(30*24*time.Hour),
 			rotatelogs.WithRotationTime(24*time.Hour),
 		)
@@ -57,7 +57,7 @@ func InitLogger(forTest bool) *MyLogger {
 		}
 
 		writerError, err := rotatelogs.New(
-			"../log_files/error/"+os.Getenv("APP_NAME")+"_%Y%m%d_error.log",
+			"../../log_files/error/"+os.Getenv("APP_NAME")+"_%Y%m%d_error.log",
 			rotatelogs.WithMaxAge(30*24*time.Hour),
 			rotatelogs.WithRotationTime(24*time.Hour),
 		)
