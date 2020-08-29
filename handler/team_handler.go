@@ -20,11 +20,28 @@ type TeamHandler struct {
 func (t *TeamHandler) AddTeam(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	urls, errUpload := upload.Upload(c)
+	if errUpload != nil {
+		return c.JSON(http.StatusBadRequest, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+	avatar := "http://footcer.tk/team/example_avatar_team.png"
+
+	if len(urls) > 0 {
+		avatar = urls[0]
+	}
+
 	req := model.Team{
-		TeamId:    uuid.NewV1().String(),
-		LeaderId:  claims.UserId,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		TeamId:     uuid.NewV1().String(),
+		Avatar:     avatar,
+		Background: "http://footcer.tk/team/example_background_team.png",
+		Level:      "VIP",
+		LeaderId:   claims.UserId,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	defer c.Request().Body.Close()
