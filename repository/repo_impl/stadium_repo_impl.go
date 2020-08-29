@@ -202,7 +202,6 @@ FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
 
 }
 
-
 func (s StadiumRepoImpl) StadiumUpdate(context context.Context, stadium model.Stadium) (model.Stadium, error) {
 
 	sqlStatement := `
@@ -331,6 +330,27 @@ func (s StadiumRepoImpl) SearchStadiumLocation(context context.Context, latitude
 		stadium[i].Distance = route.Rows[0].Elements[0].Distance.Meters / 1000
 		stadium[i].Timer = int(route.Rows[0].Elements[0].DurationInTraffic.Minutes())
 
+		//review
+		var review = []float64{}
+
+		queryReview := `SELECT rate FROM review WHERE review.stadium_id = $1;`
+		errReview := s.sql.Db.SelectContext(context, &review, queryReview, stadium[i].StadiumId)
+		if errReview != nil {
+			if errReview == sql.ErrNoRows {
+				log.Error(errReview.Error())
+			}
+			log.Error(errReview.Error())
+			return nil,message.SomeWentWrong
+		}
+		var sumRate float64 = 0
+		if len(review) > 0 {
+			for _, rate := range review {
+				sumRate += rate
+			}
+			if sumRate > 0 {
+				stadium[i].RateCount = sumRate / float64(len(review))
+			}
+		}
 	}
 
 	sort.Slice(stadium, func(i, j int) bool {
