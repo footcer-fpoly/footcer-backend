@@ -8,6 +8,7 @@ import (
 	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"strings"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -49,7 +50,8 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 		return team, message.SomeWentWrong
 	}
 	if len(team.MemberList) > 0 {
-		for _, element := range team.MemberList {
+
+		for _, element := range strings.SplitAfter(team.MemberList, ",") {
 			memberTeam = model.TeamDetails{
 				TeamDetailsId: uuid.NewV1().String(),
 				TeamId:        team.TeamId,
