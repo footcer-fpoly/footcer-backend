@@ -18,7 +18,6 @@ func TeamRouter(e *echo.Echo, sql *db.Sql) {
 	e.POST("/team/search-phone", teamHandler.SearchWithPhone, middleware.JWTMiddleware())
 	e.POST("/team/add-member", teamHandler.AddMemberTeam, middleware.JWTMiddleware())
 	e.GET("/team/for-user", teamHandler.GetTeamForUser, middleware.JWTMiddleware())
-	e.GET("/team/for-id/:id", teamHandler.GetTeamForID, middleware.JWTMiddleware())
 	e.DELETE("/team/delete-member/:id", teamHandler.DeleteMember, middleware.JWTMiddleware())
 	e.DELETE("/team/delete-team/:id", teamHandler.DeleteTeam, middleware.JWTMiddleware())
 	e.PUT("/team/update", teamHandler.UpdateTeam, middleware.JWTMiddleware())

@@ -142,24 +142,6 @@ func (t *TeamHandler) GetTeamForUser(c echo.Context) error {
 	})
 }
 
-func (t *TeamHandler) GetTeamForID(c echo.Context) error {
-	teamID := c.Param("id")
-	user, err := t.TeamRepo.GetTeamForID(c.Request().Context(), teamID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, model.Response{
-			StatusCode: http.StatusInternalServerError,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-
-	return c.JSON(http.StatusOK, model.Response{
-		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
-		Data:       user,
-	})
-
-}
 
 func (t *TeamHandler) DeleteMember(c echo.Context) error {
 
