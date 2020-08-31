@@ -43,11 +43,11 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
-
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
+
 
 	user, err := t.TeamRepo.AddTeam(c.Request().Context(), req)
 	if err != nil {
@@ -63,7 +63,6 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		Message:    "Xử lý thành công",
 		Data:       user,
 	})
-
 }
 
 func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
