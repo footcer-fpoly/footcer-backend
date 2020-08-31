@@ -47,8 +47,6 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-
-
 	user, err := t.TeamRepo.AddTeam(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
@@ -57,7 +55,6 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",

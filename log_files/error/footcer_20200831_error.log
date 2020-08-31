@@ -1,0 +1,2 @@
+time="2020-08-31T11:15:22.683767+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=143
+time="2020-08-31T11:15:28.957968+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=143
