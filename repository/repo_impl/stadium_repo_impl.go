@@ -83,7 +83,7 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 			sumRate += rate.Rate
 		}
 		if sumRate > 0 {
-			splitRate :=  strings.Split(fmt.Sprintf("%.1f", sumRate / float64(len(review))),".")
+			splitRate := strings.Split(fmt.Sprintf("%.1f", sumRate/float64(len(review))), ".")
 			stadium.Stadium.RateCount = CeilRate(splitRate)
 		}
 	}
@@ -174,7 +174,7 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 			sumRate += rate.Rate
 		}
 		if sumRate > 0 {
-			splitRate :=  strings.Split(fmt.Sprintf("%.1f", sumRate / float64(len(review))),".")
+			splitRate := strings.Split(fmt.Sprintf("%.1f", sumRate/float64(len(review))), ".")
 			stadium.Stadium.RateCount = CeilRate(splitRate)
 		}
 	}
@@ -352,7 +352,7 @@ func (s StadiumRepoImpl) SearchStadiumLocation(context context.Context, latitude
 				sumRate += rate
 			}
 			if sumRate > 0 {
-				splitRate :=  strings.Split(fmt.Sprintf("%.1f", sumRate / float64(len(review))),".")
+				splitRate := strings.Split(fmt.Sprintf("%.1f", sumRate/float64(len(review))), ".")
 				stadium[i].RateCount = CeilRate(splitRate)
 			}
 		}
@@ -384,16 +384,16 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 
 }
 
-func CeilRate(rate []string) float64{
-	  var rateCeil float64   = 0.0
-	  rate1,_ := strconv.Atoi(rate[0])
-	  rate2,_ := strconv.Atoi(rate[1])
+func CeilRate(rate []string) float64 {
+	var rateCeil float64 = 0.0
+	rate1, _ := strconv.Atoi(rate[0])
+	rate2, _ := strconv.Atoi(rate[1])
 
-	if  rate2 >= 0 && rate2 <= 2 {
+	if rate2 >= 0 && rate2 <= 2 {
 		rateCeil = float64(rate1)
-	}else if rate2 >= 3 && rate2 <= 7 {
+	} else if rate2 >= 3 && rate2 <= 7 {
 		rateCeil = float64(rate1) + 0.5
-	}else{
+	} else {
 		rateCeil = float64(rate1) + 1
 
 	}
