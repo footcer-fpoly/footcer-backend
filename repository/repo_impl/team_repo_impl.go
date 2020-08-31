@@ -51,7 +51,7 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 	}
 	if len(team.MemberList) > 0 {
 
-		for _, element := range strings.SplitAfter(team.MemberList, ",") {
+		for _, element := range strings.Split(team.MemberList, ",") {
 			memberTeam = model.TeamDetails{
 				TeamDetailsId: uuid.NewV1().String(),
 				TeamId:        team.TeamId,
