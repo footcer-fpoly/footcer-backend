@@ -54,7 +54,7 @@ func Upload(c echo.Context) ([]string, error) {
 			if err := sw.Close(); err != nil {
 				return nil, err
 			}
-			u, err := url.Parse("https://storage.cloud.google.com/" + bucket + "/" + sw.Attrs().Name)
+			u, err := url.Parse("https://storage.googleapis.com/" + bucket + "/" + sw.Attrs().Name)
 			images = append(images, u.String())
 		}
 	}
