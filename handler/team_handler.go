@@ -95,17 +95,24 @@ func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 	req := model.TeamDetails{}
 
+
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
 
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+
+
 	req.TeamDetailsId = uuid.NewV1().String()
 	req.Accept = "0"
+	req.Role = "0"
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
 
-	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req)
+	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req,claims.UserId)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,

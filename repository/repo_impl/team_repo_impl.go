@@ -3,6 +3,7 @@ package repo_impl
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"footcer-backend/db"
 	"footcer-backend/log"
 	"footcer-backend/message"
@@ -91,17 +92,37 @@ func (t TeamRepoImpl) SearchWithPhoneMemberTeam(context context.Context, phone s
 	return user, nil
 }
 
-func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.TeamDetails) (model.TeamDetails, error) {
+func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.TeamDetails, userId string) (model.TeamDetails, error) {
+
 	var user = model.User{}
-	queryMemberExits := `SELECT user_id FROM public.team_details WHERE user_id = $1 AND team_id = $2`
+
+	queryIsAdminTeam := `SELECT leader_id FROM public.team WHERE team_id = $1`
+
+	var leaderId = ""
+
+	errIsAdminTeam := t.sql.Db.GetContext(context, &leaderId, queryIsAdminTeam, teamDetails.TeamId)
+	
+	if errIsAdminTeam != nil {
+		log.Error(errIsAdminTeam.Error())
+		return teamDetails, message.SomeWentWrong
+	}
+	
+	if strings.EqualFold(leaderId,userId) == false {
+		return teamDetails, message.TeamIsNotAdmin
+	}
+
+	queryMemberExits := `SELECT user_id FROM public.team_details WHERE user_id = $1 AND teams_id = $2`
 
 	err := t.sql.Db.GetContext(context, &user, queryMemberExits, teamDetails.UserId, teamDetails.TeamId)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			queryCreateMemberTeam := `INSERT INTO public.team_details(
-				team_details_id, teams_id, user_id, accept, created_at, updated_at)
-				VALUES (:team_details_id, :teams_id, :user_id, :accept, :created_at, :updated_at);`
+				team_details_id, teams_id, user_id, accept,role_team, created_at, updated_at)
+				VALUES (:team_details_id, :teams_id, :user_id, :accept, :role_team, :created_at, :updated_at);`
+			teamDetails.Role = "0"
+			teamDetails.Accept = "0"
+
 			_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, teamDetails)
 			if errMemberTeam != nil {
 				log.Error(errMemberTeam.Error())
