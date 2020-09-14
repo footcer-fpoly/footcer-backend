@@ -8,7 +8,7 @@ import (
 type TeamRepository interface {
 	AddTeam(context context.Context, team model.Team) (model.Team, error)
 	SearchWithPhoneMemberTeam(context context.Context, phone string) (model.User, error)
-	AddMemberTeam(context context.Context, teamDetails model.TeamDetails) (model.TeamDetails, error)
+	AddMemberTeam(context context.Context, teamDetails model.TeamDetails, userId string) (model.TeamDetails, error)
 
 	GetTeamForUser(context context.Context, userId string) (interface{}, error)
 

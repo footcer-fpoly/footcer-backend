@@ -17,6 +17,7 @@ var (
 
 	//team
 	TeamMemberExits  = errors.New("Thành viên đã tồn tại")
+	TeamIsNotAdmin = errors.New("Bạn không phải là trưởng nhóm")
 	TeamMemberDelete = errors.New("Xoá thành viên thành công")
 	TeamDelete       = errors.New("Xoá nhóm thành công")
 	AdminIsTeam      = errors.New("Bạn là trưởng nhóm, không thể rời nhóm")
