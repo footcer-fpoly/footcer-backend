@@ -3,7 +3,6 @@ package repo_impl
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"footcer-backend/db"
 	"footcer-backend/log"
 	"footcer-backend/message"
