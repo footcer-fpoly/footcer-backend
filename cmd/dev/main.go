@@ -47,12 +47,12 @@ func main() {
 	structValidator.RegisterValidate()
 	e.Validator = structValidator
 
-	t := &Template{
-		templates: template.Must(template.ParseGlob("../../public/views/*.html")),
-	}
-	e.Renderer = t
-
-	e.GET("/", Web)
+	//t := &Template{
+	//	templates: template.Must(template.ParseGlob("../../public/views/*.html")),
+	//}
+	//e.Renderer = t
+	//
+	//e.GET("/", Web)
 	router.UserRouter(e, sql)
 	router.StadiumRouter(e, sql)
 	router.ReviewRouter(e, sql)

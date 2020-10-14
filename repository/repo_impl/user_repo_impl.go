@@ -10,6 +10,8 @@ import (
 	"footcer-backend/model"
 	"footcer-backend/model/req"
 	"footcer-backend/repository"
+	"math"
+	"strconv"
 	"time"
 
 	"github.com/lib/pq"
@@ -122,10 +124,10 @@ func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) (int,
 		return 200, user, nil
 	}
 	if user.Role == 0 {
-		return 409, user, message.UserConflict
+		return 209, user, message.UserConflict
 	}
 	if user.Role == 1 {
-		return 403, user, message.UserIsAdmin
+		return 203, user, message.UserIsAdmin
 	}
 
 	return 409, user, message.SomeWentWrong
@@ -133,16 +135,22 @@ func (u UserRepoImpl) ValidPhone(context context.Context, phoneReq string) (int,
 }
 
 func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (model.User, error) {
-	query := `INSERT INTO users(user_id, phone, email,password,role, display_name,birthday,position,level, avatar,verify,created_at, updated_at)
-     VALUES(:user_id, :phone, :email,:password,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
+	query := `INSERT INTO users(user_id, phone, email,password,role, display_name,birthday,position,level, avatar,verify,token_notify,created_at, updated_at)
+     VALUES(:user_id, :phone, :email,:password,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :token_notify,:created_at, :updated_at)`
 
+	user.Token = ""
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	_, err := u.sql.Db.NamedExecContext(context, query, user)
 	if err != nil {
 		log.Error(err.Error())
+		if err != sql.ErrNoRows {
+			return user, message.UserConflict
+		}
 		return user, message.SignUpFail
 	}
+	var stadiumRepo = StadiumRepoImpl{sql: u.sql}
+
 	if user.Role == 1 {
 		var stadiumId = uuid.NewV1().String()
 
@@ -152,47 +160,137 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			Address:     "01 Đường Tô Kí, Quận 12, Tp.HCM",
 			Description: "Sân cỏ nhân tao",
 			Image:       "http://footcer.tk:4000/static/stadium/example.jpg",
-			StartTime:   "5:30",
-			EndTime:     "10:00",
 			Category:    "Sân cỏ nhân tạo",
 			Latitude:    0,
 			Longitude:   1,
 			Ward:        "",
 			District:    "",
 			City:        "",
-			TimePeak:    "0",
 			UserId:      user.UserId,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
 
-		queryCreateStadium := `INSERT INTO stadium(
-		stadium_id, name_stadium, address, description, image, start_time, end_time, category, latitude, longitude, ward, district, city, time_peak,user_id, created_at, updated_at)
-		VALUES (:stadium_id, :name_stadium, :address, :description, :image, :start_time, :end_time, :category, :latitude, :longitude, :ward, :district, :city,:time_peak, :user_id, :created_at, :updated_at)`
+		queryCreateStadium := `INSERT INTO public.stadium(
+	stadium_id, user_id, name_stadium, address, description, image, category, latitude, longitude, ward, district, city, created_at, updated_at)
+	VALUES (:stadium_id, :user_id, :name_stadium, :address, :description, :image, :category, :latitude, :longitude, :ward, :district, :city, :created_at, :updated_at);`
 
 		_, err := u.sql.Db.NamedExecContext(context, queryCreateStadium, stadium)
 
 		if err != nil {
 			log.Error(err.Error())
+			queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
+			row, err := u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
+			if err != nil {
+			}
+			count, _ := row.RowsAffected()
+			if count == 0 {
+				log.Error(err.Error())
+			}
 			return user, message.SignUpFail
 		}
+
+		var stadiumCollageId = uuid.NewV4().String()
+
 		var stadiumCollage = model.StadiumCollage{
-			StadiumCollageId:   uuid.NewV1().String(),
+			StadiumCollageId:   stadiumCollageId,
 			NameStadiumCollage: "Sân số 1",
 			AmountPeople:       "5",
-			PriceNormal:        0,
-			PricePeak:          0,
+			StartTime:          "19800000", //5:30
+			EndTime:            "79200000", //22:30
+			PlayTime:           "5400000",  // 90'
 			StadiumId:          stadiumId,
 			CreatedAt:          time.Now(),
 			UpdatedAt:          time.Now(),
 		}
-		queryCreateStadiumCollage := `INSERT INTO public.stadium_collage(
-		stadium_collage_id, name_stadium_collage, amount_people, price_normal, price_peak,stadium_id, created_at, updated_at)
-		VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people,  :price_normal, :price_peak,:stadium_id, :created_at, :updated_at);`
-		_, errCreateStadiumCollage := u.sql.Db.NamedExecContext(context, queryCreateStadiumCollage, stadiumCollage)
+
+		_, errCreateStadiumCollage := stadiumRepo.StadiumCollageAdd(context, stadiumCollage)
 		if errCreateStadiumCollage != nil {
 			log.Error(errCreateStadiumCollage.Error())
+
+			queryDeleteStadium := `DELETE FROM public.stadium WHERE stadium_id = $1`
+			row, err := u.sql.Db.ExecContext(context, queryDeleteStadium, stadiumCollage.StadiumId)
+			if err != nil {
+				log.Error(err.Error())
+			}
+			count, _ := row.RowsAffected()
+			if count == 0 {
+				log.Error(err.Error())
+			}
+
+			queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
+			row, err = u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
+			if err != nil {
+				log.Error(err.Error())
+			}
+			count, _ = row.RowsAffected()
+			if count == 0 {
+				log.Error(err.Error())
+			}
+			return user, message.SignUpFail
+
 		}
+		startTime, _ := strconv.ParseInt(stadiumCollage.StartTime, 10, 64)
+		endTime, _ := strconv.ParseInt(stadiumCollage.EndTime, 10, 64)
+		playTime, _ := strconv.ParseInt(stadiumCollage.PlayTime, 10, 64)
+
+		start := startTime
+		end := 0
+
+		amountTimer := math.Floor(float64((endTime - startTime) / playTime))
+
+		for i := 0; i < int(amountTimer); i++ {
+			end = int(start + playTime)
+			var stadiumDetails = model.StadiumDetails{
+				StadiumDetailsId: uuid.NewV1().String(),
+				StadiumCollageId: stadiumCollageId,
+				StartTimeDetails: strconv.Itoa(int(start)),
+				EndTimeDetails:   strconv.Itoa(end),
+				Price:            0,
+				Description:      "",
+				HasOrder:         false,
+				CreatedAt:        time.Now(),
+				UpdatedAt:        time.Now(),
+			}
+
+			_, errCreateStadiumDetails := stadiumRepo.StadiumDetailsAdd(context, stadiumDetails)
+			if errCreateStadiumDetails != nil {
+				log.Error(errCreateStadiumDetails.Error())
+				//
+				queryDeleteStadiumCollage := `DELETE FROM public.stadium_collage WHERE stadium_collage_id = $1`
+				row, err := u.sql.Db.ExecContext(context, queryDeleteStadiumCollage, stadiumCollageId)
+				if err != nil {
+				}
+				count, _ := row.RowsAffected()
+				if count == 0 {
+					log.Error(err.Error())
+				}
+
+				queryDeleteStadium := `DELETE FROM public.stadium WHERE stadium_id = $1`
+				row, err = u.sql.Db.ExecContext(context, queryDeleteStadium, stadiumId)
+				if err != nil {
+				}
+				count, _ = row.RowsAffected()
+				if count == 0 {
+					log.Error(err.Error())
+				}
+
+				queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
+				row, err = u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
+				if err != nil {
+				}
+				count, _ = row.RowsAffected()
+				if count == 0 {
+					log.Error(err.Error())
+				}
+
+				return user, message.SignUpFail
+
+			}
+
+			start = int64(end)
+		}
+
 	}
 	return user, err
 }

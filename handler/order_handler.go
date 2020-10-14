@@ -28,8 +28,8 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 
 	req.OrderId = uuid.NewV1().String()
 	req.UserId = claims.UserId
-	req.Accept = "0"
-	req.Finish = "0"
+	req.Accept = false
+	req.Finish = false
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
 
@@ -57,7 +57,7 @@ func (o *OrderHandler) AcceptOrder(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	req.Accept = "1"
+	req.Accept = true
 
 	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
 	if err != nil {
@@ -83,7 +83,7 @@ func (o *OrderHandler) RefuseOrder(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	req.Accept = "-1"
+	req.Accept = false
 
 	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
 	if err != nil {
@@ -109,7 +109,7 @@ func (o *OrderHandler) FinishOrder(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	req.Finish = "1"
+	req.Finish = true
 
 	err := o.OrderRepo.FinishOrder(c.Request().Context(), req)
 	if err != nil {

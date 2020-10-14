@@ -6,7 +6,7 @@ var (
 	//user
 	UserConflict   = errors.New("Người dùng đã tồn tại")
 	UserNotFound   = errors.New("Người dùng không tồn tại")
-	UserIsAdmin    = errors.New("Bạn đã chủ sân, không thể tạo người dùng ")
+	UserIsAdmin    = errors.New("Bạn đã là chủ sân, không thể tạo người dùng ")
 	UserNotUpdated = errors.New("Cập nhật thông tin người dùng thất bại")
 	EmailExits     = errors.New("Email đã tồn tại")
 	SignUpFail     = errors.New("Đăng ký thất bại")
@@ -27,6 +27,7 @@ var (
 	UpdateFail = errors.New("Update không thành công")
 
 	//
+	Success = "Xử lý thành công"
 	Permission    = errors.New("Lỗi quyền truy cập")
 	SomeWentWrong = errors.New("Có lỗi xảy ra")
 )

@@ -14,6 +14,7 @@ type User struct {
 	Position    string    `json:"position,omitempty" db:"position,omitempty"`
 	Level       string    `json:"level,omitempty" db:"level,omitempty"`
 	Verify      string    `json:"verify,omitempty" db:"verify,omitempty"`
+	TokenNotify string    `json:"_,omitempty" db:"token_notify,omitempty"`
 	CreatedAt   time.Time `json:"-" db:"created_at, omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at, omitempty"`
 	Token       string    `json:"token,omitempty"`
