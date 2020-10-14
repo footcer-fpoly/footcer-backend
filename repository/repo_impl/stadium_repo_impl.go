@@ -35,7 +35,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	}
 	stadium := StadiumInfo{}
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image,  stadium.start_time, stadium.end_time, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city,stadium.time_peak,stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city, stadium.user_id,users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
 	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.user_id =  $1`
 	err := s.sql.Db.GetContext(context, &stadium,
 		query, userId)
@@ -50,7 +50,7 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 
 	//stadium collage
 	var stadiumColl = []model.StadiumCollage{}
-	queryColl := `SELECT stadium_collage_id, name_stadium_collage, amount_people, price_normal, price_peak,stadium_id, created_at, updated_at
+	queryColl := `SELECT stadium_collage_id, stadium_id, name_stadium_collage, amount_people, start_time, end_time, play_time, created_at, updated_at
 	FROM public.stadium_collage WHERE stadium_id = $1`
 	errColl := s.sql.Db.SelectContext(context, &stadiumColl, queryColl, stadium.StadiumId)
 	if errColl != nil {
@@ -62,6 +62,23 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 		return stadiumColl, errColl
 	}
 	stadium.ArrayStadiumCollage = stadiumColl
+
+	//stadium details
+	var stadiumDet = []model.StadiumDetails{}
+	queryDet := `SELECT stadium_collage_id, stadium_id, name_stadium_collage, amount_people, start_time, end_time, play_time, created_at, updated_at
+	FROM public.stadium_collage WHERE stadium_id = $1`
+	errDet := s.sql.Db.SelectContext(context, &stadiumDet, queryDet, stadium.StadiumId)
+	if errDet != nil {
+		if errDet == sql.ErrNoRows {
+			log.Error(errDet.Error())
+			return stadiumDet, message.StadiumNotFound
+		}
+		log.Error(errColl.Error())
+		return stadiumDet, errColl
+	}
+
+
+
 
 	//review
 	var review = []model.Review{}
@@ -89,27 +106,6 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 	}
 
 	stadium.ArrayStadiumReview = review
-
-	//get order time
-	var timeOrder = []string{}
-
-	queryTimeOrder := `SELECT time_slot
-FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
-	errTimeOrder := s.sql.Db.SelectContext(context, &timeOrder, queryTimeOrder, "1", "0", stadium.StadiumId)
-	if errTimeOrder != nil {
-		if errTimeOrder == sql.ErrNoRows {
-			log.Error(errTimeOrder.Error())
-			return review, message.StadiumNotFound
-		}
-		log.Error(errTimeOrder.Error())
-		return review, errTimeOrder
-	}
-	var sumTimeOrder = "null"
-	if len(timeOrder) > 0 {
-		sumTimeOrder = strings.Join(timeOrder, ",")
-	}
-
-	stadium.Stadium.TimeOrder = sumTimeOrder
 
 	return stadium, nil
 
@@ -195,12 +191,6 @@ FROM public.orders WHERE accept = $1 AND finish = $2 AND stadium_id = $3;`
 		log.Error(errTimeOrder.Error())
 		return review, errTimeOrder
 	}
-	var sumTimeOrder = "null"
-	if len(timeOrder) > 0 {
-		sumTimeOrder = strings.Join(timeOrder, ",")
-	}
-
-	stadium.Stadium.TimeOrder = sumTimeOrder
 
 	return stadium, nil
 
@@ -254,8 +244,6 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 		SET 
 			name_stadium_collage  = (CASE WHEN LENGTH(:name_stadium_collage) = 0 THEN name_stadium_collage ELSE :name_stadium_collage END),
 			amount_people = (CASE WHEN LENGTH(:amount_people) = 0 THEN amount_people ELSE :amount_people END),
-			price_normal = (CASE WHEN LENGTH(:price_normal) = 0 THEN price_normal ELSE :price_normal END),
-			price_peak = (CASE WHEN LENGTH(:price_peak) = 0 THEN price_peak ELSE :price_peak END),
 			updated_at 	  = COALESCE (:updated_at, updated_at)
 		WHERE stadium_collage_id    = :stadium_collage_id
 	`
@@ -283,13 +271,13 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl model.StadiumCollage) (model.StadiumCollage, error) {
 
 	queryCreate := `INSERT INTO public.stadium_collage(
-	stadium_collage_id, name_stadium_collage, amount_people,price_normal, price_peak,stadium_id, created_at, updated_at)
-	VALUES (:stadium_collage_id, :name_stadium_collage, :amount_people, :price_normal,:price_peak,:stadium_id, :created_at, :updated_at)`
+	stadium_collage_id, stadium_id, name_stadium_collage, amount_people,start_time, end_time , play_time,created_at, updated_at)
+	VALUES (:stadium_collage_id, :stadium_id, :name_stadium_collage, :amount_people,:start_time,:end_time,:play_time, :created_at, :updated_at);`
 
 	_, err := s.sql.Db.NamedExecContext(context, queryCreate, stadiumColl)
 	if err != nil {
 		log.Error(err.Error())
-		return stadiumColl, message.StadiumNotUpdated
+		return stadiumColl, message.SomeWentWrong
 	}
 	return stadiumColl, nil
 
@@ -382,6 +370,19 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 	}
 	return stadium, nil
 
+}
+
+func (s StadiumRepoImpl) StadiumDetailsAdd(context context.Context, stadiumDetails model.StadiumDetails) (model.StadiumDetails, error) {
+	queryCreate := `INSERT INTO public.stadium_details(
+	stadium_detail_id, stadium_collage_id, start_time_detail, end_time_detail, price, description, has_order, created_at, updated_at)
+	VALUES (:stadium_detail_id, :stadium_collage_id, :start_time_detail, :end_time_detail, :price, :description, :has_order, :created_at, :updated_at);`
+
+	_, err := s.sql.Db.NamedExecContext(context, queryCreate, stadiumDetails)
+	if err != nil {
+		log.Error(err.Error())
+		return stadiumDetails, message.SomeWentWrong
+	}
+	return stadiumDetails, nil
 }
 
 func CeilRate(rate []string) float64 {

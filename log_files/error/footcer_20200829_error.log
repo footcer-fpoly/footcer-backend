@@ -1,1 +1,0 @@
-time="2020-08-29T11:54:37.048148+07:00" level=error msg="pq: column \"rate\" does not exist" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=343

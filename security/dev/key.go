@@ -1,4 +1,4 @@
-package pro
+package dev
 
 var (
 	JWT_KEY        = "footcer6969696969969696996969699696996"

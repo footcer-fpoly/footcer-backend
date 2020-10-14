@@ -2,14 +2,14 @@ package handler
 
 import (
 	"footcer-backend/helper"
+	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
 	"footcer-backend/upload"
-	"net/http"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
+	"net/http"
 )
 
 type StadiumHandler struct {
@@ -30,7 +30,7 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
+		Message: message.Success,
 		Data:       stadium,
 	})
 }
@@ -48,12 +48,12 @@ func (u *StadiumHandler) StadiumInfoForID(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
+		Message:    message.Success,
 		Data:       stadium,
 	})
 }
 
-func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
+func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
 		return c.JSON(http.StatusBadRequest, model.Response{
@@ -89,20 +89,17 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 		Address:     req.Address,
 		Description: req.Description,
 		Image:       image,
-		StartTime:   req.StartTime,
-		EndTime:     req.EndTime,
+
 		Category:    req.Category,
 		Latitude:    req.Latitude,
 		Longitude:   req.Longitude,
 		Ward:        req.Ward,
 		District:    req.District,
 		City:        req.City,
-		TimePeak:    req.TimePeak,
-		TimeOrder:   req.TimeOrder,
 		UserId:      claims.UserId,
 	}
 
-	stadium, err = s.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium)
+	stadium, err = u.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, model.Response{
 			StatusCode: http.StatusUnprocessableEntity,
@@ -117,7 +114,7 @@ func (s *StadiumHandler) UpdateStadium(c echo.Context) error {
 	})
 }
 
-func (s *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
+func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 	req := model.StadiumCollage{}
 
 	if err := c.Bind(&req); err != nil {
@@ -137,11 +134,9 @@ func (s *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 		StadiumCollageId:   req.StadiumCollageId,
 		NameStadiumCollage: req.NameStadiumCollage,
 		AmountPeople:       req.AmountPeople,
-		PriceNormal:        req.PriceNormal,
-		PricePeak:          req.PricePeak,
 	}
 
-	stadiumColl, err = s.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
+	stadiumColl, err = u.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, model.Response{
 			StatusCode: http.StatusUnprocessableEntity,
@@ -156,7 +151,7 @@ func (s *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 	})
 }
 
-func (s *StadiumHandler) AddStadiumCollage(c echo.Context) error {
+func (u *StadiumHandler) AddStadiumCollage(c echo.Context) error {
 	req := model.StadiumCollage{}
 	req.StadiumCollageId = uuid.NewV1().String()
 
@@ -165,7 +160,7 @@ func (s *StadiumHandler) AddStadiumCollage(c echo.Context) error {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
 
-	user, err := s.StadiumRepo.StadiumCollageAdd(c.Request().Context(), req)
+	user, err := u.StadiumRepo.StadiumCollageAdd(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -176,15 +171,15 @@ func (s *StadiumHandler) AddStadiumCollage(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
+		Message:    message.Success,
 		Data:       user,
 	})
 }
 
-func (s *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
+func (u *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
 	latitude := c.QueryParam("latitude")
 	longitude := c.QueryParam("longitude")
-	stadium, err := s.StadiumRepo.SearchStadiumLocation(c.Request().Context(), latitude, longitude)
+	stadium, err := u.StadiumRepo.SearchStadiumLocation(c.Request().Context(), latitude, longitude)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -194,16 +189,16 @@ func (s *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
+		Message:    message.Success,
 		Data:       stadium,
 	})
 
 }
 
-func (s *StadiumHandler) SearchStadiumName(c echo.Context) error {
+func (u *StadiumHandler) SearchStadiumName(c echo.Context) error {
 	name := c.Param("name")
 
-	stadium, err := s.StadiumRepo.SearchStadiumName(c.Request().Context(), name)
+	stadium, err := u.StadiumRepo.SearchStadiumName(c.Request().Context(), name)
 	if err != nil {
 		return c.JSON(http.StatusConflict, model.Response{
 			StatusCode: http.StatusConflict,
@@ -213,7 +208,7 @@ func (s *StadiumHandler) SearchStadiumName(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
+		Message:    message.Success,
 		Data:       stadium,
 	})
 }
