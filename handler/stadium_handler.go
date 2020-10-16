@@ -22,7 +22,7 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 
 	stadium, err := u.StadiumRepo.StadiumInfo(c.Request().Context(), claims.UserId)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -40,7 +40,7 @@ func (u *StadiumHandler) StadiumInfoForID(c echo.Context) error {
 
 	stadium, err := u.StadiumRepo.StadiumInfoForID(c.Request().Context(), stadiumID)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -56,7 +56,7 @@ func (u *StadiumHandler) StadiumInfoForID(c echo.Context) error {
 func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    errUpload.Error(),
 		})
@@ -78,7 +78,7 @@ func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 	// validate thông tin gửi lên
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
@@ -101,8 +101,8 @@ func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 
 	stadium, err = u.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, model.Response{
-			StatusCode: http.StatusUnprocessableEntity,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}
@@ -124,7 +124,7 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 	// validate thông tin gửi lên
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
@@ -138,8 +138,8 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 
 	stadiumColl, err = u.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, model.Response{
-			StatusCode: http.StatusUnprocessableEntity,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}
@@ -162,7 +162,7 @@ func (u *StadiumHandler) AddStadiumCollage(c echo.Context) error {
 
 	user, err := u.StadiumRepo.StadiumCollageAdd(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -181,7 +181,7 @@ func (u *StadiumHandler) SearchStadiumLocation(c echo.Context) error {
 	longitude := c.QueryParam("longitude")
 	stadium, err := u.StadiumRepo.SearchStadiumLocation(c.Request().Context(), latitude, longitude)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -200,7 +200,7 @@ func (u *StadiumHandler) SearchStadiumName(c echo.Context) error {
 
 	stadium, err := u.StadiumRepo.SearchStadiumName(c.Request().Context(), name)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,

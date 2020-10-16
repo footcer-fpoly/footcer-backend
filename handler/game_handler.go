@@ -31,7 +31,7 @@ func (g *GameHandler) AddGame(c echo.Context) error {
 
 	game, err := g.GameRepo.AddGame(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -57,7 +57,7 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 
 	err := g.GameRepo.JoinGame(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -81,7 +81,7 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 
 	err := g.GameRepo.AcceptJoin(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -106,7 +106,7 @@ func (g *GameHandler) RefuseJoin(c echo.Context) error {
 
 	err := g.GameRepo.RefuseJoin(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -125,7 +125,7 @@ func (g *GameHandler) GetGames(c echo.Context) error {
 
 	games, err := g.GameRepo.GetGames(c.Request().Context(), date)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -143,7 +143,7 @@ func (g *GameHandler) GetGame(c echo.Context) error {
 	gameId := c.Param("id")
 	game, err := g.GameRepo.GetGame(c.Request().Context(), gameId)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -164,14 +164,14 @@ func (g *GameHandler) UpdateScore(c echo.Context) error {
 	}
 	_, err := g.GameRepo.UpdateScore(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, model.Response{
-			StatusCode: http.StatusUnprocessableEntity,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}
 
-	return c.JSON(http.StatusCreated, model.Response{
-		StatusCode: http.StatusCreated,
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       nil,
 	})

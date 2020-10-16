@@ -34,6 +34,7 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 	queryUserExits := `SELECT * FROM users WHERE users.phone = $1`
 
 	user.Email = ""
+	user.TokenNotify = "123"
 	err := u.sql.Db.GetContext(context, &user, queryUserExits, userReq.Phone)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -43,6 +44,9 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = time.Now()
 			_, err := u.sql.Db.NamedExecContext(context, query, userReq)
+			if err != nil{
+				log.Error(err.Error())
+			}
 			return userReq, err
 		} else {
 			fmt.Println("User Exits -> Return User")
