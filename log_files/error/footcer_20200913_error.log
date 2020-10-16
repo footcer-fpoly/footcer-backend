@@ -1,4 +1,0 @@
-time="2020-09-13T20:50:22.014001+07:00" level=error msg="pq: column \"team_id\" does not exist" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=112
-time="2020-09-13T20:52:46.48071+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=143
-time="2020-09-13T20:53:38.398109+07:00" level=error msg="pq: null value in column \"role_team\" violates not-null constraint" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=107
-time="2020-09-13T20:54:46.734384+07:00" level=error msg="pq: null value in column \"role_team\" violates not-null constraint" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=110

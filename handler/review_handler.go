@@ -34,7 +34,7 @@ func (u *ReviewHandler) AddReview(c echo.Context) error {
 
 	_, err := u.ReviewRepo.AddReview(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,

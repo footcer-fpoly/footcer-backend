@@ -27,8 +27,8 @@ func (u *UserHandler) Profile(c echo.Context) error {
 	user, err := u.UserRepo.SelectById(c.Request().Context(), claims.UserId)
 	if err != nil {
 		if err == message.UserNotFound {
-			return c.JSON(http.StatusNotFound, model.Response{
-				StatusCode: http.StatusNotFound,
+			return c.JSON(http.StatusOK, model.Response{
+				StatusCode: http.StatusOK,
 				Message:    err.Error(),
 				Data:       nil,
 			})
@@ -67,8 +67,8 @@ func (u *UserHandler) Create(c echo.Context) error {
 
 	user, err := u.UserRepo.Create(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
-			StatusCode: http.StatusConflict,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
 			Message:    err.Error(),
 			Data:       nil,
 		})
@@ -94,8 +94,8 @@ func (u *UserHandler) Create(c echo.Context) error {
 func (u *UserHandler) Update(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
-			StatusCode: http.StatusBadRequest,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
 			Message:    errUpload.Error(),
 		})
 	}
@@ -113,8 +113,8 @@ func (u *UserHandler) Update(c echo.Context) error {
 	// validate thông tin gửi lên
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
-			StatusCode: http.StatusBadRequest,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
 			Message:    err.Error(),
 		})
 	}
@@ -134,14 +134,14 @@ func (u *UserHandler) Update(c echo.Context) error {
 
 	user, err = u.UserRepo.Update(c.Request().Context(), user)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, model.Response{
-			StatusCode: http.StatusUnprocessableEntity,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
 			Message:    err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusCreated, model.Response{
-		StatusCode: http.StatusCreated,
+		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       user,
 	})
@@ -157,8 +157,8 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
-			StatusCode: http.StatusBadRequest,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
 			Message:    err.Error(),
 		})
 	}
@@ -170,7 +170,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 
 	user, err := u.UserRepo.CreateForPhone(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -198,7 +198,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 	req := req.ReqSignIn{}
 	if err := c.Bind(&req); err != nil {
 		log.Error(err.Error())
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 			Data:       nil,
@@ -207,7 +207,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 
 	if err := c.Validate(req); err != nil {
 		log.Error(err.Error())
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 			Data:       nil,
@@ -217,7 +217,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 	user, err := u.UserRepo.CheckLogin(c.Request().Context(), req)
 	if err != nil {
 		log.Error(err.Error())
-		return c.JSON(http.StatusUnauthorized, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusUnauthorized,
 			Message:    err.Error(),
 			Data:       nil,
@@ -228,7 +228,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 
 	isTheSame := security.ComparePasswords(user.Password, []byte(req.Password))
 	if !isTheSame {
-		return c.JSON(http.StatusUnauthorized, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusUnauthorized,
 			Message:    "Đăng nhập thất bại",
 			Data:       nil,
@@ -238,7 +238,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 	token, err := security.GenToken(user)
 	if err != nil {
 		log.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 			Data:       nil,
@@ -265,7 +265,7 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	token, err := security.GenToken(user)
 	if err != nil {
 		log.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 			Data:       nil,
@@ -274,8 +274,8 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	user.Token = token
 
 	if errValid != nil {
-		return c.JSON(http.StatusAccepted, model.Response{
-			StatusCode: http.StatusAccepted,
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
 			Message:    errValid.Error(),
 			Data:       user.Token,
 		})
@@ -296,14 +296,14 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	}
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
 	}
 	code, user, valid := u.UserRepo.ValidPhone(c.Request().Context(), req.Phone)
 	if valid != nil {
-		return c.JSON(code, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: code,
 			Message:    valid.Error(),
 			Data:       user,
@@ -331,7 +331,7 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 	token, err := security.GenToken(user)
 	if err != nil {
 		log.Error(err.Error())
-		return c.JSON(http.StatusInternalServerError, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 			Data:       nil,
@@ -343,7 +343,7 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 	}
 
 	if errValid != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    errValid.Error(),
 			Data:       customDataToken{Token: token},
@@ -366,7 +366,7 @@ func (u *UserHandler) UpdatePassword(c echo.Context) error {
 	}
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
@@ -377,7 +377,7 @@ func (u *UserHandler) UpdatePassword(c echo.Context) error {
 
 	err = u.UserRepo.UpdatePassword(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -398,7 +398,7 @@ func (u *UserHandler) DeleteUser(c echo.Context) error {
 	}
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
@@ -406,7 +406,7 @@ func (u *UserHandler) DeleteUser(c echo.Context) error {
 
 	err = u.UserRepo.DeleteUser(c.Request().Context(), req.Phone)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,

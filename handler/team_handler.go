@@ -23,7 +23,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    errUpload.Error(),
 		})
@@ -49,7 +49,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 	}
 	user, err := t.TeamRepo.AddTeam(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -70,7 +70,7 @@ func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 	}
 	err := c.Validate(req)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
@@ -78,7 +78,7 @@ func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 
 	user, err := t.TeamRepo.SearchWithPhoneMemberTeam(c.Request().Context(), req.Phone)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -114,7 +114,7 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 
 	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req,claims.UserId)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -135,7 +135,7 @@ func (t *TeamHandler) GetTeamForUser(c echo.Context) error {
 	user, err := t.TeamRepo.GetTeamForUser(c.Request().Context(), claims.UserId)
 	if err != nil {
 
-		return c.JSON(http.StatusInternalServerError, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusInternalServerError,
 			Message:    err.Error(),
 			Data:       nil,
@@ -183,7 +183,7 @@ func (t *TeamHandler) DeleteTeam(c echo.Context) error {
 func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    errUpload.Error(),
 		})
@@ -222,13 +222,13 @@ func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 	}
 	team, err := t.TeamRepo.UpdateTeam(c.Request().Context(), team)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}
 
-	return c.JSON(http.StatusCreated, model.Response{
+	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       team,
@@ -244,13 +244,13 @@ func (t *TeamHandler) AcceptInvite(c echo.Context) error {
 
 	err := t.TeamRepo.AcceptInvite(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}
 
-	return c.JSON(http.StatusCreated, model.Response{
+	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       nil,

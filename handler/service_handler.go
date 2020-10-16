@@ -23,7 +23,7 @@ func (s *ServiceHandler) AddService(c echo.Context) error {
 
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
-		return c.JSON(http.StatusBadRequest, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    errUpload.Error(),
 		})
@@ -34,7 +34,7 @@ func (s *ServiceHandler) AddService(c echo.Context) error {
 
 	service, err := s.ServiceRepo.AddService(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -52,7 +52,7 @@ func (s *ServiceHandler) DeleteService(c echo.Context) error {
 	err := s.ServiceRepo.DeleteService(c.Request().Context(), c.Param("id"))
 
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,

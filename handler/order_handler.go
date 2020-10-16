@@ -35,7 +35,7 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 
 	teamDetails, err := o.OrderRepo.AddOrder(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -61,7 +61,7 @@ func (o *OrderHandler) AcceptOrder(c echo.Context) error {
 
 	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -87,7 +87,7 @@ func (o *OrderHandler) RefuseOrder(c echo.Context) error {
 
 	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -113,7 +113,7 @@ func (o *OrderHandler) FinishOrder(c echo.Context) error {
 
 	err := o.OrderRepo.FinishOrder(c.Request().Context(), req)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       nil,
@@ -133,7 +133,7 @@ func (o *OrderHandler) ListOrderForStadium(c echo.Context) error {
 
 	orders, err := o.OrderRepo.ListOrderForStadium(c.Request().Context(), stadiumID)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       err.Error,
@@ -152,7 +152,7 @@ func (o *OrderHandler) ListOrderForUser(c echo.Context) error {
 
 	orders, err := o.OrderRepo.ListOrderForUser(c.Request().Context(), claims.UserId)
 	if err != nil {
-		return c.JSON(http.StatusConflict, model.Response{
+		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 			Data:       err.Error,
