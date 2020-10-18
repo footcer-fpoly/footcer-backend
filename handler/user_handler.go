@@ -158,7 +158,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	err := c.Validate(req)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusOK,
+			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
 	}
