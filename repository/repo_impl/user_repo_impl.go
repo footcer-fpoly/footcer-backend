@@ -34,13 +34,13 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 	queryUserExits := `SELECT * FROM users WHERE users.phone = $1`
 
 	user.Email = ""
-	user.TokenNotify = "123"
+	user.TokenNotify = ""
 	err := u.sql.Db.GetContext(context, &user, queryUserExits, userReq.Phone)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			fmt.Println("New user -> Insert Data")
-			query := `INSERT INTO users(user_id, phone,password, email,role, display_name,birthday,position,level, avatar,verify,created_at, updated_at)
-       VALUES(:user_id, :phone, :password,:email,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :created_at, :updated_at)`
+			query := `INSERT INTO users(user_id, phone,password, email,role, display_name,birthday,position,level, avatar,verify,token_notify,created_at, updated_at)
+       VALUES(:user_id, :phone, :password,:email,:role, :display_name,:birthday, :position,:level,:avatar, :verify, :token_notify ,:created_at, :updated_at)`
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = time.Now()
 			_, err := u.sql.Db.NamedExecContext(context, query, userReq)
