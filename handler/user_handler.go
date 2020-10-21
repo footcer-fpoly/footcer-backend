@@ -64,6 +64,7 @@ func (u *UserHandler) Create(c echo.Context) error {
 	print(req.UserId)
 	//req.UserId = uuid.NewV1().String()
 	req.Role = 0
+	req.TokenNotify = ""
 
 	user, err := u.UserRepo.Create(c.Request().Context(), req)
 	if err != nil {
@@ -158,7 +159,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	err := c.Validate(req)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusOK,
+			StatusCode: http.StatusBadRequest,
 			Message:    err.Error(),
 		})
 	}
@@ -167,6 +168,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	hash := security.HashAndSalt([]byte(req.Password))
 	req.Password = hash
 	req.Avatar = "http://footcer.tk:4000/static/user/avatar.png"
+	req.TokenNotify = ""
 
 	user, err := u.UserRepo.CreateForPhone(c.Request().Context(), req)
 	if err != nil {
