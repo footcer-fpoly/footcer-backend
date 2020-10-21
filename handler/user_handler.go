@@ -341,14 +341,18 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 	}
 
 	type customDataToken struct {
-		Token string `json:"token"`
+		UserId      string `json:"userId"`
+		DisplayName string `json:"displayName"`
+		Phone       string `json:"phone"`
+		Avatar      string `json:"avatar"`
+		Token       string `json:"token"`
 	}
 
 	if errValid != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
 			Message:    errValid.Error(),
-			Data:       customDataToken{Token: token},
+			Data:       customDataToken{UserId: user.UserId, Phone: user.Phone, Token: token, Avatar: user.Avatar, DisplayName: user.DisplayName},
 		})
 	}
 	return c.JSON(http.StatusOK, model.Response{
