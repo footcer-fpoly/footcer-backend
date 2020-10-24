@@ -10,7 +10,7 @@ type Review struct {
 	Rate      float64   `json:"rate,omitempty" db:"rate,omitempty"`
 	UserId    string    `json:"userId,omitempty" db:"user_id,omitempty"`
 	StadiumId string    `json:"stadiumId,omitempty" db:"stadium_id,omitempty"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at, omitempty"`
+	CreatedAt time.Time `json:"created_at" db:"created_at_rv"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at_rv, omitempty"`
 	User      `json:"user,omitempty"`
 }

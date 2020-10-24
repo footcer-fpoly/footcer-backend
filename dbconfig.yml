@@ -8,4 +8,3 @@ development:
   datasource: host=35.184.70.223 port=5432 user=footcerdb password=PMa45PqnMHiHCn40 dbname=footcerdb sslmode=disable
   dir: migrations
   table: migrations
-q

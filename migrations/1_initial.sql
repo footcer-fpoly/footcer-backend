@@ -31,6 +31,7 @@ CREATE TABLE "stadium"(
 "ward" text NOT NULL,
 "district" text NOT NULL,
 "city" text NOT NULL,
+"verify" text DEFAULT ('0'),
 "created_at" TIMESTAMPTZ NOT NULL,
 "updated_at" TIMESTAMPTZ NOT NULL,
 
@@ -181,6 +182,7 @@ CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
 DROP TABLE "review";
 DROP TABLE "service";
 DROP TABLE "orders";
+DROP TABLE "stadium_details";
 DROP TABLE "stadium_collage";
 DROP TABLE "team_details";
 DROP TABLE "game_temp";

@@ -29,11 +29,11 @@ func (r ReviewRepoImpl) AddReview(context context.Context, review model.Review) 
 
 		if errExits == sql.ErrNoRows {
 			query := `INSERT INTO public.review(
-	review_id, content, rate, stadium_id, user_id, created_at, updated_at)
-	VALUES (:review_id, :content, :rate, :stadium_id, :user_id, :created_at,:updated_at);`
+	review_id, content, rate, stadium_id, user_id, created_at_rv, updated_at_rv)
+	VALUES (:review_id, :content, :rate, :stadium_id, :user_id, :created_at_rv,:updated_at_rv);`
 
-			//review.CreatedAt = time.Now()
-			//review.UpdatedAt = time.Now()
+			review.CreatedAt = time.Now()
+			review.UpdatedAt = time.Now()
 
 			_, err := r.sql.Db.NamedExecContext(context, query, review)
 			if err != nil {
@@ -47,7 +47,7 @@ func (r ReviewRepoImpl) AddReview(context context.Context, review model.Review) 
 			SET
 			content = :content,
 			rate = :rate,
-			updated_at 	  = COALESCE (:updated_at, updated_at)
+			updated_at_rv 	  = COALESCE (:updated_at_rv, updated_at_rv)
 			WHERE user_id = :user_id AND stadium_id = :stadium_id`
 
 	review.UpdatedAt = time.Now()
@@ -61,5 +61,3 @@ func (r ReviewRepoImpl) AddReview(context context.Context, review model.Review) 
 
 	return review, nil
 }
-
-

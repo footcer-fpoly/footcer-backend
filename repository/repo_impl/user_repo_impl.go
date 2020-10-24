@@ -44,7 +44,7 @@ func (u UserRepoImpl) Create(context context.Context, userReq model.User) (model
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = time.Now()
 			_, err := u.sql.Db.NamedExecContext(context, query, userReq)
-			if err != nil{
+			if err != nil {
 				log.Error(err.Error())
 			}
 			return userReq, err
@@ -177,7 +177,8 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 
 		queryCreateStadium := `INSERT INTO public.stadium(
 	stadium_id, user_id, name_stadium, address, description, image, category, latitude, longitude, ward, district, city, created_at, updated_at)
-	VALUES (:stadium_id, :user_id, :name_stadium, :address, :description, :image, :category, :latitude, :longitude, :ward, :district, :city, :created_at, :updated_at);`
+	VALUES 
+	(:stadium_id, :user_id, :name_stadium, :address, :description, :image, :category, :latitude, :longitude, :ward, :district, :city , :created_at, :updated_at);`
 
 		_, err := u.sql.Db.NamedExecContext(context, queryCreateStadium, stadium)
 
@@ -186,6 +187,7 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
 			row, err := u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
 			if err != nil {
+				log.Error(err.Error())
 			}
 			count, _ := row.RowsAffected()
 			if count == 0 {
