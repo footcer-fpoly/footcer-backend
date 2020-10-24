@@ -100,13 +100,13 @@ func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.T
 	var leaderId = ""
 
 	errIsAdminTeam := t.sql.Db.GetContext(context, &leaderId, queryIsAdminTeam, teamDetails.TeamId)
-	
+
 	if errIsAdminTeam != nil {
 		log.Error(errIsAdminTeam.Error())
 		return teamDetails, message.SomeWentWrong
 	}
-	
-	if strings.EqualFold(leaderId,userId) == false {
+
+	if strings.EqualFold(leaderId, userId) == false {
 		return teamDetails, message.TeamIsNotAdmin
 	}
 
@@ -265,8 +265,6 @@ func (t TeamRepoImpl) UpdateTeam(context context.Context, team model.Team) (mode
 }
 
 func (t TeamRepoImpl) AcceptInvite(context context.Context, teamDetails model.TeamDetails) error {
-
-	print(teamDetails.TeamId)
 	sqlStatement := `
 		UPDATE team_details
 		SET 

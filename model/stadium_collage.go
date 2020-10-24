@@ -10,6 +10,6 @@ type StadiumCollage struct {
 	EndTime            string    `json:"endTime" db:"end_time"`
 	PlayTime           string    `json:"playTime" db:"play_time"`
 	StadiumId          string    `json:"stadiumId," db:"stadium_id,omitempty"`
-	CreatedAt          time.Time `json:"created_at,omitempty" db:"created_at,omitempty"`
-	UpdatedAt          time.Time `json:"updated_at,omitempty" db:"updated_at,omitempty"`
+	CreatedAt          time.Time `json:"-,omitempty" db:"created_at,omitempty"`
+	UpdatedAt          time.Time `json:"-,omitempty" db:"updated_at,omitempty"`
 }

@@ -20,7 +20,7 @@ func init() {
 }
 
 type Template struct {
-templates *template.Template
+	templates *template.Template
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -29,7 +29,6 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 func Web(c echo.Context) error {
 	return c.Render(http.StatusOK, "index.html", "Footcer")
 }
-
 
 func main() {
 	sql := &db.Sql{
@@ -61,11 +60,10 @@ func main() {
 	router.TeamRouter(e, sql)
 	router.GameRouter(e, sql)
 	router.NotificationRouter(e, sql)
-
+	router.AdminRouter(e, sql)
 	//upload
 	e.Static("/static", "../../images/")
 
-
-	e.Logger.Fatal(e.Start(":4001"))
+	e.Logger.Fatal(e.Start(":4000"))
 
 }

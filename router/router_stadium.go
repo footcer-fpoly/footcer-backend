@@ -20,4 +20,5 @@ func StadiumRouter(e *echo.Echo, sql *db.Sql) {
 
 	e.GET("/stadium/search-location", stadiumHandler.SearchStadiumLocation, middleware.JWTMiddleware())
 	e.GET("/stadium/search-name/:name", stadiumHandler.SearchStadiumName, middleware.JWTMiddleware())
+	e.GET("/stadium/collage-details/:id", stadiumHandler.StadiumDetailsInfoForStadiumCollage, middleware.JWTMiddleware())
 }

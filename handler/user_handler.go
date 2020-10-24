@@ -28,7 +28,7 @@ func (u *UserHandler) Profile(c echo.Context) error {
 	if err != nil {
 		if err == message.UserNotFound {
 			return c.JSON(http.StatusOK, model.Response{
-				StatusCode: http.StatusOK,
+				StatusCode: http.StatusConflict,
 				Message:    err.Error(),
 				Data:       nil,
 			})

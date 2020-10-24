@@ -30,7 +30,7 @@ func (u *StadiumHandler) StadiumInfo(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
-		Message: message.Success,
+		Message:    message.Success,
 		Data:       stadium,
 	})
 }
@@ -90,16 +90,16 @@ func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 		Description: req.Description,
 		Image:       image,
 
-		Category:    req.Category,
-		Latitude:    req.Latitude,
-		Longitude:   req.Longitude,
-		Ward:        req.Ward,
-		District:    req.District,
-		City:        req.City,
-		UserId:      claims.UserId,
+		Category:  req.Category,
+		Latitude:  req.Latitude,
+		Longitude: req.Longitude,
+		Ward:      req.Ward,
+		District:  req.District,
+		City:      req.City,
+		UserId:    claims.UserId,
 	}
 
-	stadium, err = u.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium)
+	stadium, err = u.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium, claims.Role)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
@@ -210,5 +210,23 @@ func (u *StadiumHandler) SearchStadiumName(c echo.Context) error {
 		StatusCode: http.StatusOK,
 		Message:    message.Success,
 		Data:       stadium,
+	})
+}
+
+func (u *StadiumHandler) StadiumDetailsInfoForStadiumCollage(c echo.Context) error {
+	id := c.Param("id")
+
+	stadiumDet, err := u.StadiumRepo.StadiumDetailsInfoForStadiumCollage(c.Request().Context(), id)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    message.Success,
+		Data:       stadiumDet,
 	})
 }
