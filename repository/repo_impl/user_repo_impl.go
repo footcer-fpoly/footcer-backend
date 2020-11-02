@@ -89,7 +89,7 @@ func (u UserRepoImpl) Update(context context.Context, user model.User) (model.Us
 			avatar = (CASE WHEN LENGTH(:avatar) = 0 THEN avatar ELSE :avatar END),
 			birthday = (CASE WHEN LENGTH(:birthday) = 0 THEN birthday ELSE :birthday END),
 			position = (CASE WHEN LENGTH(:position) = 0 THEN position ELSE :position END),
-			level = (CASE WHEN LENGTH(:level) = 0 THEN position ELSE :level END),
+			level = (CASE WHEN LENGTH(:level) = 0 THEN level ELSE :level END),
 			updated_at 	  = COALESCE (:updated_at, updated_at)
 		WHERE user_id    = :user_id
 	`
