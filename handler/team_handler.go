@@ -2,6 +2,7 @@ package handler
 
 import (
 	"footcer-backend/helper"
+	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/repository"
 	"footcer-backend/upload"
@@ -18,6 +19,16 @@ type TeamHandler struct {
 }
 
 func (t *TeamHandler) AddTeam(c echo.Context) error {
+	req := model.Team{}
+	if err := c.Validate(req); err != nil {
+		log.Error(err.Error())
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
@@ -34,7 +45,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		avatar = urls[0]
 	}
 
-	req := model.Team{
+	req = model.Team{
 		TeamId:     uuid.NewV1().String(),
 		Avatar:     avatar,
 		Background: "http://footcer.tk/team/example_background_team.png",
@@ -43,6 +54,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
+
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
@@ -95,7 +107,6 @@ func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 	req := model.TeamDetails{}
 
-
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
@@ -104,15 +115,13 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
-
-
 	req.TeamDetailsId = uuid.NewV1().String()
 	req.Accept = "0"
 	req.Role = "0"
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
 
-	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req,claims.UserId)
+	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req, claims.UserId)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
@@ -148,7 +157,6 @@ func (t *TeamHandler) GetTeamForUser(c echo.Context) error {
 		Data:       user,
 	})
 }
-
 
 func (t *TeamHandler) DeleteMember(c echo.Context) error {
 

@@ -2,6 +2,7 @@ package upload
 
 import (
 	"cloud.google.com/go/storage"
+	"footcer-backend/message"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/api/option"
@@ -13,6 +14,7 @@ import (
 var (
 	storageClient *storage.Client
 )
+
 func Upload(c echo.Context) ([]string, error) {
 	bucket := "footcer" //your bucket name
 
@@ -22,7 +24,7 @@ func Upload(c echo.Context) ([]string, error) {
 
 	storageClient, err = storage.NewClient(ctx, option.WithCredentialsFile("../../security/pro/key_bucket.json"))
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	images := make([]string, 0)
 	//
@@ -32,7 +34,6 @@ func Upload(c echo.Context) ([]string, error) {
 		return nil, err
 	}
 	folder := form.Value["folder"][0]
-
 	if folder != "" {
 		files := form.File["files"]
 		for _, file := range files {
@@ -43,7 +44,7 @@ func Upload(c echo.Context) ([]string, error) {
 
 			}
 			defer src.Close()
-			fileName := folder + "/"+uuid.NewV1().String()
+			fileName := folder + "/" + uuid.NewV1().String()
 			sw := storageClient.Bucket(bucket).Object(fileName).NewWriter(ctx)
 
 			if _, err := io.Copy(sw, src); err != nil {
@@ -57,6 +58,8 @@ func Upload(c echo.Context) ([]string, error) {
 			u, err := url.Parse("https://storage.googleapis.com/" + bucket + "/" + sw.Attrs().Name)
 			images = append(images, u.String())
 		}
+	} else {
+		return images, message.AdminIsTeam
 	}
 	return images, err
 }
