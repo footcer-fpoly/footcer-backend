@@ -18,5 +18,5 @@ type User struct {
 	CreatedAt   time.Time `json:"-" db:"created_at, omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at, omitempty"`
 	Token       string    `json:"token,omitempty"`
-	Folder      string    `json:"-" validate:"required"`
+	Folder      string    `json:"folder,omitempty" validate:"required"`
 }
