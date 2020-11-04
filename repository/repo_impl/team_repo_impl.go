@@ -160,12 +160,13 @@ func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (in
 		model.Team
 		MemberList `json:"member"`
 	}
+
 	var teams = []teamTemp{}
 	for i := range teamIdList {
 		var team = teamTemp{}
 
-		queryTeam := `SELECT team.* 
-	FROM public.team WHERE team.team_id = $1;`
+		queryTeam := `SELECT * 
+	FROM public.team WHERE team_id = $1;`
 
 		err := t.sql.Db.GetContext(context, &team,
 			queryTeam, teamIdList[i])

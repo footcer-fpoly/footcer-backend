@@ -52,6 +52,9 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 
 	req = model.Team{
 		TeamId:     uuid.NewV1().String(),
+		Name: req.Name,
+		Place: req.Place,
+		Description: req.Description,
 		Avatar:     avatar,
 		Background: "http://footcer.tk/team/example_background_team.png",
 		Level:      "VIP",
