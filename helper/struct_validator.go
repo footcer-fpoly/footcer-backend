@@ -34,7 +34,6 @@ func (cv *StructValidator) RegisterValidate() {
 		log.Error(err.Error())
 	}
 
-
 	cv.Validator.RegisterValidation("phone", func(fl validator.FieldLevel) bool {
 		if len(fl.Field().String()) != 10 {
 			return false
@@ -44,7 +43,7 @@ func (cv *StructValidator) RegisterValidate() {
 	})
 
 	cv.Validator.RegisterTranslation("required", cv.Trans, func(ut ut.Translator) error {
-		return ut.Add("required", "{0} là bắt buộc", true)
+		return ut.Add("required", "{0} là bắt buộc, tính chơi backend à???", true)
 	}, func(ut ut.Translator, fe validator.FieldError) string {
 		t, _ := ut.T("required", fe.Field())
 		return t

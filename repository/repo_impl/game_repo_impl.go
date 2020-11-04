@@ -227,7 +227,7 @@ type TeamTemp struct {
 	Name   string `json:"teamNameTemp,omitempty" db:"team_name_temp,omitempty"`
 	Avatar string `json:"teamAvatarTemp,omitempty" db:"team_avatar_temp,omitempty"`
 }
-type ArrayTeamTemp [] TeamTemp
+type ArrayTeamTemp []TeamTemp
 type ListGame struct {
 	model.Game
 	model.Stadium `json:"stadium"`
