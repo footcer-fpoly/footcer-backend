@@ -20,6 +20,11 @@ type TeamHandler struct {
 
 func (t *TeamHandler) AddTeam(c echo.Context) error {
 	req := model.Team{}
+
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
 	if err := c.Validate(req); err != nil {
 		log.Error(err.Error())
 		return c.JSON(http.StatusOK, model.Response{
@@ -55,10 +60,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		UpdatedAt:  time.Now(),
 	}
 
-	defer c.Request().Body.Close()
-	if err := c.Bind(&req); err != nil {
-		return helper.ResponseErr(c, http.StatusBadRequest)
-	}
+
 	user, err := t.TeamRepo.AddTeam(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
