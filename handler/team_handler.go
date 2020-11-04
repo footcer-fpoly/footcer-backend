@@ -76,6 +76,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 
 func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 	req := model.User{}
+	req.Folder = "default"
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)

@@ -160,7 +160,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 
 func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	req := model.User{}
-
+	req.Folder = "default"
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
@@ -208,6 +208,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 
 func (u *UserHandler) HandleSignIn(c echo.Context) error {
 	req := req.ReqSignIn{}
+
 	if err := c.Bind(&req); err != nil {
 		log.Error(err.Error())
 		return c.JSON(http.StatusOK, model.Response{
@@ -300,6 +301,8 @@ func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 
 func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 	req := model.User{}
+
+	req.Folder = "default"
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
@@ -407,6 +410,9 @@ func (u *UserHandler) UpdatePassword(c echo.Context) error {
 
 func (u *UserHandler) DeleteUser(c echo.Context) error {
 	req := model.User{}
+
+	req.Folder = "default"
+
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)

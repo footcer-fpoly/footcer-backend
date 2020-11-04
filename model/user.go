@@ -6,7 +6,7 @@ type User struct {
 	UserId      string    `json:"userId,omitempty" db:"user_id,omitempty"`
 	Phone       string    `json:"phone,omitempty" db:"phone,omitempty"  validate:"required,phone"`
 	Email       string    `json:"email,omitempty" db:"email,omitempty"`
-	Password    string    `json:"password" db:"password,omitempty"`
+	Password    string    `json:"-" db:"password,omitempty"`
 	Avatar      string    `json:"avatar,omitempty" db:"avatar,omitempty" valid:"required"`
 	DisplayName string    `json:"displayName,omitempty" db:"display_name,omitempty" valid:"required"`
 	Role        int8      `json:"role,omitempty" db:"role,omitempty" valid:"required"`
@@ -19,5 +19,5 @@ type User struct {
 	UpdatedAt   time.Time `json:"-" db:"updated_at, omitempty"`
 	Token       string    `json:"token,omitempty"`
 
-	Folder string `json:"folder,omitempty" validate:"required"`
+	Folder		string 	   `json:"-,omitempty" validate:"required"`
 }
