@@ -132,14 +132,7 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 		return err
 	}
 
-	// validate thông tin gửi lên
-	err := c.Validate(req)
-	if err != nil {
-		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    err.Error(),
-		})
-	}
+
 
 	stadiumColl := model.StadiumCollage{
 		StadiumCollageId:   req.StadiumCollageId,
@@ -147,7 +140,7 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 		AmountPeople:       req.AmountPeople,
 	}
 
-	stadiumColl, err = u.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
+	stadiumColl, err := u.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,

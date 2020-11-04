@@ -16,5 +16,5 @@ type Team struct {
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at, omitempty"`
 
 	//User        `json:"user,omitempty"`
-	Folder string `json:"folder,omitempty" validate:"required"`
+	Folder string `json:"-,omitempty" validate:"required"`
 }
