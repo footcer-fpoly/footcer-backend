@@ -94,6 +94,9 @@ func (u *UserHandler) Create(c echo.Context) error {
 
 func (u *UserHandler) Update(c echo.Context) error {
 	req := model.User{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
 
 	if err := c.Validate(req); err != nil {
 		log.Error(err.Error())
@@ -117,18 +120,9 @@ func (u *UserHandler) Update(c echo.Context) error {
 		avatar = urls[0]
 	}
 
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
 
 	// validate thông tin gửi lên
-	err := c.Validate(req)
-	if err != nil {
-		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusOK,
-			Message:    err.Error(),
-		})
-	}
+
 
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(*model.JwtCustomClaims)
@@ -143,7 +137,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 		Level:       req.Level,
 	}
 
-	user, err = u.UserRepo.Update(c.Request().Context(), user)
+	user, err := u.UserRepo.Update(c.Request().Context(), user)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusOK,
