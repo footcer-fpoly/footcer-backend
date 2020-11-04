@@ -56,6 +56,9 @@ func (u *StadiumHandler) StadiumInfoForID(c echo.Context) error {
 
 func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 	req := model.Stadium{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
 
 	if err := c.Validate(req); err != nil {
 		log.Error(err.Error())
@@ -82,18 +85,7 @@ func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(*model.JwtCustomClaims)
 
-	if err := c.Bind(&req); err != nil {
-		return err
-	}
 
-	// validate thông tin gửi lên
-	err := c.Validate(req)
-	if err != nil {
-		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    err.Error(),
-		})
-	}
 
 	stadium := model.Stadium{
 		StadiumName: req.StadiumName,
@@ -110,7 +102,7 @@ func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 		UserId:    claims.UserId,
 	}
 
-	stadium, err = u.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium, claims.Role)
+	stadium, err := u.StadiumRepo.StadiumUpdate(c.Request().Context(), stadium, claims.Role)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
