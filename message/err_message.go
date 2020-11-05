@@ -17,6 +17,7 @@ var (
 	StadiumNotUpdated   = errors.New("Cập nhật thông tin sân thất bại")
 
 	//team
+	TeamNameExits  = errors.New("Tên nhóm này đã tồn tại")
 	TeamMemberExits  = errors.New("Thành viên đã tồn tại")
 	TeamIsNotAdmin   = errors.New("Bạn không phải là trưởng nhóm")
 	TeamMemberDelete = errors.New("Xoá thành viên thành công")

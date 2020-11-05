@@ -1,0 +1,5 @@
+time="2020-11-05T12:45:49.305021+07:00" level=error msg="Folder là bắt buộc, tính chơi backend à???" file=/Users/pro/footcer-backend/handler/team_handler.go line=29
+time="2020-11-05T13:09:59.821528+07:00" level=error msg="pq: insert or update on table \"team\" violates foreign key constraint \"team_leader_id_fkey\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=32
+time="2020-11-05T13:10:43.523491+07:00" level=error msg="pq: duplicate key value violates unique constraint \"team_name_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=32
+time="2020-11-05T13:17:55.034671+07:00" level=error msg="pq: duplicate key value violates unique constraint \"team_name_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=35
+time="2020-11-05T13:18:11.201473+07:00" level=error msg="pq: duplicate key value violates unique constraint \"team_name_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=35
