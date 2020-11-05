@@ -214,33 +214,35 @@ func (t *TeamHandler) DeleteTeam(c echo.Context) error {
 }
 
 func (t *TeamHandler) UpdateTeam(c echo.Context) error {
-	urls, errUpload := upload.Upload(c)
-	if errUpload != nil {
-		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusBadRequest,
-			Message:    errUpload.Error(),
-		})
-	}
-
 	req := model.Team{}
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
 	avatar := ""
 	background := ""
-
-	if len(urls) == 2 {
-		avatar = urls[0]
-		background = urls[1]
+	urls, errUpload := upload.UploadForKey(c, "avatar")
+	if errUpload != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+	if len(urls) > 0 {
+		if urls[0] != "" {
+			avatar = urls[0]
+		}
 	}
 
-	if len(urls) == 1 {
-		if req.Avatar != "" {
-			avatar = req.Avatar
+	urls, errUpload = upload.UploadForKey(c, "background")
+	if errUpload != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+	if len(urls) > 0 {
+		if urls[0] != "" {
 			background = urls[0]
-		} else {
-			background = req.Background
-			avatar = urls[0]
 		}
 	}
 
@@ -260,11 +262,15 @@ func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
+	print(team.Background)
+
+
+
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
-		Data:       team,
+		Data:       nil,
 	})
 }
 

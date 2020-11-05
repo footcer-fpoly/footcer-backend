@@ -120,9 +120,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 		avatar = urls[0]
 	}
 
-
 	// validate thông tin gửi lên
-
 
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(*model.JwtCustomClaims)
@@ -171,7 +169,7 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 	req.UserId = uuid.NewV1().String()
 	hash := security.HashAndSalt([]byte(req.Password))
 	req.Password = hash
-	req.Avatar = "http://footcer.tk:4000/a/user/example_avatar_team.png"
+	req.Avatar = "http://footcer.tk:4000/static/user/avatar.png"
 	req.TokenNotify = ""
 
 	user, err := u.UserRepo.CreateForPhone(c.Request().Context(), req)
