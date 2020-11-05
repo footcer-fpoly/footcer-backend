@@ -8,6 +8,7 @@ import (
 	"footcer-backend/message"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"github.com/lib/pq"
 	"strings"
 	"time"
 
@@ -29,6 +30,12 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 
 	_, err := t.sql.Db.NamedExecContext(context, queryCreate, team)
 	if err != nil {
+		pqErr := err.(*pq.Error)
+		if pqErr.Code == "23505" {
+			log.Error(err.Error())
+			return team, message.TeamNameExits
+		}
+
 		log.Error(err.Error())
 		return team, message.SomeWentWrong
 	}

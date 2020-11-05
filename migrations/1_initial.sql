@@ -97,7 +97,7 @@ CREATE TABLE "team"
 (
 "team_id" text NOT NULL UNIQUE,
 "leader_id" text NOT NULL,
-"name" text NOT NULL,
+"name" text NOT NULL UNIQUE,
 "level" text NOT NULL,
 "place" text NOT NULL,
 "description" text NOT NULL,

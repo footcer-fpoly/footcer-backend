@@ -37,32 +37,51 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
-	urls, errUpload := upload.Upload(c)
+	avatar := ""
+	background := ""
+
+	urls, errUpload := upload.UploadForKey(c, "avatar")
 	if errUpload != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusBadRequest,
 			Message:    errUpload.Error(),
 		})
 	}
-	avatar := "http://footcer.tk/team/example_avatar_team.png"
-
 	if len(urls) > 0 {
-		avatar = urls[0]
+		if urls[0] != "" {
+			avatar = urls[0]
+		} else {
+			avatar = "http://footcer.tk:4000/static/team/example_avatar_team.jpg"
+		}
+	}
+
+	urls, errUpload = upload.UploadForKey(c, "background")
+	if errUpload != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+	if len(urls) > 0 {
+		if urls[0] != "" {
+			background = urls[0]
+		} else {
+			background = "http://footcer.tk:4000/static/team/example_background_team.jpg"
+		}
 	}
 
 	req = model.Team{
-		TeamId:     uuid.NewV1().String(),
-		Name: req.Name,
-		Place: req.Place,
+		TeamId:      uuid.NewV1().String(),
+		Name:        req.Name,
+		Place:       req.Place,
 		Description: req.Description,
-		Avatar:     avatar,
-		Background: "http://footcer.tk/team/example_background_team.png",
-		Level:      "VIP",
-		LeaderId:   claims.UserId,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		Avatar:      avatar,
+		Background:  background,
+		Level:       req.Level,
+		LeaderId:    claims.UserId,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
-
 
 	user, err := t.TeamRepo.AddTeam(c.Request().Context(), req)
 	if err != nil {
