@@ -16,7 +16,7 @@ type Stadium struct {
 	District    string    `json:"district,omitempty" db:"district,omitempty"`
 	City        string    `json:"city,omitempty" db:"city,omitempty"`
 	UserId      string    `json:"userId,omitempty" db:"user_id,omitempty"`
-	Verify      string    `json:"-" db:"verify,omitempty"`
+	Verify      string    `json:"verify" db:"verify,omitempty"`
 	CreatedAt   time.Time `json:"-" db:"created_at,omitempty"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at,omitempty"`
 	Distance    int       `json:"distance" db:"_,omitempty"`
