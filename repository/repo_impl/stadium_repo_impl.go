@@ -37,10 +37,10 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	}
 	stadium := StadiumInfo{}
 
-	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city, stadium.user_id, stadium.verify, users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
+	query := `SELECT stadium.stadium_id, stadium.name_stadium, stadium.address, stadium.description, stadium.image, stadium.category, stadium.latitude, stadium.longitude, stadium.ward, stadium.district, stadium.city, stadium.user_id, stadium.verify as verify_stadium, users.display_name,users.avatar,users.phone ,stadium.created_at, stadium.updated_at
 	FROM public.stadium INNER JOIN users ON users.user_id = stadium.user_id  WHERE stadium.user_id =  $1`
-	err := s.sql.Db.GetContext(context, &stadium,
-		query, userId)
+	err := s.sql.Db.GetContext(context, &stadium, query, userId)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error(err.Error())
