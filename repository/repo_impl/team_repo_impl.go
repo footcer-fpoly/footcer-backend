@@ -201,8 +201,8 @@ func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (in
 		}
 
 		var memberList = []userMemberTemp{}
-		queryMemberTeam := `SELECT team_details.*, users.display_name, users.avatar, users.position
-	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.teams_id = $1;`
+		queryMemberTeam := `SELECT team_details.*, users.display_name, users.avatar, users.position, users.level, users.birthday , users.phone 
+	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.teams_id = $1 order by role_team desc;`
 		errMember := t.sql.Db.SelectContext(context, &memberList, queryMemberTeam, teamIdList[i])
 		if errMember != nil {
 			log.Error(errMember.Error())
