@@ -37,7 +37,7 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 		}
 
 		log.Error(err.Error())
-		return team, message.SomeWentWrong
+		return team, err
 	}
 	var memberTeam = model.TeamDetails{
 		TeamDetailsId: uuid.NewV1().String(),
@@ -54,10 +54,9 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 	_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, memberTeam)
 	if errMemberTeam != nil {
 		log.Error(errMemberTeam.Error())
-		return team, message.SomeWentWrong
+		return team, err
 	}
 	if len(team.MemberList) > 0 {
-
 		for _, element := range strings.Split(team.MemberList, ",") {
 			memberTeam = model.TeamDetails{
 				TeamDetailsId: uuid.NewV1().String(),
@@ -74,7 +73,26 @@ func (t TeamRepoImpl) AddTeam(context context.Context, team model.Team) (model.T
 			_, errMemberTeam := t.sql.Db.NamedExecContext(context, queryCreateMemberTeam, memberTeam)
 			if errMemberTeam != nil {
 				log.Error(errMemberTeam.Error())
-				return team, message.SomeWentWrong
+				queryDeleteTeamDetails := `DELETE FROM public.team_details WHERE teams_id = $1`
+				row, err := t.sql.Db.ExecContext(context, queryDeleteTeamDetails, team.TeamId)
+				if err != nil {
+					log.Error(err.Error())
+				}
+				count, _ := row.RowsAffected()
+				if count == 0 {
+					log.Error(err.Error())
+				}
+
+				queryDeleteTeam := `DELETE FROM public.team WHERE team_id = $1`
+				row, err = t.sql.Db.ExecContext(context, queryDeleteTeam, team.TeamId)
+				if err != nil {
+					log.Error(err.Error())
+				}
+				count, _ = row.RowsAffected()
+				if count == 0 {
+					log.Error(err.Error())
+				}
+				return team, errMemberTeam
 			}
 		}
 	}

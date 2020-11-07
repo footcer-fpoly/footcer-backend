@@ -79,6 +79,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		Background:  background,
 		Level:       req.Level,
 		LeaderId:    claims.UserId,
+		MemberList:  req.MemberList,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -262,10 +263,6 @@ func (t *TeamHandler) UpdateTeam(c echo.Context) error {
 			Message:    err.Error(),
 		})
 	}
-	print(team.Background)
-
-
-
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
