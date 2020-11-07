@@ -252,7 +252,7 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 				StadiumCollageId: stadiumCollageId,
 				StartTimeDetails: strconv.Itoa(int(start)),
 				EndTimeDetails:   strconv.Itoa(end),
-				Price:            0,
+				Price:            stadiumCollage.DefaultPrice,
 				Description:      "",
 				HasOrder:         false,
 				CreatedAt:        time.Now(),

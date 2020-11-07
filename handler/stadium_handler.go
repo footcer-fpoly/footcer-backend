@@ -85,8 +85,6 @@ func (u *StadiumHandler) UpdateStadium(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(*model.JwtCustomClaims)
 
-
-
 	stadium := model.Stadium{
 		StadiumName: req.StadiumName,
 		Address:     req.Address,
@@ -123,8 +121,6 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
-
-
 
 	stadiumColl := model.StadiumCollage{
 		StadiumCollageId:   req.StadiumCollageId,
@@ -224,5 +220,46 @@ func (u *StadiumHandler) StadiumDetailsInfoForStadiumCollage(c echo.Context) err
 		StatusCode: http.StatusOK,
 		Message:    message.Success,
 		Data:       stadiumDet,
+	})
+}
+
+func (u *StadiumHandler) StadiumDetailsUpdateForStadiumCollage(c echo.Context) error {
+	req := model.StadiumDetails{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+	_, err := u.StadiumRepo.StadiumDetailsUpdateForStadiumCollage(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    message.Success,
+		Data:       nil,
+	})
+}
+
+func (u *StadiumHandler) StadiumCollageDelete(c echo.Context) error {
+	idCollage := c.Param("id")
+
+	err := u.StadiumRepo.StadiumCollageDelete(c.Request().Context(), idCollage)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lí thành công",
+		Data:       nil,
 	})
 }

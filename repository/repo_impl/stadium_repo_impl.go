@@ -286,6 +286,50 @@ func (s StadiumRepoImpl) StadiumCollageAdd(context context.Context, stadiumColl 
 
 }
 
+func (s StadiumRepoImpl) StadiumCollageDelete(context context.Context, idCollage string) error {
+	sqlStatement := `
+		DELETE FROM public.stadium_details
+	WHERE stadium_collage_id = $1;
+	`
+
+	result, err := s.sql.Db.ExecContext(context, sqlStatement, idCollage)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	if count == 0 {
+		return message.SomeWentWrong
+	}
+
+	sqlStatement = `
+		DELETE FROM public.stadium_collage
+	WHERE stadium_collage_id = $1;
+	`
+
+	result, err = s.sql.Db.ExecContext(context, sqlStatement, idCollage)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	count, err = result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	if count == 0 {
+		return message.SomeWentWrong
+	}
+
+	return nil
+}
+
 func (s StadiumRepoImpl) SearchStadiumLocation(context context.Context, latitude string, longitude string) ([]model.Stadium, error) {
 	var stadium = []model.Stadium{}
 
@@ -410,7 +454,7 @@ func (s StadiumRepoImpl) StadiumDetailsInfoForStadiumCollage(context context.Con
 	}
 	var stadiumDetail []model.StadiumDetails
 	querySQL := `SELECT details.stadium_detail_id, details.stadium_collage_id, details.start_time_detail, details.end_time_detail, details.price, details.description, details.has_order
-	FROM public.stadium_details as details  WHERE details.stadium_collage_id = $1;`
+	FROM public.stadium_details as details  WHERE details.stadium_collage_id = $1 order by details.start_time_detail ;`
 	errDetail := s.sql.Db.SelectContext(context, &stadiumDetail, querySQL, stadiumCollageID)
 	if errDetail != nil {
 		if errDetail == sql.ErrNoRows {
@@ -423,6 +467,35 @@ func (s StadiumRepoImpl) StadiumDetailsInfoForStadiumCollage(context context.Con
 	stadiumInfoDet.ArrayStadiumDetails = stadiumDetail
 
 	return stadiumInfoDet, nil
+}
+
+func (s StadiumRepoImpl) StadiumDetailsUpdateForStadiumCollage(context context.Context, details model.StadiumDetails) (interface{}, error) {
+	sqlStatement := `
+		UPDATE stadium_details
+		SET 
+			price = :price,
+			updated_at 	  = COALESCE (:updated_at, updated_at)
+		WHERE stadium_detail_id    = :stadium_detail_id
+	`
+
+	details.UpdatedAt = time.Now()
+
+	result, err := s.sql.Db.NamedExecContext(context, sqlStatement, details)
+	if err != nil {
+		log.Error(err.Error())
+		return details, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return details, err
+	}
+	if count == 0 {
+		return details, err
+	}
+
+	return details, nil
 }
 
 func (s StadiumRepoImpl) AbstractStadiumDetailsAdd(context context.Context, stadiumColl model.StadiumCollage) bool {
@@ -442,7 +515,7 @@ func (s StadiumRepoImpl) AbstractStadiumDetailsAdd(context context.Context, stad
 			StadiumCollageId: stadiumColl.StadiumCollageId,
 			StartTimeDetails: strconv.Itoa(int(start)),
 			EndTimeDetails:   strconv.Itoa(end),
-			Price:            0,
+			Price:            stadiumColl.DefaultPrice,
 			Description:      "",
 			HasOrder:         false,
 			CreatedAt:        time.Now(),

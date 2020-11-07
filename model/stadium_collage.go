@@ -12,4 +12,7 @@ type StadiumCollage struct {
 	StadiumId          string    `json:"stadiumId," db:"stadium_id,omitempty"`
 	CreatedAt          time.Time `json:"-,omitempty" db:"created_at,omitempty"`
 	UpdatedAt          time.Time `json:"-,omitempty" db:"updated_at,omitempty"`
+
+	DefaultPrice           int    `json:"defaultPrice" db:"-"`
+
 }
