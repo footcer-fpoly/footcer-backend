@@ -164,10 +164,30 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 
 }
 
-func (t *TeamHandler) GetTeamForUser(c echo.Context) error {
+func (t *TeamHandler) GetTeamForUserAccept(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
-	user, err := t.TeamRepo.GetTeamForUser(c.Request().Context(), claims.UserId)
+	user, err := t.TeamRepo.GetTeamForUserAccept(c.Request().Context(), claims.UserId)
+	if err != nil {
+
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       user,
+	})
+}
+
+func (t *TeamHandler) GetTeamForUserReject(c echo.Context) error {
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+	user, err := t.TeamRepo.GetTeamForUserReject(c.Request().Context(), claims.UserId)
 	if err != nil {
 
 		return c.JSON(http.StatusOK, model.Response{

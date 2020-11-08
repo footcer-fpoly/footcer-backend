@@ -162,15 +162,14 @@ func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.T
 
 }
 
-func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (interface{}, error) {
+func (t TeamRepoImpl) GetTeamForUserAccept(context context.Context, userId string) (interface{}, error) {
 
 	var teamIdList = []string{}
 
 	queryTeam := `SELECT team_details.teams_id
-	FROM public.team_details WHERE team_details.user_id = $1;`
+	FROM public.team_details WHERE team_details.user_id = $1 and accept =  $2;`
 
-	err := t.sql.Db.SelectContext(context, &teamIdList,
-		queryTeam, userId)
+	err := t.sql.Db.SelectContext(context, &teamIdList, queryTeam, userId, "1")
 	if err != nil {
 		log.Error(err.Error())
 		return teamIdList, err
@@ -215,6 +214,60 @@ func (t TeamRepoImpl) GetTeamForUser(context context.Context, userId string) (in
 	return teams, nil
 
 }
+
+func (t TeamRepoImpl) GetTeamForUserReject(context context.Context, userId string) (interface{}, error) {
+
+	var teamIdList = []string{}
+
+	queryTeam := `SELECT team_details.teams_id
+	FROM public.team_details WHERE team_details.user_id = $1 and accept =  $2;`
+
+	err := t.sql.Db.SelectContext(context, &teamIdList, queryTeam, userId, "0")
+	if err != nil {
+		log.Error(err.Error())
+		return teamIdList, err
+	}
+	type userMemberTemp struct {
+		model.TeamDetails
+		model.User `json:"user"`
+	}
+	type MemberList []userMemberTemp
+
+	type teamTemp struct {
+		model.Team
+		MemberList `json:"member"`
+	}
+
+	var teams = []teamTemp{}
+	for i := range teamIdList {
+		var team = teamTemp{}
+
+		queryTeam := `SELECT * 
+	FROM public.team WHERE team_id = $1;`
+
+		err := t.sql.Db.GetContext(context, &team,
+			queryTeam, teamIdList[i])
+		if err != nil {
+			log.Error(err.Error())
+			return teams, err
+		}
+
+		var memberList = []userMemberTemp{}
+		queryMemberTeam := `SELECT team_details.*, users.display_name, users.avatar, users.position, users.level, users.birthday , users.phone 
+	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.teams_id = $1 order by role_team desc;`
+		errMember := t.sql.Db.SelectContext(context, &memberList, queryMemberTeam, teamIdList[i])
+		if errMember != nil {
+			log.Error(errMember.Error())
+			return memberList, errMember
+		}
+		team.MemberList = memberList
+		teams = append(teams, team)
+	}
+
+	return teams, nil
+
+}
+
 
 func (t TeamRepoImpl) DeleteMember(context context.Context, userID string) error {
 
