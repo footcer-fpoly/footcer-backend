@@ -126,6 +126,11 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 		StadiumCollageId:   req.StadiumCollageId,
 		NameStadiumCollage: req.NameStadiumCollage,
 		AmountPeople:       req.AmountPeople,
+		StartTime: req.StartTime,
+		EndTime: req.EndTime,
+		PlayTime: req.PlayTime,
+		StadiumId: req.StadiumId,
+		DefaultPrice: req.DefaultPrice,
 	}
 
 	stadiumColl, err := u.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)

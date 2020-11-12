@@ -250,11 +250,13 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 		return stadiumColl, message.StadiumNotUpdated
 	}
 	if count == 0 {
+		log.Error(err.Error())
 		return stadiumColl, message.StadiumNotUpdated
 	}
 
 	success := s.AbstractStadiumDetailsAdd(context, stadiumColl)
 	if !success {
+		log.Error(err.Error())
 		return stadiumColl, message.SomeWentWrong
 	}
 	return stadiumColl, nil
