@@ -7,7 +7,7 @@ type Order struct {
 	Time             string    `json:"time,omitempty" db:"time,omitempty"`
 	Price            int       `json:"price,omitempty" db:"price,omitempty"`
 	Description      string    `json:"description,omitempty" db:"description,omitempty"`
-	StadiumDetailsId string    `json:"stadiumDetailsId,omitempty" db:"stadium_details_id,omitempty"`
+	StadiumDetailsId string    `json:"stadiumDetailsId,omitempty" db:"stadium_detail_id,omitempty"`
 	UserId           string    `json:"userId,omitempty" db:"user_id,omitempty"`
 	Finish           bool      `json:"finish,omitempty" db:"finish,omitempty"`
 	Accept           bool      `json:"accept,omitempty" db:"accept,omitempty"`

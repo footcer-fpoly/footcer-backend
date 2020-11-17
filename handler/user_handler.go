@@ -259,6 +259,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 
 func (u *UserHandler) CheckValidEmail(c echo.Context) error {
 	req := model.User{}
+	req.Folder = "default"
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
@@ -327,6 +328,7 @@ func (u *UserHandler) CheckValidPhone(c echo.Context) error {
 func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 
 	req := model.User{}
+	req.Folder = "default"
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
@@ -369,6 +371,7 @@ func (u *UserHandler) CheckValidUUID(c echo.Context) error {
 
 func (u *UserHandler) UpdatePassword(c echo.Context) error {
 	req := model.User{}
+	req.Folder = "default"
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {

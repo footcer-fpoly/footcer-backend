@@ -1,1 +1,0 @@
-time="2020-10-16T05:56:35.363095+07:00" level=error msg="pq: syntax error at or near \"$1\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=48
