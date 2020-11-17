@@ -1,0 +1,6 @@
+time="2020-11-13T21:23:25.350466+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=150
+time="2020-11-13T21:23:52.432037+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=46
+time="2020-11-13T21:24:10.789658+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=46
+time="2020-11-13T21:24:14.625852+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=150
+time="2020-11-13T21:25:46.415178+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=150
+time="2020-11-13T21:25:52.126369+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=150

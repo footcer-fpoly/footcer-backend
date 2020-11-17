@@ -407,7 +407,7 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 	var stadium = []model.Stadium{}
 
 	querySQL := `SELECT stadium_id, name_stadium, address, description, image,  category, latitude, longitude, ward, district, city, user_id, created_at, updated_at
-	FROM public.stadium WHERE name_stadium ILIKE $1 AND verify = $2`
+	FROM public.stadium WHERE name_stadium ILIKE $1 OR address ILIKE $1 AND verify = $2`
 	err := s.sql.Db.SelectContext(context, &stadium, querySQL, "%"+name+"%", "1")
 	if err != nil {
 		if err == sql.ErrNoRows {
