@@ -253,6 +253,26 @@ func (s StadiumRepoImpl) StadiumCollageUpdate(context context.Context, stadiumCo
 		log.Error(err.Error())
 		return stadiumColl, message.StadiumNotUpdated
 	}
+	//delete stadium details
+	sqlStatement = `
+		DELETE FROM public.stadium_details
+	WHERE stadium_collage_id = $1;
+	`
+
+	result, err = s.sql.Db.ExecContext(context, sqlStatement, stadiumColl.StadiumCollageId)
+	if err != nil {
+		log.Error(err.Error())
+		return stadiumColl, err
+	}
+
+	count, err = result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return stadiumColl, err
+	}
+	if count == 0 {
+		return stadiumColl, message.SomeWentWrong
+	}
 
 	success := s.AbstractStadiumDetailsAdd(context, stadiumColl)
 	if !success {

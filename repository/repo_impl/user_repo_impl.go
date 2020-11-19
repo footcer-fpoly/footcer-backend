@@ -10,8 +10,6 @@ import (
 	"footcer-backend/model"
 	"footcer-backend/model/req"
 	"footcer-backend/repository"
-	"math"
-	"strconv"
 	"time"
 
 	"github.com/lib/pq"
@@ -236,66 +234,66 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			return user, message.SignUpFail
 
 		}
-		startTime, _ := strconv.ParseInt(stadiumCollage.StartTime, 10, 64)
-		endTime, _ := strconv.ParseInt(stadiumCollage.EndTime, 10, 64)
-		playTime, _ := strconv.ParseInt(stadiumCollage.PlayTime, 10, 64)
-
-		start := startTime
-		end := 0
-
-		amountTimer := math.Floor(float64((endTime - startTime) / playTime))
-
-		for i := 0; i < int(amountTimer); i++ {
-			end = int(start + playTime)
-			var stadiumDetails = model.StadiumDetails{
-				StadiumDetailsId: uuid.NewV1().String(),
-				StadiumCollageId: stadiumCollageId,
-				StartTimeDetails: strconv.Itoa(int(start)),
-				EndTimeDetails:   strconv.Itoa(end),
-				Price:            stadiumCollage.DefaultPrice,
-				Description:      "",
-				HasOrder:         false,
-				CreatedAt:        time.Now(),
-				UpdatedAt:        time.Now(),
-			}
-
-			_, errCreateStadiumDetails := stadiumRepo.StadiumDetailsAdd(context, stadiumDetails)
-			if errCreateStadiumDetails != nil {
-				log.Error(errCreateStadiumDetails.Error())
-				//
-				queryDeleteStadiumCollage := `DELETE FROM public.stadium_collage WHERE stadium_collage_id = $1`
-				row, err := u.sql.Db.ExecContext(context, queryDeleteStadiumCollage, stadiumCollageId)
-				if err != nil {
-				}
-				count, _ := row.RowsAffected()
-				if count == 0 {
-					log.Error(err.Error())
-				}
-
-				queryDeleteStadium := `DELETE FROM public.stadium WHERE stadium_id = $1`
-				row, err = u.sql.Db.ExecContext(context, queryDeleteStadium, stadiumId)
-				if err != nil {
-				}
-				count, _ = row.RowsAffected()
-				if count == 0 {
-					log.Error(err.Error())
-				}
-
-				queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
-				row, err = u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
-				if err != nil {
-				}
-				count, _ = row.RowsAffected()
-				if count == 0 {
-					log.Error(err.Error())
-				}
-
-				return user, message.SignUpFail
-
-			}
-
-			start = int64(end)
-		}
+		//startTime, _ := strconv.ParseInt(stadiumCollage.StartTime, 10, 64)
+		//endTime, _ := strconv.ParseInt(stadiumCollage.EndTime, 10, 64)
+		//playTime, _ := strconv.ParseInt(stadiumCollage.PlayTime, 10, 64)
+		//
+		//start := startTime
+		//end := 0
+		//
+		//amountTimer := math.Floor(float64((endTime - startTime) / playTime))
+		//
+		//for i := 0; i < int(amountTimer); i++ {
+		//	end = int(start + playTime)
+		//	var stadiumDetails = model.StadiumDetails{
+		//		StadiumDetailsId: uuid.NewV1().String(),
+		//		StadiumCollageId: stadiumCollageId,
+		//		StartTimeDetails: strconv.Itoa(int(start)),
+		//		EndTimeDetails:   strconv.Itoa(end),
+		//		Price:            stadiumCollage.DefaultPrice,
+		//		Description:      "",
+		//		HasOrder:         false,
+		//		CreatedAt:        time.Now(),
+		//		UpdatedAt:        time.Now(),
+		//	}
+		//
+		//	_, errCreateStadiumDetails := stadiumRepo.StadiumDetailsAdd(context, stadiumDetails)
+		//	if errCreateStadiumDetails != nil {
+		//		log.Error(errCreateStadiumDetails.Error())
+		//		//
+		//		queryDeleteStadiumCollage := `DELETE FROM public.stadium_collage WHERE stadium_collage_id = $1`
+		//		row, err := u.sql.Db.ExecContext(context, queryDeleteStadiumCollage, stadiumCollageId)
+		//		if err != nil {
+		//		}
+		//		count, _ := row.RowsAffected()
+		//		if count == 0 {
+		//			log.Error(err.Error())
+		//		}
+		//
+		//		queryDeleteStadium := `DELETE FROM public.stadium WHERE stadium_id = $1`
+		//		row, err = u.sql.Db.ExecContext(context, queryDeleteStadium, stadiumId)
+		//		if err != nil {
+		//		}
+		//		count, _ = row.RowsAffected()
+		//		if count == 0 {
+		//			log.Error(err.Error())
+		//		}
+		//
+		//		queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
+		//		row, err = u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
+		//		if err != nil {
+		//		}
+		//		count, _ = row.RowsAffected()
+		//		if count == 0 {
+		//			log.Error(err.Error())
+		//		}
+		//
+		//		return user, message.SignUpFail
+		//
+		//	}
+		//
+		//	start = int64(end)
+		//}
 
 	}
 	return user, err
