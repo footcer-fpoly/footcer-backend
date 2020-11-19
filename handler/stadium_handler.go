@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
+	"time"
 )
 
 type StadiumHandler struct {
@@ -126,11 +127,11 @@ func (u *StadiumHandler) UpdateStadiumCollage(c echo.Context) error {
 		StadiumCollageId:   req.StadiumCollageId,
 		NameStadiumCollage: req.NameStadiumCollage,
 		AmountPeople:       req.AmountPeople,
-		StartTime: req.StartTime,
-		EndTime: req.EndTime,
-		PlayTime: req.PlayTime,
-		StadiumId: req.StadiumId,
-		DefaultPrice: req.DefaultPrice,
+		StartTime:          req.StartTime,
+		EndTime:            req.EndTime,
+		PlayTime:           req.PlayTime,
+		StadiumId:          req.StadiumId,
+		DefaultPrice:       req.DefaultPrice,
 	}
 
 	stadiumColl, err := u.StadiumRepo.StadiumCollageUpdate(c.Request().Context(), stadiumColl)
@@ -265,6 +266,48 @@ func (u *StadiumHandler) StadiumCollageDelete(c echo.Context) error {
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lí thành công",
+		Data:       nil,
+	})
+}
+
+func (u *StadiumHandler) StadiumUploadImages(c echo.Context) error {
+	req := model.Images{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	req.CreatedAt = time.Now()
+	req.UpdatedAt = time.Now()
+
+	urls, errUpload := upload.Upload(c)
+	if errUpload != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    errUpload.Error(),
+		})
+	}
+
+	if len(urls) > 0 {
+		for i := 0; i < len(urls); i++ {
+			req.ImageId = uuid.NewV4().String()
+			req.Url = urls[i]
+			_, err := u.StadiumRepo.StadiumUploadImages(c.Request().Context(), req)
+			if err != nil {
+				return c.JSON(http.StatusOK, model.Response{
+					StatusCode: http.StatusConflict,
+					Message:    err.Error(),
+				})
+			}
+		}
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusOK,
+			Message:    "Xử lý thành công",
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Thất bại",
 		Data:       nil,
 	})
 }
