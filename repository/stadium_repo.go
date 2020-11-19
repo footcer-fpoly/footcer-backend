@@ -18,4 +18,5 @@ type StadiumRepository interface {
 	//StadiumDetailsInfoForStadium(context context.Context, name string) (interface{}, error)
 	StadiumDetailsInfoForStadiumCollage(context context.Context, id string) (interface{}, error)
 	StadiumDetailsUpdateForStadiumCollage(context context.Context, details model.StadiumDetails) (interface{}, error)
+	StadiumUploadImages(context context.Context, images model.Images) (interface{}, error)
 }

@@ -31,8 +31,10 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 
 	type StadiumInfo struct {
 		model.Stadium
+		ArrayStadiumImages  `json:"stadium_images"`
 		ArrayStadiumCollage `json:"stadium_collage"`
 		ArrayStadiumReview  `json:"review"`
+		ArrayStadiumService `json:"service"`
 		model.User          `json:"user"`
 	}
 	stadium := StadiumInfo{}
@@ -65,20 +67,6 @@ func (s StadiumRepoImpl) StadiumInfo(context context.Context, userId string) (in
 	}
 	stadium.ArrayStadiumCollage = stadiumColl
 
-	//stadium details
-	//var stadiumDet = []model.StadiumDetails{}
-	//queryDet := `SELECT stadium_collage_id, stadium_id, name_stadium_collage, amount_people, start_time, end_time, play_time, created_at, updated_at
-	//FROM public.stadium_collage WHERE stadium_id = $1`
-	//errDet := s.sql.Db.SelectContext(context, &stadiumDet, queryDet, stadium.StadiumId)
-	//if errDet != nil {
-	//	if errDet == sql.ErrNoRows {
-	//		log.Error(errDet.Error())
-	//		return stadiumDet, message.StadiumNotFound
-	//	}
-	//	log.Error(errColl.Error())
-	//	return stadiumDet, errColl
-	//}
-
 	//review
 	var review = []model.Review{}
 
@@ -105,6 +93,35 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 	}
 
 	stadium.ArrayStadiumReview = review
+
+	//stadium service
+	var stadiumService = []model.Service{}
+	queryService := `SELECT service_id, stadium_id, name_service, price_service, image
+	FROM public.service WHERE stadium_id = $1`
+	errService := s.sql.Db.SelectContext(context, &stadiumService, queryService, stadium.StadiumId)
+	if errService != nil {
+		if errService == sql.ErrNoRows {
+			log.Error(errService.Error())
+			return stadiumService, message.StadiumNotFound
+		}
+		log.Error(errService.Error())
+		return stadiumService, errColl
+	}
+	stadium.ArrayStadiumService = stadiumService
+
+	//stadium image
+	var stadiumImage = []model.Images{}
+	queryImage := `SELECT img.* FROM images as img INNER JOIN stadium as s ON  s.stadium_id = img.general_id WHERE s.stadium_id = $1`
+	errImage := s.sql.Db.SelectContext(context, &stadiumImage, queryImage, stadium.StadiumId)
+	if errImage != nil {
+		if errImage == sql.ErrNoRows {
+			log.Error(errImage.Error())
+			return stadiumService, message.StadiumNotFound
+		}
+		log.Error(errImage.Error())
+		return stadiumImage, errImage
+	}
+	stadium.ArrayStadiumImages = stadiumImage
 
 	return stadium, nil
 
@@ -565,6 +582,18 @@ func (s StadiumRepoImpl) AbstractStadiumDetailsAdd(context context.Context, stad
 	return true
 }
 
+func (s StadiumRepoImpl) StadiumUploadImages(context context.Context, images model.Images) (interface{}, error) {
+	queryCreate := `INSERT INTO public.images(
+	image_id, general_id, url, created_at_img, updated_at_img)
+	VALUES (:image_id , :general_id , :url , :created_at_img , :updated_at_img );`
+
+	_, err := s.sql.Db.NamedExecContext(context, queryCreate, images)
+	if err != nil {
+		log.Error(err.Error())
+		return images, message.SomeWentWrong
+	}
+	return images, nil
+}
 func CeilRate(rate []string) float64 {
 	var rateCeil float64 = 0.0
 	rate1, _ := strconv.Atoi(rate[0])
@@ -584,6 +613,8 @@ func CeilRate(rate []string) float64 {
 //TODO chưa hợp lí -> xử lí sau
 type ArrayStadiumCollage []model.StadiumCollage
 type ArrayStadiumReview []model.Review
+type ArrayStadiumService []model.Service
+type ArrayStadiumImages []model.Images
 type ArrayStadiumDetails []model.StadiumDetails
 
 /**

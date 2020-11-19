@@ -69,6 +69,17 @@ FOREIGN KEY (stadium_collage_id) REFERENCES stadium_collage (stadium_collage_id)
 CONSTRAINT stadium_details_pkey PRIMARY KEY (stadium_detail_id)
 );
 
+CREATE TABLE "images"
+(
+"image_id" text NOT NULL UNIQUE,
+"general_id" text NOT NULL,
+"url" text NOT NULL,
+"created_at_img" DATE NOT NULL,
+"updated_at_img" DATE NOT NULL,
+CONSTRAINT images_pkey PRIMARY KEY (image_id)
+
+);
+
 CREATE TABLE "service"(
 "service_id" text NOT NULL UNIQUE,
 "stadium_id" text NOT NULL,
