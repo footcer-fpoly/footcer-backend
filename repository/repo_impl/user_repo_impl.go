@@ -151,7 +151,7 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 		}
 		return user, message.SignUpFail
 	}
-	var stadiumRepo = StadiumRepoImpl{sql: u.sql}
+	//var stadiumRepo = StadiumRepoImpl{sql: u.sql}
 
 	if user.Role == 1 {
 		var stadiumId = uuid.NewV1().String()
@@ -194,46 +194,46 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 			return user, message.SignUpFail
 		}
 
-		var stadiumCollageId = uuid.NewV4().String()
-
-		var stadiumCollage = model.StadiumCollage{
-			StadiumCollageId:   stadiumCollageId,
-			NameStadiumCollage: "Sân số 1",
-			AmountPeople:       "5",
-			StartTime:          "19800000", //5:30
-			EndTime:            "79200000", //22:30
-			PlayTime:           "5400000",  // 90'
-			StadiumId:          stadiumId,
-			CreatedAt:          time.Now(),
-			UpdatedAt:          time.Now(),
-		}
-
-		_, errCreateStadiumCollage := stadiumRepo.StadiumCollageAdd(context, stadiumCollage)
-		if errCreateStadiumCollage != nil {
-			log.Error(errCreateStadiumCollage.Error())
-
-			queryDeleteStadium := `DELETE FROM public.stadium WHERE stadium_id = $1`
-			row, err := u.sql.Db.ExecContext(context, queryDeleteStadium, stadiumCollage.StadiumId)
-			if err != nil {
-				log.Error(err.Error())
-			}
-			count, _ := row.RowsAffected()
-			if count == 0 {
-				log.Error(err.Error())
-			}
-
-			queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
-			row, err = u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
-			if err != nil {
-				log.Error(err.Error())
-			}
-			count, _ = row.RowsAffected()
-			if count == 0 {
-				log.Error(err.Error())
-			}
-			return user, message.SignUpFail
-
-		}
+		//var stadiumCollageId = uuid.NewV4().String()
+		//
+		//var stadiumCollage = model.StadiumCollage{
+		//	StadiumCollageId:   stadiumCollageId,
+		//	NameStadiumCollage: "Sân số 1",
+		//	AmountPeople:       "5",
+		//	StartTime:          "19800000", //5:30
+		//	EndTime:            "79200000", //22:30
+		//	PlayTime:           "5400000",  // 90'
+		//	StadiumId:          stadiumId,
+		//	CreatedAt:          time.Now(),
+		//	UpdatedAt:          time.Now(),
+		//}
+		//
+		//_, errCreateStadiumCollage := stadiumRepo.StadiumCollageAdd(context, stadiumCollage)
+		//if errCreateStadiumCollage != nil {
+		//	log.Error(errCreateStadiumCollage.Error())
+		//
+		//	queryDeleteStadium := `DELETE FROM public.stadium WHERE stadium_id = $1`
+		//	row, err := u.sql.Db.ExecContext(context, queryDeleteStadium, stadiumCollage.StadiumId)
+		//	if err != nil {
+		//		log.Error(err.Error())
+		//	}
+		//	count, _ := row.RowsAffected()
+		//	if count == 0 {
+		//		log.Error(err.Error())
+		//	}
+		//
+		//	queryDeleteUser := `DELETE FROM public.users WHERE user_id = $1`
+		//	row, err = u.sql.Db.ExecContext(context, queryDeleteUser, user.UserId)
+		//	if err != nil {
+		//		log.Error(err.Error())
+		//	}
+		//	count, _ = row.RowsAffected()
+		//	if count == 0 {
+		//		log.Error(err.Error())
+		//	}
+		//	return user, message.SignUpFail
+		//
+		//}
 		//startTime, _ := strconv.ParseInt(stadiumCollage.StartTime, 10, 64)
 		//endTime, _ := strconv.ParseInt(stadiumCollage.EndTime, 10, 64)
 		//playTime, _ := strconv.ParseInt(stadiumCollage.PlayTime, 10, 64)

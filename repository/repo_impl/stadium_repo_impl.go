@@ -460,8 +460,8 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 
 func (s StadiumRepoImpl) StadiumDetailsAdd(context context.Context, stadiumDetails model.StadiumDetails) (model.StadiumDetails, error) {
 	queryCreate := `INSERT INTO public.stadium_details(
-	stadium_detail_id, stadium_collage_id, start_time_detail, end_time_detail, price, description, has_order, created_at, updated_at)
-	VALUES (:stadium_detail_id, :stadium_collage_id, :start_time_detail, :end_time_detail, :price, :description, :has_order, :created_at, :updated_at);`
+	stadium_detail_id, stadium_collage_id, start_time_detail, end_time_detail, price, description, created_at, updated_at)
+	VALUES (:stadium_detail_id, :stadium_collage_id, :start_time_detail, :end_time_detail, :price, :description, :created_at, :updated_at);`
 
 	_, err := s.sql.Db.NamedExecContext(context, queryCreate, stadiumDetails)
 	if err != nil {
@@ -471,7 +471,7 @@ func (s StadiumRepoImpl) StadiumDetailsAdd(context context.Context, stadiumDetai
 	return stadiumDetails, nil
 }
 
-func (s StadiumRepoImpl) StadiumDetailsInfoForStadiumCollage(context context.Context, stadiumCollageID string) (interface{}, error) {
+func (s StadiumRepoImpl) StadiumDetailsInfoForStadiumCollage(context context.Context, stadiumCollageID string, date string) (interface{}, error) {
 	type StadiumDetailsInfo struct {
 		model.StadiumCollage
 		ArrayStadiumDetails `json:"stadiumDetails"`
@@ -492,7 +492,8 @@ func (s StadiumRepoImpl) StadiumDetailsInfoForStadiumCollage(context context.Con
 		return stadiumInfoDet, err
 	}
 	var stadiumDetail []model.StadiumDetails
-	querySQL := `SELECT details.stadium_detail_id, details.stadium_collage_id, details.start_time_detail, details.end_time_detail, details.price, details.description, details.has_order
+	querySQL := `SELECT details.stadium_detail_id, details.stadium_collage_id, details.start_time_detail, 
+details.end_time_detail, details.price, details.description
 	FROM public.stadium_details as details  WHERE details.stadium_collage_id = $1 order by details.start_time_detail ;`
 	errDetail := s.sql.Db.SelectContext(context, &stadiumDetail, querySQL, stadiumCollageID)
 	if errDetail != nil {
@@ -502,6 +503,36 @@ func (s StadiumRepoImpl) StadiumDetailsInfoForStadiumCollage(context context.Con
 		}
 		log.Error(errDetail.Error())
 		return stadiumInfoDet, errDetail
+	}
+
+	var stadiumOrder []string
+	queryOrder := `SELECT 
+	 details.stadium_detail_id
+	FROM public.stadium_details as details 
+	INNER JOIN orders as o ON details.stadium_detail_id = o.stadium_detail_id
+	INNER join orders_status  on orders_status.order_id = o.order_id 
+	WHERE details.stadium_collage_id = $1 
+	AND orders_status.status LIKE $2 
+	AND CAST(time as DATE) = CAST($3 AS DATE)
+	order by details.start_time_detail`
+	errOrder := s.sql.Db.SelectContext(context, &stadiumOrder, queryOrder, stadiumCollageID, "%ACCEPT%", date)
+	if errOrder != nil {
+		if errOrder == sql.ErrNoRows {
+			log.Error(errOrder.Error())
+			return stadiumInfoDet, err
+		}
+		log.Error(errOrder.Error())
+		return stadiumInfoDet, err
+	}
+	if len(stadiumOrder) > 0 {
+		for i := 0; i < len(stadiumDetail); i++ {
+			for j := 0; j < len(stadiumOrder); j++ {
+				if stadiumDetail[i].StadiumDetailsId == stadiumOrder[j] {
+					stadiumDetail[i].HasOrder = true
+					break
+				}
+			}
+		}
 	}
 	stadiumInfoDet.ArrayStadiumDetails = stadiumDetail
 

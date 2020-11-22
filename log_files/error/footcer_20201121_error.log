@@ -1,0 +1,10 @@
+time="2020-11-21T16:42:48.435866+07:00" level=error msg="pq: column \"isuser\" does not exist" file=/Users/pro/footcer-backend/repository/repo_impl/order_repo_impl.go line=68
+time="2020-11-21T20:09:29.625844+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=488
+time="2020-11-21T20:09:36.748895+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=48
+time="2020-11-21T20:09:48.424607+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=148
+time="2020-11-21T20:10:21.45033+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=488
+time="2020-11-21T20:10:27.56442+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=48
+time="2020-11-22T00:44:18.016641+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=488
+time="2020-11-22T00:44:46.758028+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=488
+time="2020-11-22T00:46:13.108509+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=488
+time="2020-11-22T00:47:09.518644+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=488
