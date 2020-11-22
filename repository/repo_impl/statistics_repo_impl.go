@@ -94,7 +94,7 @@ func (s StatisticsRepoImpl) StatisticsMonth(context context.Context, date string
 	}
 
 	queryTotalDetailsOrder := `
-	SELECT COUNT(o.order_id) as total_details_order, COUNT(DISTINCT o.user_id) as total_customer,  SUM( o.price) as total_price
+	SELECT COUNT(o.order_id) as total_details_order, COUNT(DISTINCT o.user_id) as total_customer,  COALESCE(SUM( o.price), 0 )as total_price
 	FROM public.stadium_details as details 
 	INNER JOIN orders as o ON details.stadium_detail_id = o.stadium_detail_id
 	INNER join orders_status  on orders_status.order_id = o.order_id 
