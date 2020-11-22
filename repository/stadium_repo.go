@@ -18,6 +18,8 @@ type StadiumRepository interface {
 	SearchStadiumLocation(context context.Context, latitude string, longitude string) ([]model.Stadium, error)
 	SearchStadiumName(context context.Context, name string) ([]model.Stadium, error)
 
+	ListStadium(context context.Context) ([]model.Stadium, error)
+
 	StadiumDetailsInfoForStadiumCollage(context context.Context, stadiumCollageId string, date string) (interface{}, error)
 	StadiumDetailsUpdateForStadiumCollage(context context.Context, details model.StadiumDetails) (interface{}, error)
 

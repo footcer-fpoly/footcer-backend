@@ -210,6 +210,23 @@ func (u *StadiumHandler) SearchStadiumName(c echo.Context) error {
 	})
 }
 
+func (u *StadiumHandler) ListStadium(c echo.Context) error {
+
+	stadium, err := u.StadiumRepo.ListStadium(c.Request().Context())
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    message.Success,
+		Data:       stadium,
+	})
+}
+
 func (u *StadiumHandler) StadiumDetailsInfoForStadiumCollage(c echo.Context) error {
 	stadiumCollageId := c.QueryParam("stadiumCollageId")
 	date := c.QueryParam("date")
