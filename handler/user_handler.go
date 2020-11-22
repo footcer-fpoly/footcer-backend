@@ -110,7 +110,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 	urls, errUpload := upload.Upload(c)
 	if errUpload != nil {
 		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusOK,
+			StatusCode: http.StatusConflict,
 			Message:    errUpload.Error(),
 		})
 	}
@@ -138,7 +138,7 @@ func (u *UserHandler) Update(c echo.Context) error {
 	user, err := u.UserRepo.Update(c.Request().Context(), user)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusOK,
+			StatusCode: http.StatusConflict,
 			Message:    err.Error(),
 		})
 	}

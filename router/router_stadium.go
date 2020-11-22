@@ -20,6 +20,7 @@ func StadiumRouter(e *echo.Echo, sql *db.Sql) {
 	e.DELETE("/stadium/delete_collage/:id", stadiumHandler.StadiumCollageDelete, middleware.JWTMiddleware())
 	e.GET("/stadium/search-location", stadiumHandler.SearchStadiumLocation, middleware.JWTMiddleware())
 	e.GET("/stadium/search-name/:name", stadiumHandler.SearchStadiumName, middleware.JWTMiddleware())
+	e.GET("/stadium/list", stadiumHandler.ListStadium, middleware.JWTMiddleware())
 	e.GET("/stadium/collage-details/", stadiumHandler.StadiumDetailsInfoForStadiumCollage, middleware.JWTMiddleware())
 	e.PUT("/stadium/collage-details-update", stadiumHandler.StadiumDetailsUpdateForStadiumCollage, middleware.JWTMiddleware())
 	e.POST("/stadium/upload-images", stadiumHandler.StadiumUploadImages, middleware.JWTMiddleware())

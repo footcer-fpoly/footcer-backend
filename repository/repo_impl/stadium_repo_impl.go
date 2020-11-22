@@ -458,6 +458,22 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 
 }
 
+func (s StadiumRepoImpl) ListStadium(context context.Context) ([]model.Stadium, error) {
+	var stadium = []model.Stadium{}
+
+	querySQL := `SELECT * FROM public.stadium`
+	err := s.sql.Db.SelectContext(context, &stadium, querySQL)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return stadium, message.StadiumNotFound
+		}
+		log.Error(err.Error())
+		return stadium, err
+	}
+	return stadium, nil
+}
+
 func (s StadiumRepoImpl) StadiumDetailsAdd(context context.Context, stadiumDetails model.StadiumDetails) (model.StadiumDetails, error) {
 	queryCreate := `INSERT INTO public.stadium_details(
 	stadium_detail_id, stadium_collage_id, start_time_detail, end_time_detail, price, description, created_at, updated_at)
