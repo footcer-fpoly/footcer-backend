@@ -28,7 +28,6 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 
 	req.OrderId = uuid.NewV1().String()
 	req.UserId = claims.UserId
-	req.Accept = false
 	req.Finish = false
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
@@ -50,42 +49,24 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 
 }
 
-func (o *OrderHandler) AcceptOrder(c echo.Context) error {
-	req := model.Order{}
+func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	req := model.OrderStatus{}
+	if claims.Role == 0{
+		req.IsUser = true
+	}else{
+		req.IsUser = false
+	}
+
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	req.Accept = true
 
-	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
-	if err != nil {
-		return c.JSON(http.StatusOK, model.Response{
-			StatusCode: http.StatusConflict,
-			Message:    err.Error(),
-			Data:       nil,
-		})
-	}
-
-	return c.JSON(http.StatusOK, model.Response{
-		StatusCode: http.StatusOK,
-		Message:    "Xử lý thành công",
-		Data:       nil,
-	})
-
-}
-
-func (o *OrderHandler) RefuseOrder(c echo.Context) error {
-	req := model.Order{}
-
-	defer c.Request().Body.Close()
-	if err := c.Bind(&req); err != nil {
-		return helper.ResponseErr(c, http.StatusBadRequest)
-	}
-	req.Accept = false
-
-	err := o.OrderRepo.AcceptOrder(c.Request().Context(), req)
+	err := o.OrderRepo.UpdateStatusOrder(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,

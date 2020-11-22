@@ -61,7 +61,6 @@ CREATE TABLE "stadium_details"(
 "end_time_detail" text NOT NULL,
 "price" numeric NOT NULL,
 "description" text NOT NULL,
-"has_order" BOOLEAN NOT NULL DEFAULT FALSE,
 "created_at" TIMESTAMPTZ NOT NULL,
 "updated_at" TIMESTAMPTZ NOT NULL,
 
@@ -77,7 +76,6 @@ CREATE TABLE "images"
 "created_at_img" DATE NOT NULL,
 "updated_at_img" DATE NOT NULL,
 CONSTRAINT images_pkey PRIMARY KEY (image_id)
-
 );
 
 CREATE TABLE "service"(
@@ -140,11 +138,10 @@ CREATE TABLE "orders"
 "order_id" text NOT NULL UNIQUE,
 "user_id" text NOT NULL,
 "stadium_detail_id" text NOT NULL,
-"time" text NOT NULL,
+"time" DATE NOT NULL,
 "price" numeric NOT NULL,
 "description" text NOT NULL,
 "finish" BOOLEAN NOT NULL,
-"accept" BOOLEAN NOT NULL,
 "order_created_at" TIMESTAMPTZ NOT NULL,
 "order_updated_at" TIMESTAMPTZ NOT NULL,
 
@@ -152,6 +149,20 @@ FOREIGN KEY (stadium_detail_id) REFERENCES stadium_details (stadium_detail_id),
 FOREIGN KEY (user_id) REFERENCES users (user_id),
 
 CONSTRAINT order_id_pkey PRIMARY KEY (order_id)
+);
+
+CREATE TABLE "orders_status"
+(
+"order_status_id" text NOT NULL UNIQUE,
+"order_id" text NOT NULL,
+"status" text NOT NULL,
+"reason" text NOT NULL,
+"is_user" BOOLEAN NOT NULL,
+"created_at" DATE NOT NULL,
+"updated_at" DATE NOT NULL,
+CONSTRAINT orders_status_pkey PRIMARY KEY (order_status_id),
+FOREIGN KEY (order_id) REFERENCES orders (order_id)
+
 );
 
 CREATE TABLE "game"
@@ -190,9 +201,12 @@ CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
 );
 
 -- +migrate Down
+
 DROP TABLE "review";
 DROP TABLE "service";
+DROP TABLE "orders_status";
 DROP TABLE "orders";
+DROP TABLE "images";
 DROP TABLE "stadium_details";
 DROP TABLE "stadium_collage";
 DROP TABLE "team_details";

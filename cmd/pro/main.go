@@ -58,7 +58,7 @@ func main() {
 	router.TeamRouter(e, sql)
 	router.GameRouter(e, sql)
 	router.NotificationRouter(e, sql)
-	router.AdRouter(e, sql)
+	router.StatisticsRouter(e, sql)
 	router.AdminRouter(e, sql)
 
 	//upload
