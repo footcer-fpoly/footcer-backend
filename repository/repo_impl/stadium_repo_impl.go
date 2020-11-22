@@ -461,7 +461,7 @@ func (s StadiumRepoImpl) SearchStadiumName(context context.Context, name string)
 func (s StadiumRepoImpl) ListStadium(context context.Context) ([]model.Stadium, error) {
 	var stadium = []model.Stadium{}
 
-	querySQL := `SELECT * FROM public.stadium`
+	querySQL := `SELECT *, verify as verify_stadium FROM public.stadium`
 	err := s.sql.Db.SelectContext(context, &stadium, querySQL)
 	if err != nil {
 		if err == sql.ErrNoRows {

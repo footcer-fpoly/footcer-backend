@@ -34,3 +34,4 @@ time="2020-11-22T11:53:13.388203+07:00" level=error msg="sql: Scan error on colu
 time="2020-11-22T12:07:46.442535+07:00" level=error msg="pq: invalid input syntax for type date: \"2020-11\"" file=/Users/pro/footcer-backend/repository/repo_impl/statistics_repo_impl.go line=61
 time="2020-11-22T13:11:21.064197+07:00" level=error msg="sql: Scan error on column index 2, name \"total_price\": converting NULL to int is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/statistics_repo_impl.go line=108
 time="2020-11-22T13:11:30.186315+07:00" level=error msg="sql: Scan error on column index 2, name \"total_price\": converting NULL to int is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/statistics_repo_impl.go line=108
+time="2020-11-22T22:03:12.557673+07:00" level=error msg="missing destination name verify_stadium in *repo_impl.StadiumInfo" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=51
