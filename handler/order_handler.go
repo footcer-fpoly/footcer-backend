@@ -54,12 +54,11 @@ func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
 	req := model.OrderStatus{}
-	if claims.Role == 0{
+	if claims.Role == 0 {
 		req.IsUser = true
-	}else{
+	} else {
 		req.IsUser = false
 	}
-
 
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
@@ -132,6 +131,24 @@ func (o *OrderHandler) ListOrderForUser(c echo.Context) error {
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
 	orders, err := o.OrderRepo.ListOrderForUser(c.Request().Context(), claims.UserId)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       err.Error,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       orders,
+	})
+}
+
+func (o *OrderHandler) OrderDetail(c echo.Context) error {
+	orderId := c.Param("id")
+
+	orders, err := o.OrderRepo.OrderDetail(c.Request().Context(), orderId)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,

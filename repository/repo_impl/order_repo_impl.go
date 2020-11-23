@@ -170,3 +170,36 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 	}
 	return orders, nil
 }
+
+func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (interface{}, error) {
+	type listOrders struct {
+		model.Order
+		model.OrderStatus    `json:"order_status"`
+		model.Stadium        `json:"stadium"`
+		model.StadiumCollage `json:"stadium_collage"`
+		model.StadiumDetails `json:"stadium_details"`
+		model.User           `json:"user"`
+	}
+	var orders = listOrders{}
+	sqlStatement := `
+	SELECT orders.*,
+	users.user_id,users.display_name,users.avatar,
+	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
+	stadium.name_stadium,stadium.address,stadium.category, 
+	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
+	FROM public.orders 
+	INNER JOIN users ON users.user_id = orders.user_id 
+	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id
+	INNER JOIN stadium_collage  ON stadium_collage.stadium_collage_id = stadium_details.stadium_collage_id  
+	INNER JOIN stadium ON stadium.stadium_id = stadium_collage.stadium_id 
+	INNER JOIN orders_status  ON orders_status.order_id = orders.order_id
+	WHERE orders.order_id = $1;
+	`
+
+	err := o.sql.Db.GetContext(context, &orders, sqlStatement, orderId)
+	if err != nil {
+		log.Error(err.Error())
+		return orders, message.SomeWentWrong
+	}
+	return orders, nil
+}
