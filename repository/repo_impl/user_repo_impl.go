@@ -404,3 +404,29 @@ func (u UserRepoImpl) DeleteUser(context context.Context, phone string) error {
 
 	return nil
 }
+
+func (u UserRepoImpl) UpdateTokenNotify(context context.Context, tokenNotify req.TokenNotify) error {
+
+	sqlStatement := `
+		UPDATE users
+		SET token_notify = :token_notify
+		WHERE user_id    = :user_id
+	`
+
+	result, err := u.sql.Db.NamedExecContext(context, sqlStatement, tokenNotify)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return message.UserNotUpdated
+	}
+	if count == 0 {
+		return message.UserNotUpdated
+	}
+
+	return nil
+}

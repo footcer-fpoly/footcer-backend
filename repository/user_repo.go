@@ -18,4 +18,6 @@ type UserRepository interface {
 	ValidUUID(context context.Context, uuid string) (model.User, error)
 	UpdatePassword(context context.Context, user model.User) error
 	DeleteUser(context context.Context, phone string) error
+
+	UpdateTokenNotify(context context.Context, tokenNotify req.TokenNotify) error
 }

@@ -435,3 +435,37 @@ func (u *UserHandler) DeleteUser(c echo.Context) error {
 	})
 
 }
+
+func (u *UserHandler) UpdateTokenNotify(c echo.Context) error {
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	tokenNotify := req.TokenNotify{}
+	tokenNotify.UserId = claims.UserId
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&tokenNotify); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+	err := c.Validate(tokenNotify)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusBadRequest,
+			Message:    err.Error(),
+		})
+	}
+
+	err = u.UserRepo.UpdateTokenNotify(c.Request().Context(), tokenNotify)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lí thành công",
+		Data:       nil,
+	})
+}

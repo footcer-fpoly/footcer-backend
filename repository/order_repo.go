@@ -12,4 +12,5 @@ type OrderRepository interface {
 	FinishOrder(context context.Context, order model.Order) error
 	ListOrderForStadium(context context.Context, stadiumId string) (interface{}, error)
 	ListOrderForUser(context context.Context, userId string) (interface{}, error)
+	OrderDetail(context context.Context, orderId string) (interface{}, error)
 }
