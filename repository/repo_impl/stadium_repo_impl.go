@@ -528,10 +528,9 @@ details.end_time_detail, details.price, details.description
 	INNER JOIN orders as o ON details.stadium_detail_id = o.stadium_detail_id
 	INNER join orders_status  on orders_status.order_id = o.order_id 
 	WHERE details.stadium_collage_id = $1 
-	AND orders_status.status LIKE $2 
 	AND CAST(time as DATE) = CAST($3 AS DATE)
 	order by details.start_time_detail`
-	errOrder := s.sql.Db.SelectContext(context, &stadiumOrder, queryOrder, stadiumCollageID, "%ACCEPT%", date)
+	errOrder := s.sql.Db.SelectContext(context, &stadiumOrder, queryOrder, stadiumCollageID, date)
 	if errOrder != nil {
 		if errOrder == sql.ErrNoRows {
 			log.Error(errOrder.Error())

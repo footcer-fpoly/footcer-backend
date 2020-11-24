@@ -268,7 +268,6 @@ func (t TeamRepoImpl) GetTeamForUserReject(context context.Context, userId strin
 
 }
 
-
 func (t TeamRepoImpl) DeleteMember(context context.Context, userID string) error {
 
 	queryDelete := `DELETE FROM public.team_details
@@ -372,4 +371,8 @@ func (t TeamRepoImpl) AcceptInvite(context context.Context, teamDetails model.Te
 		return message.SomeWentWrong
 	}
 	return nil
+}
+
+func (t TeamRepoImpl) GetToken(context context.Context, userId string) error {
+	panic("implement me")
 }

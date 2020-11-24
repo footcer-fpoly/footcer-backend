@@ -18,4 +18,6 @@ type TeamRepository interface {
 
 	UpdateTeam(context context.Context, team model.Team) (model.Team, error)
 	AcceptInvite(context context.Context, teamDetails model.TeamDetails) error
+
+	GetToken(context context.Context, userId string) error
 }

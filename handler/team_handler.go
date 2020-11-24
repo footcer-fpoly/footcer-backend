@@ -156,6 +156,15 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 		})
 	}
 
+	//service.PushNotification(c,model.DataNotification{
+	//	Type: "ADD-MEMBER",
+	//	Body: model.BodyNotification{
+	//		Title:     "",
+	//		Content:   "",
+	//		GeneralId: "",
+	//	},
+	//}, )
+
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
