@@ -1,2 +1,4 @@
 time="2020-11-26T21:11:14.138835+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/order_repo_impl.go line=201
 time="2020-11-26T21:11:17.395591+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/order_repo_impl.go line=201
+time="2020-11-26T22:45:53.012186+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=148
+time="2020-11-26T22:46:41.710082+07:00" level=error msg="pq: could not determine data type of parameter $2" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=539
