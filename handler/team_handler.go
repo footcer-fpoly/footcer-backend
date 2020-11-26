@@ -5,6 +5,7 @@ import (
 	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/repository/repo_impl"
 	"footcer-backend/upload"
 	"net/http"
 	"time"
@@ -130,7 +131,7 @@ func (t *TeamHandler) SearchWithPhone(c echo.Context) error {
 	})
 }
 
-func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
+func (t TeamHandler) AddMemberTeam(c echo.Context) error {
 	req := model.TeamDetails{}
 
 	defer c.Request().Body.Close()
@@ -146,7 +147,17 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 	req.Role = "0"
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
+	var userRepo = repo_impl.UserRepoImpl{}
 
+
+	tokens, errToken := userRepo.GetToken(c.Request().Context(), req.UserId)
+	if errToken != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
 	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req, claims.UserId)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
@@ -156,6 +167,8 @@ func (t *TeamHandler) AddMemberTeam(c echo.Context) error {
 		})
 	}
 
+
+	print(tokens)
 	//service.PushNotification(c,model.DataNotification{
 	//	Type: "ADD-MEMBER",
 	//	Body: model.BodyNotification{

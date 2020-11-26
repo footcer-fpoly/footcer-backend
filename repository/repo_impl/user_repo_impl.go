@@ -151,6 +151,7 @@ func (u UserRepoImpl) CreateForPhone(context context.Context, user model.User) (
 		}
 		return user, message.SignUpFail
 	}
+
 	//var stadiumRepo = StadiumRepoImpl{sql: u.sql}
 
 	if user.Role == 1 {
@@ -429,4 +430,19 @@ func (u UserRepoImpl) UpdateTokenNotify(context context.Context, tokenNotify req
 	}
 
 	return nil
+}
+
+func (u UserRepoImpl) GetToken(context context.Context, userId string) (string, error) {
+	var tokens string
+	query := `SELECT token_notify FROM public.users WHERE user_id = $1`
+	err := u.sql.Db.GetContext(context, &tokens, query, userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return tokens, err
+		}
+		log.Error(err.Error())
+		return tokens, err
+	}
+	return tokens, err
 }

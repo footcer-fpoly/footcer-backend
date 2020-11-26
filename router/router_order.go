@@ -19,6 +19,6 @@ func OrderRouter(e *echo.Echo, sql *db.Sql) {
 	e.PUT("/order/finish", orderHandler.FinishOrder, middleware.JWTMiddleware())
 	e.GET("/order/stadium/:id", orderHandler.ListOrderForStadium, middleware.JWTMiddleware())
 	e.GET("/order/user", orderHandler.ListOrderForUser, middleware.JWTMiddleware())
-	e.GET("/order/:id", orderHandler.ListOrderForUser, middleware.JWTMiddleware())
+	e.GET("/order/:id", orderHandler.OrderDetail, middleware.JWTMiddleware())
 
 }
