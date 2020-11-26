@@ -20,4 +20,5 @@ type UserRepository interface {
 	DeleteUser(context context.Context, phone string) error
 
 	UpdateTokenNotify(context context.Context, tokenNotify req.TokenNotify) error
+	GetToken(context context.Context, userId string) (string, error)
 }
