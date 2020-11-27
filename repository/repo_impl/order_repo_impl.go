@@ -126,7 +126,7 @@ func (o OrderRepoImpl) ListOrderForStadium(context context.Context, stadiumId st
 	INNER JOIN stadium_collage  ON stadium_collage.stadium_collage_id = stadium_details.stadium_collage_id  
 	INNER JOIN stadium ON stadium.stadium_id = stadium_collage.stadium_id 
 	INNER JOIN orders_status  ON orders_status.order_id = orders.order_id
-	WHERE stadium.stadium_id = $1;
+	WHERE stadium.stadium_id = $1 ORDER BY orders.time DESC;
 	`
 
 	err := o.sql.Db.SelectContext(context, &orders, sqlStatement, stadiumId)
@@ -160,7 +160,7 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 	INNER JOIN stadium_collage  ON stadium_collage.stadium_collage_id = stadium_details.stadium_collage_id  
 	INNER JOIN stadium ON stadium.stadium_id = stadium_collage.stadium_id 
 	INNER JOIN orders_status  ON orders_status.order_id = orders.order_id
-	WHERE users.user_id = $1;
+	WHERE users.user_id = $1 ORDER BY orders.time DESC;
 	`
 
 	err := o.sql.Db.SelectContext(context, &orders, sqlStatement, userId)
