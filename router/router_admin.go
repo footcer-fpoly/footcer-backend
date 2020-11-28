@@ -13,5 +13,6 @@ func AdminRouter(e *echo.Echo, sql *db.Sql) {
 		AdminRepo: repo.NewAdminRepo(sql),
 	}
 	e.GET("/admin/accept-stadium/:id", adminHandler.AcceptStadium)
+	e.GET("/admin/statistics", adminHandler.Statistics)
 
 }
