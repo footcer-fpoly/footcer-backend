@@ -1,0 +1,1 @@
+time="2020-11-28T10:40:15.436158+07:00" level=error msg="missing destination name total_user in *model.Stadium" file=/Users/pro/footcer-backend/repository/repo_impl/admin_repo_impl.go line=55

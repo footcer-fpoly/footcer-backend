@@ -29,3 +29,20 @@ func (a *AdminHandler) AcceptStadium(c echo.Context) error {
 		Data:       nil,
 	})
 }
+
+func (a *AdminHandler) Statistics(c echo.Context) error {
+
+	statistics, err := a.AdminRepo.Statistics(c.Request().Context())
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    message.Success,
+		Data:       statistics,
+	})
+}
