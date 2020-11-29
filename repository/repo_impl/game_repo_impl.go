@@ -15,6 +15,8 @@ type GameRepoImpl struct {
 	sql *db.Sql
 }
 
+
+
 func NewGameRepo(sql *db.Sql) repository.GameRepository {
 	return &GameRepoImpl{sql: sql}
 }
@@ -22,7 +24,7 @@ func NewGameRepo(sql *db.Sql) repository.GameRepository {
 func (g *GameRepoImpl) AddGame(context context.Context, game model.Game) (model.Game, error) {
 
 	queryCreateGame := `INSERT INTO public.game(
-	game_id, date, hour, type, score, description_game, finish, stadium_id, team_id_host, team_id_guest, game_created_at, game_updated_at)
+	game_id, date, hour, type, score, description , finish, stadium_id, team_id_host, team_id_guest, game_created_at, game_updated_at)
 	VALUES (:game_id, :date, :hour, :type, :score, :description_game, :finish, (CASE WHEN LENGTH(:stadium_id) = 0 THEN null ELSE :stadium_id END) , :team_id_host, null, :game_created_at, :game_updated_at);`
 	if len(game.StadiumId) > 0 {
 		//game.StadiumId = sql.NullString{}
@@ -130,7 +132,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 
 	var listGame = []ListGame{}
 	if date == "all" {
-		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description_game, game.finish,
+		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.finish,
  COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium,
   game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,
   COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
@@ -147,7 +149,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 			return listGame, err
 		}
 	} else {
-		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description_game, 
+		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , 
 	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
@@ -173,7 +175,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interface{}, error) {
 	var game = ListGame{}
 
-	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description_game, 
+	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , 
 	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, 'null') name_stadium, 
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
@@ -192,10 +194,10 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 	inviteTeam := game.TeamIdGuest == "null"
 	if inviteTeam {
 		var inviteTeams = []TeamTemp{}
-		sqlGetTeamInvate := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp 
+		sqlGetTeamInvite := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp 
 	FROM public.game_temp INNER JOIN team ON team.team_id = game_temp.team_id WHERE game_id =$1;`
 
-		err := g.sql.Db.SelectContext(context, &inviteTeams, sqlGetTeamInvate, gameId)
+		err := g.sql.Db.SelectContext(context, &inviteTeams, sqlGetTeamInvite, gameId)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				log.Error(err.Error())
@@ -210,6 +212,53 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 
 	return game, nil
 
+}
+
+func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (interface{}, error) {
+	var game = []ListGame{}
+
+	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , 
+	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
+	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
+	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
+	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
+	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
+	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest
+	INNER JOIN team_details AS details_host ON team_host.team_id = details_host.teams_id
+	LEFT JOIN team_details AS details_guest ON team_host.team_id = details_guest.teams_id
+	INNER JOIN users as user_host ON user_host.user_id = details_host.user_id 
+	INNER JOIN users as user_guest ON user_guest.user_id = details_guest.user_id 
+	where user_host.user_id = $1
+	OR user_guest.user_id = $1;`
+	err := g.sql.Db.SelectContext(context, &game, sqlGetGame, userId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return game, message.NotData
+		}
+		log.Error(err.Error())
+		return game, err
+	}
+	//inviteTeam := game.TeamIdGuest == "null"
+	//if inviteTeam {
+	//	var inviteTeams = []TeamTemp{}
+	//	sqlGetTeamInvite := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp
+	//FROM public.game_temp INNER JOIN team ON team.team_id = game_temp.team_id WHERE game_id =$1;`
+	//
+	//	err := g.sql.Db.SelectContext(context, &inviteTeams, sqlGetTeamInvite, userId)
+	//	if err != nil {
+	//		if err == sql.ErrNoRows {
+	//			log.Error(err.Error())
+	//			return game, message.NotData
+	//		}
+	//		log.Error(err.Error())
+	//		return game, err
+	//	}
+	//	game.ArrayTeamTemp = inviteTeams
+	//
+	//}
+
+	return game, nil
 }
 
 type TeamHost struct {
