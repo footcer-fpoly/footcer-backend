@@ -3,7 +3,7 @@ package model
 import "time"
 
 type Stadium struct {
-	StadiumId     string    `json:"stadiumId,omitempty" db:"stadium_id,omitempty"`
+	StadiumId     string    `json:"stadiumId" db:"stadium_id,omitempty"`
 	StadiumName   string    `json:"stadiumName,omitempty" db:"name_stadium,omitempty"`
 	Address       string    `json:"address,omitempty" db:"address"`
 	Description   string    `json:"description,omitempty" db:"description,omitempty"`

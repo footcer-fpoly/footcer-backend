@@ -118,7 +118,7 @@ func (o OrderRepoImpl) ListOrderForStadium(context context.Context, stadiumId st
 	sqlStatement := `SELECT orders.*,
 	users.user_id,users.display_name,users.avatar,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
-	stadium.name_stadium,stadium.address,stadium.category, 
+	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id, 
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
 	FROM public.orders 
 	INNER JOIN users ON users.user_id = orders.user_id 
@@ -134,6 +134,12 @@ func (o OrderRepoImpl) ListOrderForStadium(context context.Context, stadiumId st
 		log.Error(err.Error())
 		return orders, message.SomeWentWrong
 	}
+	for i := 0;i <len(orders); i++ {
+		orders[i].Stadium.StadiumId = 	orders[i].StadiumCollage.StadiumId
+		orders[i].StadiumCollage.StadiumCollageId = orders[i].StadiumDetails.StadiumCollageId
+	}
+
+
 
 	return orders, nil
 }
@@ -150,9 +156,9 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 	var orders = []listOrders{}
 	sqlStatement := `
 	SELECT orders.*,
-	users.user_id,users.display_name,users.avatar,
+	users.user_id,users.display_name,users.avatar, stadium_collage.stadium_collage_id ,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
-	stadium.name_stadium,stadium.address,stadium.category, 
+	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id ,
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
 	FROM public.orders 
 	INNER JOIN users ON users.user_id = orders.user_id 
@@ -168,6 +174,12 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 		log.Error(err.Error())
 		return orders, message.SomeWentWrong
 	}
+
+	for i := 0;i <len(orders); i++ {
+		orders[i].Stadium.StadiumId = 	orders[i].StadiumCollage.StadiumId
+		orders[i].StadiumCollage.StadiumCollageId = orders[i].StadiumDetails.StadiumCollageId
+	}
+
 	return orders, nil
 }
 
@@ -185,7 +197,7 @@ func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (int
 	SELECT orders.*,
 	users.user_id,users.display_name,users.avatar,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
-	stadium.name_stadium,stadium.address,stadium.category, 
+	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id, 
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
 	FROM public.orders 
 	INNER JOIN users ON users.user_id = orders.user_id 
