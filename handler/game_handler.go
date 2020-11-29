@@ -5,6 +5,7 @@ import (
 	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
@@ -142,6 +143,27 @@ func (g *GameHandler) GetGames(c echo.Context) error {
 func (g *GameHandler) GetGame(c echo.Context) error {
 	gameId := c.Param("id")
 	game, err := g.GameRepo.GetGame(c.Request().Context(), gameId)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       game,
+	})
+}
+
+func (g *GameHandler) GetGameForUser(c echo.Context) error {
+
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	game, err := g.GameRepo.GetGameForUser(c.Request().Context(), claims.UserId)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,

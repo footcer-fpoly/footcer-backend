@@ -199,8 +199,14 @@ func (u *UserHandler) CreateForPhone(c echo.Context) error {
 }
 
 func (u *UserHandler) HandleSignIn(c echo.Context) error {
+	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+
 	req := req.ReqSignIn{}
 
+
+	println(req.Phone)
 	if err := c.Bind(&req); err != nil {
 		log.Error(err.Error())
 		return c.JSON(http.StatusOK, model.Response{

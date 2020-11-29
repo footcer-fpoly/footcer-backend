@@ -20,5 +20,7 @@ type GameRepository interface {
 
 	UpdateScore(context context.Context, game model.Game) (interface{}, error)
 
+	GetGameForUser(context context.Context, userId string) (interface{}, error)
+
 	//SearchGameForDate(context context.Context, var date) (interface{}, error)
 }
