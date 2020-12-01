@@ -211,6 +211,9 @@ func (u *StadiumHandler) SearchStadiumName(c echo.Context) error {
 }
 
 func (u *StadiumHandler) ListStadium(c echo.Context) error {
+	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	stadium, err := u.StadiumRepo.ListStadium(c.Request().Context())
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
