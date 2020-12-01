@@ -24,8 +24,8 @@ func NewGameRepo(sql *db.Sql) repository.GameRepository {
 func (g *GameRepoImpl) AddGame(context context.Context, game model.Game) (model.Game, error) {
 
 	queryCreateGame := `INSERT INTO public.game(
-	game_id, date, hour, type, score, description , finish, stadium_id, team_id_host, team_id_guest, game_created_at, game_updated_at)
-	VALUES (:game_id, :date, :hour, :type, :score, :description_game, :finish, (CASE WHEN LENGTH(:stadium_id) = 0 THEN null ELSE :stadium_id END) , :team_id_host, null, :game_created_at, :game_updated_at);`
+	game_id, date, hour, type, score, description , finish, stadium_id, team_id_host, team_id_guest, order_id,game_created_at, game_updated_at)
+	VALUES (:game_id, :date, :hour, :type, :score, :description_game, :finish, (CASE WHEN LENGTH(:stadium_id) = 0 THEN null ELSE :stadium_id END) , :team_id_host, null, :order_id, :game_created_at, :game_updated_at);`
 	if len(game.StadiumId) > 0 {
 		//game.StadiumId = sql.NullString{}
 	}
@@ -36,6 +36,63 @@ func (g *GameRepoImpl) AddGame(context context.Context, game model.Game) (model.
 		return game, message.SomeWentWrong
 	}
 	return game, nil
+}
+
+func (g *GameRepoImpl) UpdateGame(context context.Context, game model.Game) (interface{}, error) {
+	sqlStatement := `
+		UPDATE game
+		SET 
+			date  = (CASE WHEN LENGTH(:date) = 0 THEN date ELSE :date END),
+			hour = (CASE WHEN LENGTH(:hour) = 0 THEN hour ELSE :hour END),
+			type = (CASE WHEN LENGTH(:type) = 0 THEN type ELSE :type END),
+			score = (CASE WHEN LENGTH(:score) = 0 THEN score ELSE :score END),
+			description = (CASE WHEN LENGTH(:description_game) = 0 THEN description ELSE :description_game END),
+			finish = (CASE WHEN LENGTH(:finish) = 0 THEN finish ELSE :finish END),
+			stadium_id = (CASE WHEN LENGTH(:stadium_id) = 0 THEN stadium_id ELSE :stadium_id END),
+			team_id_host = (CASE WHEN LENGTH(:team_id_host) = 0 THEN team_id_host ELSE :team_id_host END),
+			team_id_guest = (CASE WHEN LENGTH(:team_id_guest) = 0 THEN team_id_guest ELSE :team_id_guest END),
+			order_id = (CASE WHEN LENGTH(:order_id) = 0 THEN order_id ELSE :order_id END),
+			game_updated_at 	  = COALESCE (:game_updated_at, game_updated_at)
+		WHERE game_id    = :game_id
+	`
+
+	game.UpdatedAt = time.Now()
+
+	result, err := g.sql.Db.NamedExecContext(context, sqlStatement, game)
+	if err != nil {
+		log.Error(err.Error())
+		return game, err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		log.Error(err.Error())
+		return game, message.UpdateFail
+	}
+	if count == 0 {
+		return game, message.UpdateFail
+	}
+
+	return game, nil
+}
+
+func (g *GameRepoImpl) DeleteGame(context context.Context, gameId string)  error {
+	queryDeleteGameTemp := `DELETE FROM public.game_temp
+	WHERE game_id = $1;`
+	_, err := g.sql.Db.ExecContext(context, queryDeleteGameTemp, gameId)
+	if err != nil {
+		log.Error(err.Error())
+		return message.SomeWentWrong
+	}
+	queryDeleteTeam := `DELETE FROM public.game
+	WHERE game_id = $1;`
+	_, errDeleteTeam := g.sql.Db.ExecContext(context, queryDeleteTeam, gameId)
+	if errDeleteTeam != nil {
+		log.Error(errDeleteTeam.Error())
+		return message.SomeWentWrong
+	}
+
+	return nil
 }
 
 func (g *GameRepoImpl) JoinGame(context context.Context, gameTemp model.GameTemp) error {
@@ -132,7 +189,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 
 	var listGame = []ListGame{}
 	if date == "all" {
-		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.finish,
+		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.finish, game.order_id,
  COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium,
   game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,
   COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
@@ -149,7 +206,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 			return listGame, err
 		}
 	} else {
-		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , 
+		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,
 	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
@@ -175,7 +232,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interface{}, error) {
 	var game = ListGame{}
 
-	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , 
+	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,
 	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, 'null') name_stadium, 
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
@@ -217,7 +274,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (interface{}, error) {
 	var game = []ListGame{}
 
-	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , 
+	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , order_id,
 	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 

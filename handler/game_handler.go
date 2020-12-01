@@ -18,7 +18,7 @@ type GameHandler struct {
 
 func (g *GameHandler) AddGame(c echo.Context) error {
 	req := model.Game{}
-
+	print(req.OrderId)
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
 		log.Error(err.Error())
@@ -45,6 +45,54 @@ func (g *GameHandler) AddGame(c echo.Context) error {
 		Data:       game,
 	})
 
+}
+
+func (g *GameHandler) UpdateGame(c echo.Context) error {
+	req := model.Game{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+	_, err := g.GameRepo.UpdateGame(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
+}
+
+func (g *GameHandler) DeleteGame(c echo.Context) error {
+	req := model.Game{}
+
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+	err := g.GameRepo.DeleteGame(c.Request().Context(), c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
 }
 
 func (g *GameHandler) JoinGame(c echo.Context) error {

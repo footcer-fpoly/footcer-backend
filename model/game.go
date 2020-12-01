@@ -13,6 +13,7 @@ type Game struct {
 	StadiumId   string    `json:"stadiumId,omitempty" db:"stadium_id"`
 	TeamIdHost  string    `json:"teamIdHost,omitempty" db:"team_id_host,omitempty"`
 	TeamIdGuest string    `json:"teamIdGuest,omitempty" db:"team_id_guest,omitempty"`
+	OrderId     string    `json:"orderId,omitempty" db:"order_id,omitempty"`
 	CreatedAt   time.Time `json:"created_at" db:"game_created_at,omitempty"`
 	UpdatedAt   time.Time `json:"updated_at" db:"game_updated_at, omitempty"`
 }
