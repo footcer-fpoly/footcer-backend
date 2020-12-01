@@ -8,6 +8,10 @@ import (
 type GameRepository interface {
 	AddGame(context context.Context, game model.Game) (model.Game, error)
 
+	UpdateGame(context context.Context, game model.Game) (interface{}, error)
+
+	DeleteGame(context context.Context, gameId string)  error
+
 	JoinGame(context context.Context, gameTemp model.GameTemp) error
 
 	AcceptJoin(context context.Context, gameTemp model.GameTemp) error

@@ -78,25 +78,11 @@ func (o OrderRepoImpl) FinishOrder(context context.Context, order model.Order) e
 		SET 
 		finish  = (CASE WHEN LENGTH(:finish) = 0 THEN finish ELSE :finish END),
 			order_updated_at 	  = COALESCE (:order_updated_at, order_updated_at)
-		WHERE orders_status.order_id    = :orders_status.order_id
+		WHERE order_id    = :order_id
 	`
 
 	order.UpdatedAt = time.Now()
 	_, err := o.sql.Db.NamedExecContext(context, sqlStatement, order)
-	if err != nil {
-		log.Error(err.Error())
-		return message.SomeWentWrong
-	}
-
-	sqlStatement = `
-		UPDATE stadium_details
-		SET has_order  = false,
-			updated_at 	  = CURRENT_DATE
-		WHERE stadium_detail_id    = :stadium_detail_id
-	`
-
-	order.UpdatedAt = time.Now()
-	_, err = o.sql.Db.NamedExecContext(context, sqlStatement, order)
 	if err != nil {
 		log.Error(err.Error())
 		return message.SomeWentWrong
