@@ -13,6 +13,9 @@ type AdminHandler struct {
 }
 
 func (a *AdminHandler) AcceptStadium(c echo.Context) error {
+	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+	c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 	id := c.Param("id")
 
 	err := a.AdminRepo.AcceptStadium(c.Request().Context(), id)
