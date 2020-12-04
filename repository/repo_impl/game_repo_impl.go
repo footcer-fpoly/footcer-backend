@@ -15,8 +15,6 @@ type GameRepoImpl struct {
 	sql *db.Sql
 }
 
-
-
 func NewGameRepo(sql *db.Sql) repository.GameRepository {
 	return &GameRepoImpl{sql: sql}
 }
@@ -76,7 +74,7 @@ func (g *GameRepoImpl) UpdateGame(context context.Context, game model.Game) (int
 	return game, nil
 }
 
-func (g *GameRepoImpl) DeleteGame(context context.Context, gameId string)  error {
+func (g *GameRepoImpl) DeleteGame(context context.Context, gameId string) error {
 	queryDeleteGameTemp := `DELETE FROM public.game_temp
 	WHERE game_id = $1;`
 	_, err := g.sql.Db.ExecContext(context, queryDeleteGameTemp, gameId)
@@ -189,13 +187,16 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 
 	var listGame = []ListGame{}
 	if date == "all" {
-		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.finish, game.order_id,
- COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium,
+		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.finish, game.order_id,stadium_details.*,
+ COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
   game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,
   COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
-	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest ORDER BY game_created_at DESC;`
+	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
+	INNER JOIN orders ON orders.order_id = game.order_id
+	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id 
+	ORDER BY game_created_at DESC;`
 		err := g.sql.Db.SelectContext(context, &listGame, sqlSearch)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -206,13 +207,16 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 			return listGame, err
 		}
 	} else {
-		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,
-	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
+		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
+	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
-	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest  WHERE date = $1;`
+	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
+	 INNER JOIN orders ON orders.order_id = game.order_id
+	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id 
+	 WHERE date = $1;`
 		err := g.sql.Db.SelectContext(context, &listGame, sqlSearchDate, date)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -232,13 +236,16 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interface{}, error) {
 	var game = ListGame{}
 
-	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,
-	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, 'null') name_stadium, 
+	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
+	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, 'null') name_stadium, stadium.address,
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
-	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest  WHERE game_id = $1;`
+	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
+	INNER JOIN orders ON orders.order_id = game.order_id
+	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id 
+	WHERE game_id = $1;`
 	err := g.sql.Db.GetContext(context, &game, sqlGetGame, gameId)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -274,7 +281,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (interface{}, error) {
 	var game = []ListGame{}
 
-	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , order_id,
+	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id, stadium_details.*,stadium.address,
 	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
 	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
@@ -285,6 +292,8 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 	LEFT JOIN team_details AS details_guest ON team_host.team_id = details_guest.teams_id
 	INNER JOIN users as user_host ON user_host.user_id = details_host.user_id 
 	INNER JOIN users as user_guest ON user_guest.user_id = details_guest.user_id 
+	INNER JOIN orders ON orders.order_id = game.order_id
+	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id 
 	where user_host.user_id = $1
 	OR user_guest.user_id = $1;`
 	err := g.sql.Db.SelectContext(context, &game, sqlGetGame, userId)
@@ -336,8 +345,9 @@ type TeamTemp struct {
 type ArrayTeamTemp []TeamTemp
 type ListGame struct {
 	model.Game
-	model.Stadium `json:"stadium"`
-	TeamHost      `json:"teamHost"`
-	TeamGuest     `json:"teamGuest"`
-	ArrayTeamTemp `json:"teamInvite"`
+	model.Stadium        `json:"stadium"`
+	model.StadiumDetails `json:"stadiumDetails"`
+	TeamHost             `json:"teamHost"`
+	TeamGuest            `json:"teamGuest"`
+	ArrayTeamTemp        `json:"teamInvite"`
 }

@@ -1,0 +1,7 @@
+time="2020-12-04T22:56:55.399213+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=245
+time="2020-12-04T22:57:02.579335+07:00" level=error msg="sql: Scan error on column index 6, name \"order_id\": converting NULL to string is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=296
+time="2020-12-04T23:23:18.228401+07:00" level=error msg="pq: column stadium_details.order_id does not exist" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=248
+time="2020-12-04T23:24:49.189972+07:00" level=error msg="pq: syntax error at or near \"order\"" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=249
+time="2020-12-04T23:27:52.92108+07:00" level=error msg="pq: syntax error at or near \"order\"" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=249
+time="2020-12-04T23:37:28.349256+07:00" level=error msg="pq: column reference \"order_id\" is ambiguous" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=299
+time="2020-12-04T23:39:04.550442+07:00" level=error msg="pq: column reference \"order_id\" is ambiguous" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=299
