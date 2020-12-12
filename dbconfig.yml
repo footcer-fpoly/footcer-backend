@@ -5,6 +5,6 @@
 #  table: migrations
 development:
   dialect: postgres
-  datasource: host=35.184.70.223 port=5432 user=footcerdb password=PMa45PqnMHiHCn40 dbname=footcerdb sslmode=disable
+  datasource: host=34.121.241.87 port=5432 user=footcerdb password=PMa45PqnMHiHCn40 dbname=footcerdb sslmode=disable
   dir: migrations
   table: migrations
