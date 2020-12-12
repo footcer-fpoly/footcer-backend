@@ -21,4 +21,5 @@ type UserRepository interface {
 
 	UpdateTokenNotify(context context.Context, tokenNotify req.TokenNotify) error
 	GetToken(context context.Context, userId string) (string, error)
+	GetTokenForTeam(context context.Context, teamId string) ([]model.User, error)
 }

@@ -11,7 +11,9 @@ import (
 func GameRouter(e *echo.Echo, sql *db.Sql) {
 
 	gameHandler := handler.GameHandler{
-		GameRepo: repo.NewGameRepo(sql),
+		GameRepo:   repo.NewGameRepo(sql),
+		UserRepo:   repo.NewUserRepo(sql),
+		NotifyRepo: repo.NewNotificationRepo(sql),
 	}
 	e.POST("/game/add", gameHandler.AddGame, middleware.JWTMiddleware())
 	e.PUT("/game/update", gameHandler.UpdateGame, middleware.JWTMiddleware())

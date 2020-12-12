@@ -1,0 +1,2 @@
+time="2020-12-06T10:51:31.885954+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=441
+time="2020-12-06T10:51:31.886503+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/team_handler.go line=387

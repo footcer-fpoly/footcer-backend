@@ -169,7 +169,7 @@ func (s StadiumRepoImpl) StadiumInfoForID(context context.Context, stadiumID str
 	var review = []model.Review{}
 
 	queryReview := `SELECT review_id, content, rate, stadium_id, review.user_id, review.created_at_rv, review.updated_at_rv, users.display_name,users.avatar
-FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE review.stadium_id = $1;`
+FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE review.stadium_id = $1 ORDER BY review.updated_at_rv DESC;`
 	errReview := s.sql.Db.SelectContext(context, &review, queryReview, stadium.StadiumId)
 	if errReview != nil {
 		if errReview == sql.ErrNoRows {

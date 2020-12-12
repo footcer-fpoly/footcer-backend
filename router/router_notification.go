@@ -14,5 +14,5 @@ func NotificationRouter(e *echo.Echo, sql *db.Sql) {
 		NotificationRepo: repo_impl.NewNotificationRepo(sql),
 	}
 
-	e.POST("/notification/add", notificationHandler.AddNotification, middleware.JWTMiddleware())
+	e.GET("/notification/get", notificationHandler.GetNotification, middleware.JWTMiddleware())
 }

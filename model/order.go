@@ -12,4 +12,6 @@ type Order struct {
 	Finish           bool      `json:"finish" db:"finish,omitempty"`
 	CreatedAt        time.Time `json:"createdAt" db:"order_created_at,omitempty"`
 	UpdatedAt        time.Time `json:"updatedAt" db:"order_updated_at, omitempty"`
+
+	StadiumUserId string `json:"stadiumUserId" db:"-,omitempty"`
 }

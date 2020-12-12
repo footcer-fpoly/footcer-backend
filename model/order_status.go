@@ -10,4 +10,8 @@ type OrderStatus struct {
 	IsUser        bool      `json:"isUser" db:"is_user,omitempty"`
 	CreatedAt     time.Time `json:"-" db:"created_at,omitempty"`
 	UpdatedAt     time.Time `json:"-" db:"updated_at, omitempty"`
+
+	UserId string `json:"userId" db:"-,omitempty"`
+	Name string `json:"name" db:"-,omitempty"`
+
 }

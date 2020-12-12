@@ -2,8 +2,10 @@ package handler
 
 import (
 	"footcer-backend/helper"
+	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/service"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
@@ -12,7 +14,9 @@ import (
 )
 
 type OrderHandler struct {
-	OrderRepo repository.OrderRepository
+	OrderRepo  repository.OrderRepository
+	UserRepo   repository.UserRepository
+	NotifyRepo repository.NotificationRepository
 }
 
 func (o *OrderHandler) AddOrder(c echo.Context) error {
@@ -33,6 +37,47 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 	req.UpdatedAt = time.Now()
 
 	teamDetails, err := o.OrderRepo.AddOrder(c.Request().Context(), req)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	token, errToken := o.UserRepo.GetToken(c.Request().Context(), req.StadiumUserId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "ADD_ORDER",
+		Body: model.BodyNotification{
+			Title:     "Yêu cầu đặt sân",
+			Content:   claims.UserName + " đã yêu cầu đặt sân của bạn vào lúc " + time.Now().String(),
+			GeneralId: req.OrderId,
+		},
+	}, tokens,
+	)
+	_, err = o.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "DELETE_MEMBER",
+		Title:     "Mời rời đội bóng",
+		Content:   claims.UserName + " đã yêu cầu đặt sân của bạn vào lúc " + time.Now().String(),
+		Icon:      "",
+		GeneralID: req.OrderId,
+		UserId:    req.StadiumUserId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
@@ -73,6 +118,69 @@ func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+	token, errToken := o.UserRepo.GetToken(c.Request().Context(), req.UserId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+	title := ""
+	content := ""
+	if req.Status == "ACCEPT" {
+		title = "Chấp nhận đặt sân"
+		content = "Sân " + req.Name + " đã chấp nhận yêu cầu đặt sân của bạn"
+	}else if req.Status =="REJECT"{
+		if req.IsUser {
+			//noti den user
+			title = "Từ chối đặt sân"
+			content = "Sân " + req.Name + " đã từ chối yêu cầu đặt sân của bạn"
+		}else{
+			//noti den chu san
+			title = "Huỷ đặt sân"
+			content =   req.Name + " đã huỷ yêu cầu đặt sân của bạn"
+		}
+
+	}else if req.Status == "FINISH"{
+		//noti user
+		title = "Hoàn thành đặt sân"
+		content =   "Hãy đánh giá sân " + req.Name
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: req.Status,
+		Body: model.BodyNotification{
+			Title:     title,
+			Content:   content,
+			GeneralId: req.OrderId,
+		},
+	}, tokens,
+	)
+	_, err = o.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       req.Status,
+		Title:     title,
+		Content:   content,
+		Icon:      "",
+		GeneralID: req.OrderId,
+		UserId:    req.UserId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
