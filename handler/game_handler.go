@@ -5,6 +5,7 @@ import (
 	"footcer-backend/log"
 	"footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/service"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	uuid "github.com/satori/go.uuid"
@@ -13,7 +14,9 @@ import (
 )
 
 type GameHandler struct {
-	GameRepo repository.GameRepository
+	GameRepo   repository.GameRepository
+	UserRepo   repository.UserRepository
+	NotifyRepo repository.NotificationRepository
 }
 
 func (g *GameHandler) AddGame(c echo.Context) error {
@@ -113,6 +116,47 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 		})
 	}
 
+	token, errToken := g.UserRepo.GetToken(c.Request().Context(), req.UserNotifyId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "JOIN_GAME",
+		Body: model.BodyNotification{
+			Title:     "Đề nghị tham gia trận đấu",
+			Content:   req.Name + " đã đề nghị tham gia trận đấu của đội bóng của bạn",
+			GeneralId: req.GameId,
+		},
+	}, tokens,
+	)
+	_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "JOIN_GAME",
+		Title:     "Đề nghị tham gia trận đấu",
+		Content:   req.Name + " đã đề nghị tham gia trận đấu của đội bóng của bạn",
+		Icon:      "",
+		GeneralID: req.GameId,
+		UserId:    req.UserNotifyId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
@@ -136,6 +180,89 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+
+	users, errToken := g.UserRepo.GetTokenForTeam(c.Request().Context(), req.TeamId) // id guest
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+	var tokens []string
+	for _, user := range users {
+		tokens = append(tokens, user.TokenNotify)
+		_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+			NotifyID:  uuid.NewV1().String(),
+			Key:       "ACCEPT_GAME",
+			Title:     "Chấp nhận tham gia trận đấu",
+			Content:   req.Name + " đã chấp nhận đề nghị tham gia trận đấu của đội bóng của bạn",
+			Icon:      "",
+			GeneralID: req.GameId,
+			UserId:    user.UserId,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		})
+		if err != nil {
+			return c.JSON(http.StatusOK, model.Response{
+				StatusCode: http.StatusConflict,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+	}
+	service.PushNotification(c, model.DataNotification{
+		Type: "ACCEPT_GAME",
+		Body: model.BodyNotification{
+			Title:     "Chấp nhận tham gia trận đấu",
+			Content:   req.Name + " đã chấp nhận đề nghị tham gia trận đấu của đội bóng của bạn",
+			GeneralId: req.GameId,
+		},
+	}, tokens,
+	)
+
+	tokens = []string{}
+	users, errToken = g.UserRepo.GetTokenForTeam(c.Request().Context(), req.UserNotifyId) // id host
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	for _, user := range users {
+		tokens = append(tokens, user.TokenNotify)
+		_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+			NotifyID:  uuid.NewV1().String(),
+			Key:       "ACCEPT_GAME",
+			Title:     "Loi thach dau",
+			Content:   "Chưa biết để tên gì",
+			Icon:      "",
+			GeneralID: req.GameId,
+			UserId:    user.UserId,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		})
+	}
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	service.PushNotification(c, model.DataNotification{
+		Type: "ACCEPT_GAME",
+		Body: model.BodyNotification{
+			Title:     "Lời thách đấu",
+			Content:   "Chưa biết để tên gì",
+			GeneralId: req.GameId,
+		},
+	}, tokens,
+	)
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,

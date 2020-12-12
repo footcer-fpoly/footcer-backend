@@ -188,9 +188,9 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 	var listGame = []ListGame{}
 	if date == "all" {
 		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.finish, game.order_id,stadium_details.*,
- COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
-  game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,
-  COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
+ COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
+  game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,
+  COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
 	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
@@ -208,9 +208,9 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 		}
 	} else {
 		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
-	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
-	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
-	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
+	game.finish, COALESCE(game.stadium_id,null) stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, null) name_stadium, stadium.address,
+	game.team_id_host, COALESCE(game.team_id_guest, null) team_id_guest,team_host.name AS team_name_host,
+	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , null)  team_name_guest,COALESCE(team_guest.avatar ,null)  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
 	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
@@ -237,9 +237,9 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 	var game = ListGame{}
 
 	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
-	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, 'null') name_stadium, stadium.address,
-	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
-	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'null')  team_avatar_guest FROM public.game 
+	game.finish, COALESCE(game.stadium_id,null) stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, null) name_stadium, stadium.address,
+	game.team_id_host, COALESCE(game.team_id_guest, null) team_id_guest,team_host.name AS team_name_host,
+	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , null)  team_name_guest,COALESCE(team_guest.avatar ,null)  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
 	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
@@ -255,7 +255,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 		log.Error(err.Error())
 		return game, err
 	}
-	inviteTeam := game.TeamIdGuest == "null"
+	inviteTeam := game.TeamIdGuest == ""
 	if inviteTeam {
 		var inviteTeams = []TeamTemp{}
 		sqlGetTeamInvite := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp 
@@ -282,9 +282,9 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 	var game = []ListGame{}
 
 	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id, stadium_details.*,stadium.address,
-	game.finish, COALESCE(game.stadium_id,'null') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
-	game.team_id_host, COALESCE(game.team_id_guest, 'null') team_id_guest,team_host.name AS team_name_host,
-	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , 'null')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
+	game.finish, COALESCE(game.stadium_id,null) stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, null) name_stadium, 
+	game.team_id_host, COALESCE(game.team_id_guest, null) team_id_guest,team_host.name AS team_name_host,
+	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , null)  team_name_guest,COALESCE(team_guest.avatar ,null)  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
 	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest

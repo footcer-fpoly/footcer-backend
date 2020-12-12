@@ -446,3 +446,19 @@ func (u UserRepoImpl) GetToken(context context.Context, userId string) (string, 
 	}
 	return tokens, err
 }
+func (u UserRepoImpl) GetTokenForTeam(context context.Context, teamId string) ([]model.User, error) {
+	var users []model.User
+	query := `select users.user_id, users.token_notify from users inner join 
+				team_details on team_details.user_id = users.user_id
+				where team_details.teams_id = $1`
+	err := u.sql.Db.SelectContext(context, &users, query, teamId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Error(err.Error())
+			return users, err
+		}
+		log.Error(err.Error())
+		return users, err
+	}
+	return users, err
+}

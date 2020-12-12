@@ -11,7 +11,9 @@ import (
 func OrderRouter(e *echo.Echo, sql *db.Sql) {
 
 	orderHandler := handler.OrderHandler{
-		OrderRepo: repo.NewOrderRepo(sql),
+		OrderRepo:  repo.NewOrderRepo(sql),
+		UserRepo:   repo.NewUserRepo(sql),
+		NotifyRepo: repo.NewNotificationRepo(sql),
 	}
 
 	e.POST("/order/add", orderHandler.AddOrder, middleware.JWTMiddleware())

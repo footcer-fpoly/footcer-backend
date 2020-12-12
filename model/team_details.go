@@ -11,4 +11,7 @@ type TeamDetails struct {
 	CreatedAt     time.Time `json:"created_at" db:"created_at,omitempty"`
 	UpdatedAt     time.Time `json:"updated_at" db:"updated_at, omitempty"`
 	//User        `json:"user,omitempty"`
+
+	//notify
+	Name string `json:"name,omitempty"`
 }

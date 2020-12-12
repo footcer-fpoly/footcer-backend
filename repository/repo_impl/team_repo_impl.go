@@ -162,6 +162,42 @@ func (t TeamRepoImpl) AddMemberTeam(context context.Context, teamDetails model.T
 
 }
 
+func (t TeamRepoImpl) GetTeam(context context.Context, teamId string) (interface{}, error) {
+	type userMemberTemp struct {
+		model.TeamDetails
+		model.User `json:"user"`
+	}
+	type MemberList []userMemberTemp
+
+	type teamTemp struct {
+		model.Team
+		MemberList `json:"member"`
+	}
+	var team = teamTemp{}
+
+	queryTeam := `SELECT * 
+	FROM public.team WHERE team_id = $1;`
+
+	err := t.sql.Db.GetContext(context, &team,
+		queryTeam, teamId)
+	if err != nil {
+		log.Error(err.Error())
+		return team, err
+	}
+
+	var memberList = []userMemberTemp{}
+	queryMemberTeam := `SELECT team_details.*, users.display_name, users.avatar, users.position, users.level, users.birthday , users.phone 
+	FROM public.team_details INNER JOIN users ON users.user_id = team_details.user_id WHERE team_details.teams_id = $1 order by role_team desc;`
+	errMember := t.sql.Db.SelectContext(context, &memberList, queryMemberTeam, teamId)
+	if errMember != nil {
+		log.Error(errMember.Error())
+		return memberList, errMember
+	}
+	team.MemberList = memberList
+	return team, nil
+
+}
+
 func (t TeamRepoImpl) GetTeamForUserAccept(context context.Context, userId string) (interface{}, error) {
 
 	var teamIdList = []string{}

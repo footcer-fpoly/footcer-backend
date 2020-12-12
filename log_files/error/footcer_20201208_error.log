@@ -1,0 +1,2 @@
+time="2020-12-09T00:12:57.51281+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=252
+time="2020-12-09T00:13:00.411518+07:00" level=error msg="sql: Scan error on column index 22, name \"team_id_guest\": converting NULL to string is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=206

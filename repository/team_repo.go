@@ -10,6 +10,7 @@ type TeamRepository interface {
 	SearchWithPhoneMemberTeam(context context.Context, phone string) (model.User, error)
 	AddMemberTeam(context context.Context, teamDetails model.TeamDetails, userId string) (model.TeamDetails, error)
 
+	GetTeam(context context.Context, teamId string) (interface{}, error)
 	GetTeamForUserAccept(context context.Context, userId string) (interface{}, error)
 	GetTeamForUserReject(context context.Context, userId string) (interface{}, error)
 

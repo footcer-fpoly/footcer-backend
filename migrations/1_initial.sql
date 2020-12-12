@@ -201,6 +201,21 @@ FOREIGN KEY (team_id) REFERENCES team (team_id),
 CONSTRAINT game_temp_id_pkey PRIMARY KEY (game_temp_id)
 );
 
+CREATE TABLE "notifications"
+(
+"notify_id" text NOT NULL UNIQUE,
+"key" text NOT NULL,
+"title" text NOT NULL,
+"content" text NOT NULL,
+"icon" text NOT NULL,
+"general_id" text NOT NULL,
+"user_id" text NOT NULL,
+"created_at_notify" TIMESTAMPTZ NOT NULL,
+"updated_at_notify" TIMESTAMPTZ NOT NULL,
+
+CONSTRAINT notifications_pkey PRIMARY KEY (notify_id)
+);
+
 -- +migrate Down
 
 DROP TABLE "review";

@@ -202,9 +202,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
 	c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-
 	req := req.ReqSignIn{}
-
 
 	println(req.Phone)
 	if err := c.Bind(&req); err != nil {
@@ -254,6 +252,7 @@ func (u *UserHandler) HandleSignIn(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+
 	user.Token = token
 
 	return c.JSON(http.StatusOK, model.Response{
@@ -474,4 +473,11 @@ func (u *UserHandler) UpdateTokenNotify(c echo.Context) error {
 		Message:    "Xử lí thành công",
 		Data:       nil,
 	})
+}
+
+func (u *UserHandler) GetTokenForUserID(c echo.Context, userId string) (string, error) {
+	token, err := u.UserRepo.GetToken(c.Request().Context(), userId)
+
+	return token, err
+
 }

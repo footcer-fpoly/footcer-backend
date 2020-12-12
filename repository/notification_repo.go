@@ -7,5 +7,5 @@ import (
 
 type NotificationRepository interface {
 	AddNotification(context context.Context, notification model.Notification) (model.Notification, error)
-	GetNotification(context context.Context) ([]model.Notification, error)
+	GetNotification(context context.Context, userId string) ([]model.Notification, error)
 }

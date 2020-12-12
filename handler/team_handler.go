@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"encoding/json"
 	"footcer-backend/helper"
 	"footcer-backend/log"
-	"footcer-backend/model"
+	model "footcer-backend/model"
 	"footcer-backend/repository"
+	"footcer-backend/service"
 	"footcer-backend/upload"
 	"net/http"
 	"time"
@@ -15,7 +17,9 @@ import (
 )
 
 type TeamHandler struct {
-	TeamRepo repository.TeamRepository
+	TeamRepo   repository.TeamRepository
+	UserRepo   repository.UserRepository
+	NotifyRepo repository.NotificationRepository
 }
 
 func (t *TeamHandler) AddTeam(c echo.Context) error {
@@ -146,17 +150,7 @@ func (t TeamHandler) AddMemberTeam(c echo.Context) error {
 	req.Role = "0"
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
-	//var userRepo = repo_impl.UserRepoImpl{}
-	//
-	//
-	//tokens, errToken := userRepo.GetToken(c.Request().Context(), req.UserId)
-	//if errToken != nil {
-	//	return c.JSON(http.StatusOK, model.Response{
-	//		StatusCode: http.StatusConflict,
-	//		Message:    errToken.Error(),
-	//		Data:       nil,
-	//	})
-	//}
+
 	teamDetails, err := t.TeamRepo.AddMemberTeam(c.Request().Context(), req, claims.UserId)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
@@ -166,22 +160,71 @@ func (t TeamHandler) AddMemberTeam(c echo.Context) error {
 		})
 	}
 
+	token, errToken := t.UserRepo.GetToken(c.Request().Context(), req.UserId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
 
-	//service.PushNotification(c,model.DataNotification{
-	//	Type: "ADD-MEMBER",
-	//	Body: model.BodyNotification{
-	//		Title:     "",
-	//		Content:   "",
-	//		GeneralId: "",
-	//	},
-	//}, )
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "ADD_MEMBER",
+		Body: model.BodyNotification{
+			Title:     "Tham gia đội bóng",
+			Content:   req.Name + " mời bạn tham gia đội bóng",
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
+	_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "ADD_MEMBER",
+		Title:     "Tham gia đội bóng",
+		Content:   req.Name + " mời bạn tham gia đội bóng",
+		Icon:      "",
+		GeneralID: req.TeamId,
+		UserId:    req.UserId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
 
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
 		Data:       teamDetails,
 	})
 
+}
+
+func (t *TeamHandler) GetTeam(c echo.Context) error {
+
+	team, err := t.TeamRepo.GetTeam(c.Request().Context(), c.Param("id"))
+	if err != nil {
+
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusInternalServerError,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       team,
+	})
 }
 
 func (t *TeamHandler) GetTeamForUserAccept(c echo.Context) error {
@@ -225,10 +268,57 @@ func (t *TeamHandler) GetTeamForUserReject(c echo.Context) error {
 }
 
 func (t *TeamHandler) DeleteMember(c echo.Context) error {
+	req := model.TeamDetails{}
 
-	err := t.TeamRepo.DeleteMember(c.Request().Context(), c.Param("id"))
+	defer c.Request().Body.Close()
+	if err := c.Bind(&req); err != nil {
+		return helper.ResponseErr(c, http.StatusBadRequest)
+	}
+
+	err := t.TeamRepo.DeleteMember(c.Request().Context(), req.UserId)
 	if err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest, err.Error())
+	}
+
+	token, errToken := t.UserRepo.GetToken(c.Request().Context(), req.UserId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "DELETE_MEMBER",
+		Body: model.BodyNotification{
+			Title:     "Mời rời đội bóng",
+			Content:   req.Name + " đã xoá bạn ra khỏi đội bóng",
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
+	_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "DELETE_MEMBER",
+		Title:     "Mời rời đội bóng",
+		Content:   req.Name + " đã xoá bạn ra khỏi đội bóng",
+		Icon:      "",
+		GeneralID: req.TeamId,
+		UserId:    req.UserId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
 	}
 
 	return c.JSON(http.StatusOK, model.Response{
@@ -326,6 +416,59 @@ func (t *TeamHandler) AcceptInvite(c echo.Context) error {
 		})
 	}
 
+	teamInterface, err := t.TeamRepo.GetTeam(c.Request().Context(), req.TeamId)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	var team model.Team
+	jsonTeam, _ := json.Marshal(teamInterface)
+	_ = json.Unmarshal([]byte((jsonTeam)), &team)
+
+	token, errToken := t.UserRepo.GetToken(c.Request().Context(), team.LeaderId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "ADD_MEMBER",
+		Body: model.BodyNotification{
+			Title:     "Chấp nhận lời mời",
+			Content:   req.Name + " mời bạn tham gia đội bóng",
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
+	_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "ACCEPT_INVITE",
+		Title:     "Tham gia đội bóng",
+		Content:   req.Name + " chấp nhận tham gia đội bóng",
+		Icon:      "",
+		GeneralID: req.TeamId,
+		UserId:    team.LeaderId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
