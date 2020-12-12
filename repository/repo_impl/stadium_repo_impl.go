@@ -131,8 +131,10 @@ func (s StadiumRepoImpl) StadiumInfoForID(context context.Context, stadiumID str
 
 	type StadiumInfo struct {
 		model.Stadium
+		ArrayStadiumImages  `json:"stadium_images"`
 		ArrayStadiumCollage `json:"stadium_collage"`
 		ArrayStadiumReview  `json:"review"`
+		ArrayStadiumService `json:"service"`
 		model.User          `json:"user"`
 	}
 	stadium := StadiumInfo{}
@@ -192,6 +194,35 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 	}
 
 	stadium.ArrayStadiumReview = review
+
+	//stadium service
+	var stadiumService = []model.Service{}
+	queryService := `SELECT service_id, stadium_id, name_service, price_service, image
+	FROM public.service WHERE stadium_id = $1`
+	errService := s.sql.Db.SelectContext(context, &stadiumService, queryService, stadium.StadiumId)
+	if errService != nil {
+		if errService == sql.ErrNoRows {
+			log.Error(errService.Error())
+			return stadiumService, message.StadiumNotFound
+		}
+		log.Error(errService.Error())
+		return stadiumService, errColl
+	}
+	stadium.ArrayStadiumService = stadiumService
+
+	//stadium image
+	var stadiumImage = []model.Images{}
+	queryImage := `SELECT img.* FROM images as img INNER JOIN stadium as s ON  s.stadium_id = img.general_id WHERE s.stadium_id = $1`
+	errImage := s.sql.Db.SelectContext(context, &stadiumImage, queryImage, stadium.StadiumId)
+	if errImage != nil {
+		if errImage == sql.ErrNoRows {
+			log.Error(errImage.Error())
+			return stadiumService, message.StadiumNotFound
+		}
+		log.Error(errImage.Error())
+		return stadiumImage, errImage
+	}
+	stadium.ArrayStadiumImages = stadiumImage
 
 	return stadium, nil
 
