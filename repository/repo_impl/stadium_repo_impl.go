@@ -577,12 +577,10 @@ details.end_time_detail, details.price, details.description
 		var stadiumDetail model.StadiumDetails
 		queryStadiumOrder := `SELECT orders.stadium_detail_id as stadium_detail_id FROM orders
 	INNER join orders_status  on orders_status.order_id = orders.order_id 
-	WHERE 
-	orders_status.order_id = $1
-	AND orders_status.status LIKE $2
-	OR orders_status.status LIKE $3
+	WHERE orders_status.order_id = $1
+	AND orders_status.status IN ($2, $3 )
 	order by details.start_time_detail`
-		errOrder := s.sql.Db.SelectContext(context, &stadiumDetail, queryStadiumOrder, o, "%WAITING%", "%ACCEPT%")
+		errOrder := s.sql.Db.SelectContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
 		if errOrder != nil {
 			if errOrder == sql.ErrNoRows {
 				log.Error(errOrder.Error())
