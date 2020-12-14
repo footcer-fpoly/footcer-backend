@@ -552,18 +552,15 @@ details.end_time_detail, details.price, details.description
 		return stadiumInfoDet, errDetail
 	}
 
-	var stadiumOrder []string
+	var orders []string
 	queryOrder := `SELECT 
-	 details.stadium_detail_id
+	 o.order_id
 	FROM public.stadium_details as details 
 	INNER JOIN orders as o ON details.stadium_detail_id = o.stadium_detail_id
 	INNER join orders_status  on orders_status.order_id = o.order_id 
 	WHERE details.stadium_collage_id = $1 
-	AND CAST(time as DATE) = CAST($2 AS DATE)
-	AND orders_status.status LIKE $3
-	OR orders_status.status LIKE $4
-	order by details.start_time_detail`
-	errOrder := s.sql.Db.SelectContext(context, &stadiumOrder, queryOrder, stadiumCollageID, date, "%WAITING%", "%ACCEPT%")
+	AND CAST(time as DATE) = CAST($2 AS DATE)`
+	errOrder := s.sql.Db.SelectContext(context, &orders, queryOrder, stadiumCollageID, date)
 	if errOrder != nil {
 		if errOrder == sql.ErrNoRows {
 			log.Error(errOrder.Error())
@@ -572,6 +569,31 @@ details.end_time_detail, details.price, details.description
 		log.Error(errOrder.Error())
 		return stadiumInfoDet, err
 	}
+
+
+
+	var stadiumOrder []string
+	for _, o := range orders {
+		var stadiumDetail model.StadiumDetails
+		queryStadiumOrder := `SELECT orders.stadium_detail_id as stadium_detail_id FROM orders
+	INNER join orders_status  on orders_status.order_id = orders.order_id 
+	WHERE 
+	orders_status.order_id = $1
+	AND orders_status.status LIKE $2
+	OR orders_status.status LIKE $3
+	order by details.start_time_detail`
+		errOrder := s.sql.Db.SelectContext(context, &stadiumDetail, queryStadiumOrder, o, "%WAITING%", "%ACCEPT%")
+		if errOrder != nil {
+			if errOrder == sql.ErrNoRows {
+				log.Error(errOrder.Error())
+				return stadiumInfoDet, err
+			}
+			log.Error(errOrder.Error())
+			return stadiumInfoDet, err
+		}
+		stadiumOrder = append(stadiumOrder, stadiumDetail.StadiumDetailsId)
+	}
+
 	if len(stadiumOrder) > 0 {
 		for i := 0; i < len(stadiumDetail); i++ {
 			for j := 0; j < len(stadiumOrder); j++ {

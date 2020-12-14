@@ -139,8 +139,8 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 	}
 	var orders = []listOrders{}
 	sqlStatement := `
-	SELECT orders.*,
-	users.user_id,users.display_name,users.avatar, users.phone,stadium_collage.stadium_collage_id ,
+	SELECT orders.*, stadium.image ,
+	users.user_id,users.display_name,users.avatar, users.phone,stadium_collage.stadium_collage_id,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
 	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id ,
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
@@ -181,7 +181,7 @@ func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (int
 	SELECT orders.*,
 	users.user_id,users.display_name,users.avatar, users.phone,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
-	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id, 
+	stadium.name_stadium, stadium.image ,stadium.address,stadium.category, stadium.stadium_id, 
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
 	FROM public.orders 
 	INNER JOIN users ON users.user_id = orders.user_id 
