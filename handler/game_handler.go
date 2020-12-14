@@ -238,7 +238,7 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 		_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 			NotifyID:  uuid.NewV1().String(),
 			Key:       "ACCEPT_GAME",
-			Title:     "Loi thach dau",
+			Title:     "Đã tìm được đối thủ cho trận đấu",
 			Content:   "Chưa biết để tên gì",
 			Icon:      "",
 			GeneralID: req.GameId,
