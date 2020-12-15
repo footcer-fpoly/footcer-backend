@@ -334,7 +334,7 @@ type TeamHost struct {
 }
 
 type TeamGuest struct {
-	Name   string `json:"teamNameGuest" db:"team_name_guest,omitempty"`
+	Name   string `json:"teamNameGuest,omitempty" db:"team_name_guest,omitempty"`
 	Avatar string `json:"teamAvatarGuest,omitempty" db:"team_avatar_guest,omitempty"`
 }
 
