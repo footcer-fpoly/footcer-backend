@@ -131,8 +131,10 @@ func (s StadiumRepoImpl) StadiumInfoForID(context context.Context, stadiumID str
 
 	type StadiumInfo struct {
 		model.Stadium
+		ArrayStadiumImages  `json:"stadium_images"`
 		ArrayStadiumCollage `json:"stadium_collage"`
 		ArrayStadiumReview  `json:"review"`
+		ArrayStadiumService `json:"service"`
 		model.User          `json:"user"`
 	}
 	stadium := StadiumInfo{}
@@ -192,6 +194,35 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 	}
 
 	stadium.ArrayStadiumReview = review
+
+	//stadium service
+	var stadiumService = []model.Service{}
+	queryService := `SELECT service_id, stadium_id, name_service, price_service, image
+	FROM public.service WHERE stadium_id = $1`
+	errService := s.sql.Db.SelectContext(context, &stadiumService, queryService, stadium.StadiumId)
+	if errService != nil {
+		if errService == sql.ErrNoRows {
+			log.Error(errService.Error())
+			return stadiumService, message.StadiumNotFound
+		}
+		log.Error(errService.Error())
+		return stadiumService, errColl
+	}
+	stadium.ArrayStadiumService = stadiumService
+
+	//stadium image
+	var stadiumImage = []model.Images{}
+	queryImage := `SELECT img.* FROM images as img INNER JOIN stadium as s ON  s.stadium_id = img.general_id WHERE s.stadium_id = $1`
+	errImage := s.sql.Db.SelectContext(context, &stadiumImage, queryImage, stadium.StadiumId)
+	if errImage != nil {
+		if errImage == sql.ErrNoRows {
+			log.Error(errImage.Error())
+			return stadiumService, message.StadiumNotFound
+		}
+		log.Error(errImage.Error())
+		return stadiumImage, errImage
+	}
+	stadium.ArrayStadiumImages = stadiumImage
 
 	return stadium, nil
 
@@ -521,18 +552,16 @@ details.end_time_detail, details.price, details.description
 		return stadiumInfoDet, errDetail
 	}
 
-	var stadiumOrder []string
+	var orders []string
 	queryOrder := `SELECT 
-	 details.stadium_detail_id
+	 o.order_id
 	FROM public.stadium_details as details 
 	INNER JOIN orders as o ON details.stadium_detail_id = o.stadium_detail_id
 	INNER join orders_status  on orders_status.order_id = o.order_id 
 	WHERE details.stadium_collage_id = $1 
 	AND CAST(time as DATE) = CAST($2 AS DATE)
-	AND orders_status.status LIKE $3
-	OR orders_status.status LIKE $4
 	order by details.start_time_detail`
-	errOrder := s.sql.Db.SelectContext(context, &stadiumOrder, queryOrder, stadiumCollageID, date, "%WAITING%", "%ACCEPT%")
+	errOrder := s.sql.Db.SelectContext(context, &orders, queryOrder, stadiumCollageID, date)
 	if errOrder != nil {
 		if errOrder == sql.ErrNoRows {
 			log.Error(errOrder.Error())
@@ -541,6 +570,28 @@ details.end_time_detail, details.price, details.description
 		log.Error(errOrder.Error())
 		return stadiumInfoDet, err
 	}
+
+
+
+	var stadiumOrder []string
+	for _, o := range orders {
+		var stadiumDetail model.StadiumDetails
+		queryStadiumOrder := `SELECT orders.stadium_detail_id as stadium_detail_id FROM orders
+	INNER join orders_status  on orders_status.order_id = orders.order_id 
+	WHERE orders_status.order_id = $1
+	AND orders_status.status IN ($2, $3 )`
+		errOrder := s.sql.Db.SelectContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
+		if errOrder != nil {
+			if errOrder == sql.ErrNoRows {
+				log.Error(errOrder.Error())
+				return stadiumInfoDet, err
+			}
+			log.Error(errOrder.Error())
+			return stadiumInfoDet, err
+		}
+		stadiumOrder = append(stadiumOrder, stadiumDetail.StadiumDetailsId)
+	}
+
 	if len(stadiumOrder) > 0 {
 		for i := 0; i < len(stadiumDetail); i++ {
 			for j := 0; j < len(stadiumOrder); j++ {

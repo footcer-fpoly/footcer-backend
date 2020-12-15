@@ -1,0 +1,4 @@
+time="2020-12-12T16:48:04.596628+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=252
+time="2020-12-12T16:52:10.87719+07:00" level=error msg="sql: Scan error on column index 25, name \"team_name_guest\": converting NULL to string is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=255
+time="2020-12-12T16:58:31.017151+07:00" level=error msg="sql: Scan error on column index 25, name \"team_name_guest\": converting NULL to string is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=255
+time="2020-12-12T16:58:44.672637+07:00" level=error msg="sql: Scan error on column index 25, name \"team_name_guest\": converting NULL to string is unsupported" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=255
