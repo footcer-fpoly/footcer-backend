@@ -1,0 +1,3 @@
+time="2020-12-15T21:20:27.333629+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=535
+time="2020-12-15T21:22:06.370319+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=589
+time="2020-12-15T21:26:12.058633+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=253
