@@ -580,7 +580,7 @@ details.end_time_detail, details.price, details.description
 	INNER join orders_status  on orders_status.order_id = orders.order_id 
 	WHERE orders_status.order_id = $1
 	AND orders_status.status IN ($2, $3 )`
-		errOrder := s.sql.Db.SelectContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
+		errOrder := s.sql.Db.GetContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
 		if errOrder != nil {
 			if errOrder == sql.ErrNoRows {
 				log.Error(errOrder.Error())
