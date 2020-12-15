@@ -240,7 +240,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
 	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
 	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,
-	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , null)  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
+	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
 	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 

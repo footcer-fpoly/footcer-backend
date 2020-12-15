@@ -559,7 +559,8 @@ details.end_time_detail, details.price, details.description
 	INNER JOIN orders as o ON details.stadium_detail_id = o.stadium_detail_id
 	INNER join orders_status  on orders_status.order_id = o.order_id 
 	WHERE details.stadium_collage_id = $1 
-	AND CAST(time as DATE) = CAST($2 AS DATE)`
+	AND CAST(time as DATE) = CAST($2 AS DATE)
+	order by details.start_time_detail`
 	errOrder := s.sql.Db.SelectContext(context, &orders, queryOrder, stadiumCollageID, date)
 	if errOrder != nil {
 		if errOrder == sql.ErrNoRows {
@@ -578,8 +579,7 @@ details.end_time_detail, details.price, details.description
 		queryStadiumOrder := `SELECT orders.stadium_detail_id as stadium_detail_id FROM orders
 	INNER join orders_status  on orders_status.order_id = orders.order_id 
 	WHERE orders_status.order_id = $1
-	AND orders_status.status IN ($2, $3 )
-	order by details.start_time_detail`
+	AND orders_status.status IN ($2, $3 )`
 		errOrder := s.sql.Db.SelectContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
 		if errOrder != nil {
 			if errOrder == sql.ErrNoRows {
