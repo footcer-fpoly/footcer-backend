@@ -1,0 +1,9 @@
+time="2020-12-16T21:16:06.409096+07:00" level=error msg="pq: syntax error at or near \":\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:16:14.318478+07:00" level=error msg="pq: syntax error at or near \":\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:16:53.597195+07:00" level=error msg="pq: syntax error at or near \":\"" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:18:31.561408+07:00" level=error msg="sql: converting argument $1 type: unsupported type model.TeamDetails, a struct" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:20:38.514386+07:00" level=error msg="sql: converting argument $1 type: unsupported type model.TeamDetails, a struct" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:21:00.781969+07:00" level=error msg="sql: converting argument $1 type: unsupported type model.TeamDetails, a struct" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:21:53.563197+07:00" level=error msg="sql: converting argument $1 type: unsupported type model.TeamDetails, a struct" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:22:45.774203+07:00" level=error msg="sql: converting argument $1 type: unsupported type model.TeamDetails, a struct" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421
+time="2020-12-16T21:26:08.283968+07:00" level=error msg="sql: converting argument $1 type: unsupported type model.TeamDetails, a struct" file=/Users/pro/footcer-backend/repository/repo_impl/team_repo_impl.go line=421

@@ -15,4 +15,5 @@ func StatisticsRouter(e *echo.Echo, sql *db.Sql) {
 	}
 
 	e.GET("/statistics", statisticsHandler.Statistics, middleware.JWTMiddleware())
+	e.GET("/statistics-from-to", statisticsHandler.StatisticsFromTo, middleware.JWTMiddleware())
 }

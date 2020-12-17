@@ -13,5 +13,6 @@ type TeamDetails struct {
 	//User        `json:"user,omitempty"`
 
 	//notify
-	Name string `json:"name,omitempty"`
+	NameUser string `json:"nameUser,omitempty"`
+	NameTeam string `json:"nameTeam,omitempty"`
 }
