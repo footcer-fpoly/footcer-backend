@@ -409,6 +409,39 @@ func (t TeamRepoImpl) AcceptInvite(context context.Context, teamDetails model.Te
 	return nil
 }
 
+func (t TeamRepoImpl) CancelInvite(context context.Context, teamDetails model.TeamDetails) error {
+	var team = model.TeamDetails{}
+
+	queryTeam := `SELECT * 
+	FROM public.team_details WHERE teams_id = $1 AND user_id = $2`
+
+	err := t.sql.Db.GetContext(context, &team,
+		queryTeam, teamDetails.TeamId, teamDetails.UserId)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+
+	if team.Role == "1" {
+		return message.AdminIsTeam
+	}
+
+	queryDelete := `DELETE FROM public.team_details
+	WHERE team_details_id = $1 ;`
+	row, err := t.sql.Db.ExecContext(context, queryDelete, team.TeamDetailsId)
+	if err != nil {
+		log.Error(err.Error())
+		return message.SomeWentWrong
+	}
+	count, _ := row.RowsAffected()
+	if count == 0 {
+		return err
+	}
+
+	return nil
+
+}
+
 func (t TeamRepoImpl) GetToken(context context.Context, userId string) error {
 	panic("implement me")
 }

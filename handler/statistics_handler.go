@@ -62,3 +62,34 @@ func (s *StatisticsHandler) Statistics(c echo.Context) error {
 		Data:       statistics,
 	})
 }
+
+func (s *StatisticsHandler) StatisticsFromTo(c echo.Context) error {
+
+	dates := c.QueryParam("dates")
+
+	tokenData := c.Get("user").(*jwt.Token)
+	claims := tokenData.Claims.(*model.JwtCustomClaims)
+
+	if claims.Role == 0 {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    "Đây là chức năng xem thống kê chỉ dành cho chủ sân",
+			Data:       nil,
+		})
+	}
+
+		statistics, err := s.StatisticsRepo.StatisticsFromTo(c.Request().Context(), dates, claims.UserId)
+		if err != nil {
+			return c.JSON(http.StatusOK, model.Response{
+				StatusCode: http.StatusConflict,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "OK",
+		Data:       statistics,
+	})
+}
