@@ -551,3 +551,69 @@ func (t *TeamHandler) CancelInvite(c echo.Context) error {
 		Data:       nil,
 	})
 }
+
+func (t *TeamHandler) OutTeam(c echo.Context) error {
+
+	req := model.TeamDetails{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+
+	err := t.TeamRepo.CancelInvite(c.Request().Context(), req)
+
+	users, errToken := t.UserRepo.GetTokenForTeam(c.Request().Context(), req.TeamId) // id guest
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+	var tokens []string
+	for _, user := range users {
+		tokens = append(tokens, user.TokenNotify)
+		_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+			NotifyID:  uuid.NewV1().String(),
+			Key:       "OUT_TEAM",
+			Title:     "Rời đội bóng",
+			Content:   req.NameUser + " đã rời đội bóng " + req.NameTeam,
+			Icon:      "",
+			GeneralID: req.TeamId,
+			UserId:    user.UserId,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		})
+		if err != nil {
+			return c.JSON(http.StatusOK, model.Response{
+				StatusCode: http.StatusConflict,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+	}
+	service.PushNotification(c, model.DataNotification{
+		Type: "OUT_TEAM",
+		Body: model.BodyNotification{
+			Title:     "Rời đội bóng",
+			Content:   req.NameUser + " đã rời đội bóng " + req.NameTeam,
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
+}
+
