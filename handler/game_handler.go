@@ -289,6 +289,49 @@ func (g *GameHandler) RefuseJoin(c echo.Context) error {
 		})
 	}
 
+
+	token, errToken := g.UserRepo.GetToken(c.Request().Context(), req.UserNotifyId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "REFUSE_GAME",
+		Body: model.BodyNotification{
+			Title:     "Từ chối đề nghị tham gia trận đấu",
+			Content:   req.Name + " đã từ chối lời đề nghị tham gia trận đấu của đội bóng của bạn",
+			GeneralId: req.GameId,
+		},
+	}, tokens,
+	)
+	_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "REFUSE_GAME",
+		Title:     "Từ chối đề nghị tham gia trận đấu",
+		Content:   req.Name + " đã từ chối lời đề nghị tham gia trận đấu của đội bóng của bạn",
+		Icon:      "",
+		GeneralID: req.GameId,
+		UserId:    req.UserNotifyId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
