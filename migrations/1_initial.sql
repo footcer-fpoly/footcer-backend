@@ -168,7 +168,7 @@ FOREIGN KEY (order_id) REFERENCES orders (order_id)
 CREATE TABLE "game"
 (
 "game_id" text NOT NULL UNIQUE,
-"date" DATE NOT NULL,
+"date" text NOT NULL,
 "hour" TIME NOT NULL,
 "type" text NOT NULL,
 "score" text NOT NULL,

@@ -13,3 +13,7 @@ time="2020-12-18T19:33:03.053971+07:00" level=error msg="sql: no rows in result 
 time="2020-12-18T19:33:03.054616+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/game_handler.go line=126
 time="2020-12-18T19:33:16.164163+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=441
 time="2020-12-18T19:33:16.164709+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/game_handler.go line=127
+time="2020-12-18T20:54:37.166621+07:00" level=error msg="pq: missing FROM-clause entry for table \"stadium_details\"" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=259
+time="2020-12-18T20:55:27.59026+07:00" level=error msg="pq: column orders.stadium_collage_id does not exist" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=259
+time="2020-12-18T20:56:24.707143+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=256
+time="2020-12-18T20:56:40.345011+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=256
