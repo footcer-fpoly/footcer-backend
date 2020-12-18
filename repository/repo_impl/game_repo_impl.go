@@ -190,7 +190,7 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 		sqlSearch := `SELECT game.game_id, game.date, game.hour, game.type, game.score,
  game.description as description_game , game.finish, game.order_id,stadium_details.*,
  COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
-  game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host,
+  game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,team_host.avatar AS team_avatar_host, team_host.leader_id as leader_id_host ,
   COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
@@ -211,7 +211,8 @@ func (g *GameRepoImpl) GetGames(context context.Context, date string) (interface
 		sqlSearchDate := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
 	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
 	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,
-	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
+	team_host.avatar AS team_avatar_host,  team_host.leader_id as leader_id_host ,
+	COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
 	LEFT JOIN team AS team_guest ON team_guest.team_id = game.team_id_guest 
@@ -239,7 +240,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 
 	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
 	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
-	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,
+	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,  team_host.leader_id as leader_id_host , 
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
@@ -284,7 +285,7 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 
 	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id, stadium_details.*,stadium.address,
 	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
-	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,
+	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,  team_host.leader_id as leader_id_host  ,
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
 	INNER JOIN team AS team_host ON team_host.team_id = game.team_id_host 
@@ -329,8 +330,9 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 }
 
 type TeamHost struct {
-	Name   string `json:"teamNameHost,omitempty" db:"team_name_host,omitempty"`
-	Avatar string `json:"teamAvatarHost,omitempty" db:"team_avatar_host,omitempty"`
+	LeaderId string `json:"leaderIdHost,omitempty" db:"leader_id_host,omitempty"`
+	Name     string `json:"teamNameHost,omitempty" db:"team_name_host,omitempty"`
+	Avatar   string `json:"teamAvatarHost,omitempty" db:"team_avatar_host,omitempty"`
 }
 
 type TeamGuest struct {
