@@ -30,6 +30,10 @@ func Web(c echo.Context) error {
 	return c.Render(http.StatusOK, "index.html", "Footcer")
 }
 
+func PrivacyPolicy(c echo.Context) error {
+	return c.Render(http.StatusOK, "privacy-policy.html", "Footcer")
+}
+
 func main() {
 	sql := &db.Sql{
 		Host:     dev.HOST,
@@ -46,12 +50,13 @@ func main() {
 	structValidator.RegisterValidate()
 	e.Validator = structValidator
 
-	//t := &Template{
-	//	templates: template.Must(template.ParseGlob("../../public/views/*.html")),
-	//}
-	//e.Renderer = t
-	//
-	//e.GET("/", Web)
+	t := &Template{
+		templates: template.Must(template.ParseGlob("../../public/views/*.html")),
+	}
+	e.Renderer = t
+
+	e.GET("/", Web)
+	e.GET("/privacy-policy", PrivacyPolicy)
 	router.UserRouter(e, sql)
 	router.StadiumRouter(e, sql)
 	router.ReviewRouter(e, sql)
