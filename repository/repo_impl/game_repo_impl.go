@@ -239,7 +239,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 	var game = ListGame{}
 
 	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
-	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address,
+	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, stadium.address, stadium.latitude , stadium.longitude,
 	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,  team_host.leader_id as leader_id_host , 
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
@@ -330,7 +330,7 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 }
 
 type TeamHost struct {
-	LeaderId string `json:"leaderIdHost,omitempty" db:"leader_id_host,omitempty"`
+	//LeaderId string `json:"leaderIdHost,omitempty" db:"leader_id_host,omitempty"`
 	Name     string `json:"teamNameHost,omitempty" db:"team_name_host,omitempty"`
 	Avatar   string `json:"teamAvatarHost,omitempty" db:"team_avatar_host,omitempty"`
 }
