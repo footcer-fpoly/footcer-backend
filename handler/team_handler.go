@@ -492,59 +492,59 @@ func (t *TeamHandler) CancelInvite(c echo.Context) error {
 		})
 	}
 
-	//teamInterface, err := t.TeamRepo.GetTeam(c.Request().Context(), req.TeamId)
-	//if err != nil {
-	//	return c.JSON(http.StatusOK, model.Response{
-	//		StatusCode: http.StatusConflict,
-	//		Message:    err.Error(),
-	//		Data:       nil,
-	//	})
-	//}
-	//
-	//var team model.Team
-	//jsonTeam, _ := json.Marshal(teamInterface)
-	//_ = json.Unmarshal([]byte((jsonTeam)), &team)
-	//
-	//token, errToken := t.UserRepo.GetToken(c.Request().Context(), team.LeaderId)
-	//if errToken != nil {
-	//	log.Error(errToken)
-	//	return c.JSON(http.StatusOK, model.Response{
-	//		StatusCode: http.StatusConflict,
-	//		Message:    errToken.Error(),
-	//		Data:       nil,
-	//	})
-	//}
-	//
-	//var tokens []string
-	//tokens = append(tokens, token)
-	//service.PushNotification(c, model.DataNotification{
-	//	Type: "CANCEL_MEMBER",
-	//	Body: model.BodyNotification{
-	//		Title:     "Từ chối lời mời",
-	//		Content:   req.NameUser + " từ chối tham gia đội bóng",
-	//		GeneralId: req.TeamId,
-	//	},
-	//}, tokens,
-	//)
-	//_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
-	//	NotifyID:  uuid.NewV1().String(),
-	//	Key:       "CANCEL_MEMBER",
-	//	Title:     "Từ chối lời mời",
-	//	Content:   req.NameUser + " từ chối tham gia đội bóng",
-	//	Icon:      "",
-	//	GeneralID: req.TeamId,
-	//	UserId:    team.LeaderId,
-	//	CreatedAt: time.Now(),
-	//	UpdatedAt: time.Now(),
-	//})
-	//
-	//if err != nil {
-	//	return c.JSON(http.StatusOK, model.Response{
-	//		StatusCode: http.StatusConflict,
-	//		Message:    err.Error(),
-	//		Data:       nil,
-	//	})
-	//}
+	teamInterface, err := t.TeamRepo.GetTeam(c.Request().Context(), req.TeamId)
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+
+	var team model.Team
+	jsonTeam, _ := json.Marshal(teamInterface)
+	_ = json.Unmarshal([]byte((jsonTeam)), &team)
+
+	token, errToken := t.UserRepo.GetToken(c.Request().Context(), team.LeaderId)
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	tokens = append(tokens, token)
+	service.PushNotification(c, model.DataNotification{
+		Type: "CANCEL_MEMBER",
+		Body: model.BodyNotification{
+			Title:     "Từ chối lời mời",
+			Content:   req.NameUser + " từ chối tham gia đội bóng",
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
+	_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+		NotifyID:  uuid.NewV1().String(),
+		Key:       "CANCEL_MEMBER",
+		Title:     "Từ chối lời mời",
+		Content:   req.NameUser + " từ chối tham gia đội bóng",
+		Icon:      "",
+		GeneralID: req.TeamId,
+		UserId:    team.LeaderId,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",

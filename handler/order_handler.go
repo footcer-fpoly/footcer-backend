@@ -68,7 +68,7 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 	)
 	_, err = o.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 		NotifyID:  uuid.NewV1().String(),
-		Key:       "DELETE_MEMBER",
+		Key:       "ADD_ORDER",
 		Title:     "Mời rời đội bóng",
 		Content:   claims.UserName + " đã yêu cầu đặt sân của bạn vào lúc " + time.Now().String(),
 		Icon:      "",

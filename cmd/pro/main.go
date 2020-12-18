@@ -27,6 +27,9 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 func Web(c echo.Context) error {
 	return c.Render(http.StatusOK, "index.html", "Footcer")
 }
+func PrivacyPolicy(c echo.Context) error {
+	return c.Render(http.StatusOK, "privacy-policy.html", "Footcer")
+}
 
 func main() {
 	sql := &db.Sql{
@@ -50,6 +53,8 @@ func main() {
 	e.Renderer = t
 
 	e.GET("/", Web)
+	e.GET("/privacy-policy", PrivacyPolicy)
+
 	router.UserRouter(e, sql)
 	router.StadiumRouter(e, sql)
 	router.ReviewRouter(e, sql)
