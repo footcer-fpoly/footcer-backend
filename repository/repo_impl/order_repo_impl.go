@@ -106,7 +106,7 @@ func (o OrderRepoImpl) ListOrderForStadium(context context.Context, stadiumId st
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
 	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id, 
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
-	FROM public.orders 1
+	FROM public.orders 
 	INNER JOIN users ON users.user_id = orders.user_id 
 	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id
 	INNER JOIN stadium_collage  ON stadium_collage.stadium_collage_id = stadium_details.stadium_collage_id  

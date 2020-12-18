@@ -61,8 +61,6 @@ func (u *UserHandler) Create(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return helper.ResponseErr(c, http.StatusBadRequest)
 	}
-	print(req.UserId)
-	//req.UserId = uuid.NewV1().String()
 	req.Role = 0
 	req.TokenNotify = ""
 
