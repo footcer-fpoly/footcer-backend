@@ -568,7 +568,7 @@ details.end_time_detail, details.price, details.description
 			//return stadiumInfoDet, err
 		}
 		log.Error(errOrder.Error())
-		return stadiumInfoDet, err
+		//return stadiumInfoDet, err
 	}
 
 	var stadiumOrder []string
@@ -586,7 +586,7 @@ details.end_time_detail, details.price, details.description
 					//return stadiumInfoDet, err
 				}
 				log.Error(errOrder.Error())
-				return stadiumInfoDet, err
+				//return stadiumInfoDet, err
 			}
 			stadiumOrder = append(stadiumOrder, stadiumDetail.StadiumDetailsId)
 		}
