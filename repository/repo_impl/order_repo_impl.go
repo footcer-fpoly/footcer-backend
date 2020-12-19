@@ -139,7 +139,7 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 	}
 	var orders = []listOrders{}
 	sqlStatement := `
-	SELECT orders.*, stadium.image ,
+	SELECT orders.*, stadium.image , stadium.latitude, stadium.longitude ,
 	users.user_id,users.display_name,users.avatar, users.phone,stadium_collage.stadium_collage_id,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
 	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id ,

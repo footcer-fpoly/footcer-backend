@@ -565,31 +565,31 @@ details.end_time_detail, details.price, details.description
 	if errOrder != nil {
 		if errOrder == sql.ErrNoRows {
 			log.Error(errOrder.Error())
-			return stadiumInfoDet, err
+			//return stadiumInfoDet, err
 		}
 		log.Error(errOrder.Error())
 		return stadiumInfoDet, err
 	}
 
-
-
 	var stadiumOrder []string
-	for _, o := range orders {
-		var stadiumDetail model.StadiumDetails
-		queryStadiumOrder := `SELECT orders.stadium_detail_id as stadium_detail_id FROM orders
+	if len(orders) > 0 {
+		for _, o := range orders {
+			var stadiumDetail model.StadiumDetails
+			queryStadiumOrder := `SELECT orders.stadium_detail_id as stadium_detail_id FROM orders
 	INNER join orders_status  on orders_status.order_id = orders.order_id 
 	WHERE orders_status.order_id = $1
 	AND orders_status.status IN ($2, $3 )`
-		errOrder := s.sql.Db.GetContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
-		if errOrder != nil {
-			if errOrder == sql.ErrNoRows {
+			errOrder := s.sql.Db.GetContext(context, &stadiumDetail, queryStadiumOrder, o, "WAITING", "ACCEPT")
+			if errOrder != nil {
+				if errOrder == sql.ErrNoRows {
+					log.Error(errOrder.Error())
+					//return stadiumInfoDet, err
+				}
 				log.Error(errOrder.Error())
 				return stadiumInfoDet, err
 			}
-			log.Error(errOrder.Error())
-			return stadiumInfoDet, err
+			stadiumOrder = append(stadiumOrder, stadiumDetail.StadiumDetailsId)
 		}
-		stadiumOrder = append(stadiumOrder, stadiumDetail.StadiumDetailsId)
 	}
 
 	if len(stadiumOrder) > 0 {
