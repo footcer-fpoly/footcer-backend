@@ -27,5 +27,6 @@ func TeamRouter(e *echo.Echo, sql *db.Sql) {
 	e.PUT("/team/update", teamHandler.UpdateTeam, middleware.JWTMiddleware())
 	e.PUT("/team/accept-invite", teamHandler.AcceptInvite, middleware.JWTMiddleware())
 	e.POST("/team/cancel-invite", teamHandler.CancelInvite, middleware.JWTMiddleware())
+	e.POST("/team/out-team", teamHandler.OutTeam, middleware.JWTMiddleware())
 
 }

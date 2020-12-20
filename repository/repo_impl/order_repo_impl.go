@@ -139,7 +139,7 @@ func (o OrderRepoImpl) ListOrderForUser(context context.Context, userId string) 
 	}
 	var orders = []listOrders{}
 	sqlStatement := `
-	SELECT orders.*, stadium.image ,
+	SELECT orders.*, stadium.image , stadium.latitude, stadium.longitude ,
 	users.user_id,users.display_name,users.avatar, users.phone,stadium_collage.stadium_collage_id,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
 	stadium.name_stadium,stadium.address,stadium.category, stadium.stadium_id ,
@@ -175,20 +175,23 @@ func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (int
 		model.StadiumCollage `json:"stadium_collage"`
 		model.StadiumDetails `json:"stadium_details"`
 		model.User           `json:"user"`
+		userStadium          `json:"userStadium"`
 	}
 	var orders = listOrders{}
 	sqlStatement := `
 	SELECT orders.*,
 	users.user_id,users.display_name,users.avatar, users.phone,
+	users_stadium.user_id as user_id_stadium, users_stadium.display_name as user_display_name_stadium, 
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
 	stadium.name_stadium, stadium.image , stadium.latitude, stadium.longitude ,stadium.address,stadium.category, stadium.stadium_id, 
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
 	FROM public.orders 
-	INNER JOIN users ON users.user_id = orders.user_id 
+	INNER JOIN users as users ON users.user_id = orders.user_id 
 	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id
 	INNER JOIN stadium_collage  ON stadium_collage.stadium_collage_id = stadium_details.stadium_collage_id  
 	INNER JOIN stadium ON stadium.stadium_id = stadium_collage.stadium_id 
 	INNER JOIN orders_status  ON orders_status.order_id = orders.order_id
+	INNER JOIN users as users_stadium ON users_stadium.user_id = stadium.user_id 
 	WHERE orders.order_id = $1;
 	`
 
@@ -198,4 +201,10 @@ func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (int
 		return orders, message.SomeWentWrong
 	}
 	return orders, nil
+}
+
+type userStadium struct {
+	UserId      string `json:"userId,omitempty" db:"user_id_stadium,omitempty"`
+	DisplayName string `json:"displayName,omitempty" db:"user_display_name_stadium,omitempty"`
+	//Phone       string `json:"phone,omitempty" db:"user_phone_stadium,omitempty"`
 }

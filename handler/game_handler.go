@@ -104,7 +104,6 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 	tokenData := c.Get("user").(*jwt.Token)
 	claims := tokenData.Claims.(*model.JwtCustomClaims)
 
-
 	req.GameTempId = uuid.NewV1().String()
 	defer c.Request().Body.Close()
 	if err := c.Bind(&req); err != nil {
@@ -135,8 +134,8 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "JOIN_GAME",
 		Body: model.BodyNotification{
-			Title:     "Đề nghị tham gia trận đấu",
-			Content:   req.NameInvite + " đã đề nghị tham gia trận đấu của đội bóng của bạn",
+			Title:     "Tham gia trận đấu ",
+			Content:   req.NameInvite + " gửi lời thách đấu đến trận đấu của bạn",
 			GeneralId: req.GameId,
 		},
 	}, tokens,
@@ -144,8 +143,8 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 	_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "JOIN_GAME",
-		Title:     "Đề nghị tham gia trận đấu",
-		Content:   req.NameInvite + " đã đề nghị tham gia trận đấu của đội bóng của bạn",
+		Title:     "Tham gia trận đấu ",
+		Content:   req.NameInvite + " gửi lời thách đấu đến trận đấu của bạn",
 		Icon:      "",
 		GeneralID: req.GameId,
 		UserId:    req.UserNotifyId,
@@ -176,8 +175,8 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "JOIN_GAME",
 		Body: model.BodyNotification{
-			Title:     "Lời đề nghị tham gia " + req.NameHost,
-			Content:   "Lời đề nghị tham gia trận đấu đã được gửi đến đội bóng " + req.NameHost,
+			Title:     "Tham gia trận đấu ",
+			Content:   "Bạn vừa gửi lời mời thách đấu đến đội bóng " + req.NameHost,
 			GeneralId: req.GameId,
 		},
 	}, tokens,
@@ -185,8 +184,8 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 	_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "JOIN_GAME",
-		Title:     "Lời đề nghị tham gia " + req.NameHost,
-		Content:   "Lời đề nghị tham gia trận đấu đã được gửi đến đội bóng " + req.NameHost,
+		Title:     "Tham gia trận đấu ",
+		Content:   "Bạn vừa gửi lời mời thách đấu đến đội bóng " + req.NameHost,
 		Icon:      "",
 		GeneralID: req.GameId,
 		UserId:    claims.UserId,
@@ -201,7 +200,6 @@ func (g *GameHandler) JoinGame(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
@@ -242,8 +240,8 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 		_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 			NotifyID:  uuid.NewV1().String(),
 			Key:       "ACCEPT_GAME",
-			Title:     "Chấp nhận tham gia trận đấu",
-			Content:   req.NameHost + " đã chấp nhận đề nghị tham gia trận đấu của đội bóng của bạn",
+			Title:     "Chấp nhận thách đấu ",
+			Content:   "Đội bóng " + req.NameHost + " đã chấp nhận lời thách đấu đội bóng " + req.NameInvite + " của bạn vào ngày " + req.DateGame,
 			Icon:      "",
 			GeneralID: req.GameId,
 			UserId:    user.UserId,
@@ -261,8 +259,8 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "ACCEPT_GAME",
 		Body: model.BodyNotification{
-			Title:     "Chấp nhận tham gia trận đấu",
-			Content:   req.NameHost + " đã chấp nhận đề nghị tham gia trận đấu của đội bóng của bạn",
+			Title:     "Chấp nhận thách đấu ",
+			Content:   "Đội bóng " + req.NameHost + " đã chấp nhận lời thách đấu đội bóng " + req.NameInvite + " của bạn vào ngày " + req.DateGame,
 			GeneralId: req.GameId,
 		},
 	}, tokens,
@@ -284,8 +282,8 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 		_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 			NotifyID:  uuid.NewV1().String(),
 			Key:       "ACCEPT_GAME",
-			Title:     "Đã tìm được đối thủ cho trận đấu",
-			Content:   "Chưa biết để tên gì",
+			Title:     "Trận đấu",
+			Content:   "Đội bóng " + req.NameHost + " của bạn đã xác nhận đội bóng " + req.NameInvite + " là đối thủ cho trận đấu vào ngày " + req.DateGame,
 			Icon:      "",
 			GeneralID: req.GameId,
 			UserId:    user.UserId,
@@ -303,8 +301,8 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "ACCEPT_GAME",
 		Body: model.BodyNotification{
-			Title:     "Lời thách đấu",
-			Content:   "Chưa biết để tên gì",
+			Title:     "Trận đấu",
+			Content:   "Đội bóng " + req.NameHost + " của bạn đã xác nhận đội bóng " + req.NameInvite + " là đối thủ cho trận đấu vào ngày " + req.DateGame,
 			GeneralId: req.GameId,
 		},
 	}, tokens,
@@ -335,13 +333,12 @@ func (g *GameHandler) RefuseJoin(c echo.Context) error {
 		})
 	}
 
-
 	token, errToken := g.UserRepo.GetToken(c.Request().Context(), req.UserNotifyId)
 	if errToken != nil {
 		log.Error(errToken)
 		return c.JSON(http.StatusOK, model.Response{
 			StatusCode: http.StatusConflict,
-			Message:    errToken.Error(),
+			Message:    errToken.Error() + " tokennn",
 			Data:       nil,
 		})
 	}
@@ -351,8 +348,8 @@ func (g *GameHandler) RefuseJoin(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "REFUSE_GAME",
 		Body: model.BodyNotification{
-			Title:     "Từ chối đề nghị tham gia trận đấu",
-			Content:   req.NameHost + " đã từ chối lời đề nghị tham gia trận đấu của đội bóng của bạn",
+			Title:     "Từ chối thách đấu",
+			Content:   req.NameHost + " đã từ chối lời thách đấu " + req.NameInvite + " của bạn",
 			GeneralId: req.GameId,
 		},
 	}, tokens,
@@ -360,8 +357,8 @@ func (g *GameHandler) RefuseJoin(c echo.Context) error {
 	_, err = g.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "REFUSE_GAME",
-		Title:     "Từ chối đề nghị tham gia trận đấu",
-		Content:   req.NameHost + " đã từ chối lời đề nghị tham gia trận đấu của đội bóng của bạn",
+		Title:     "Từ chối thách đấu",
+		Content:   req.NameHost + " đã từ chối lời thách đấu " + req.NameInvite + " của bạn",
 		Icon:      "",
 		GeneralID: req.GameId,
 		UserId:    req.UserNotifyId,
@@ -376,7 +373,6 @@ func (g *GameHandler) RefuseJoin(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,

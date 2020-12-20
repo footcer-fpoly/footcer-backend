@@ -141,8 +141,8 @@ func (g *GameRepoImpl) AcceptJoin(context context.Context, gameTemp model.GameTe
 
 func (g *GameRepoImpl) RefuseJoin(context context.Context, gameTemp model.GameTemp) error {
 	queryDelete := `DELETE FROM public.game_temp
-	WHERE game_temp_id = $1;`
-	row, err := g.sql.Db.ExecContext(context, queryDelete, gameTemp.GameTempId)
+	WHERE team_id = $1;`
+	row, err := g.sql.Db.ExecContext(context, queryDelete, gameTemp.TeamId)
 	if err != nil {
 		log.Error(err.Error())
 		return message.SomeWentWrong
@@ -240,7 +240,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 
 	sqlGetGame := `SELECT game.game_id, game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id,stadium_details.*,
 	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium,
-	 stadium.address, stadium.latitude , stadium.longitude, stadium_collage.*,
+	 stadium.address, stadium.latitude , stadium.longitude, stadium_collage.name_stadium_collage as name_stadium_collage,
 	game.team_id_host, COALESCE(game.team_id_guest, '') team_id_guest,team_host.name AS team_name_host,  team_host.leader_id as leader_id_host , 
 	team_host.avatar AS team_avatar_host,COALESCE(team_guest.name , '')  team_name_guest,COALESCE(team_guest.avatar ,'')  team_avatar_guest FROM public.game 
 	LEFT JOIN stadium ON stadium.stadium_id = game.stadium_id 
@@ -283,7 +283,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 }
 
 func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (interface{}, error) {
-	var game = []ListGame{}
+	var games = []ListGame{}
 
 	sqlGetGame := `SELECT DISTINCT(game.game_id), game.date, game.hour, game.type, game.score, game.description as description_game , game.order_id, stadium_details.*,stadium.address,
 	game.finish, COALESCE(game.stadium_id,'') stadium_id,  game_created_at, game_updated_at,COALESCE(stadium.name_stadium, '') name_stadium, 
@@ -300,15 +300,38 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 	INNER JOIN stadium_details ON stadium_details.stadium_detail_id = orders.stadium_detail_id 
 	where user_host.user_id = $1
 	OR user_guest.user_id = $1;`
-	err := g.sql.Db.SelectContext(context, &game, sqlGetGame, userId)
+	err := g.sql.Db.SelectContext(context, &games, sqlGetGame, userId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Error(err.Error())
-			return game, message.NotData
+			return games, message.NotData
 		}
 		log.Error(err.Error())
-		return game, err
+		return games, err
 	}
+
+	if len(games) > 0 {
+		for i, game := range games {
+			var gg = ListGame{}
+
+			sqlGetTeamInvite := `SELECT COUNT(game_temp.game_temp_id)  as count_invite
+	FROM public.game_temp INNER JOIN team ON team.team_id = game_temp.team_id WHERE game_id =$1;`
+
+			err := g.sql.Db.GetContext(context, &gg, sqlGetTeamInvite, game.GameId)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					log.Error(err.Error())
+					//return game, message.NotData
+				}
+				log.Error(err.Error())
+				//return game, err
+			}
+
+			games[i].CountInvite = gg.CountInvite
+		}
+
+	}
+
 	//inviteTeam := game.TeamIdGuest == "null"
 	//if inviteTeam {
 	//	var inviteTeams = []TeamTemp{}
@@ -328,7 +351,7 @@ func (g *GameRepoImpl) GetGameForUser(context context.Context, userId string) (i
 	//
 	//}
 
-	return game, nil
+	return games, nil
 }
 
 type TeamHost struct {
@@ -348,6 +371,11 @@ type TeamTemp struct {
 	Avatar string `json:"teamAvatarTemp,omitempty" db:"team_avatar_temp,omitempty"`
 }
 type ArrayTeamTemp []TeamTemp
+
+type CountInvite struct {
+	CountInvite int `json:"countInvite" db:"count_invite,omitempty"`
+}
+
 type ListGame struct {
 	model.Game
 	model.Stadium        `json:"stadium"`
@@ -356,4 +384,5 @@ type ListGame struct {
 	TeamHost             `json:"teamHost"`
 	TeamGuest            `json:"teamGuest"`
 	ArrayTeamTemp        `json:"teamInvite"`
+	CountInvite          int `json:"countInvite" db:"count_invite,omitempty"`
 }

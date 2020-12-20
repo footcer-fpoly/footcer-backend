@@ -96,6 +96,49 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 			Data:       nil,
 		})
 	}
+
+	users, errToken := t.UserRepo.GetTokenForTeam(c.Request().Context(), req.TeamId) // id guest
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+
+	var tokens []string
+	for _, user := range users {
+		tokens = append(tokens, user.TokenNotify)
+		_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+			NotifyID:  uuid.NewV1().String(),
+			Key:       "ADD_MEMBER",
+			Title:     "Tham gia đội bóng",
+			Content:   req.NameUser + " mời bạn tham gia vào đội bóng " + req.Name,
+			Icon:      "",
+			GeneralID: req.TeamId,
+			UserId:    user.UserId,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		})
+		if err != nil {
+			return c.JSON(http.StatusOK, model.Response{
+				StatusCode: http.StatusConflict,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+	}
+	service.PushNotification(c, model.DataNotification{
+		Type: "ADD_MEMBER",
+		Body: model.BodyNotification{
+			Title:     "Tham gia đội bóng",
+			Content:   req.NameUser + " mời bạn tham gia vào đội bóng " + req.Name,
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
+
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
@@ -176,7 +219,7 @@ func (t TeamHandler) AddMemberTeam(c echo.Context) error {
 		Type: "ADD_MEMBER",
 		Body: model.BodyNotification{
 			Title:     "Tham gia đội bóng",
-			Content:   req.NameTeam + " mời bạn tham gia đội bóng",
+			Content:   req.NameUser + " mời bạn tham gia vào đội bóng " + req.NameTeam,
 			GeneralId: req.TeamId,
 		},
 	}, tokens,
@@ -185,7 +228,7 @@ func (t TeamHandler) AddMemberTeam(c echo.Context) error {
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "ADD_MEMBER",
 		Title:     "Tham gia đội bóng",
-		Content:   req.NameTeam + " mời bạn tham gia đội bóng",
+		Content:   req.NameUser + " mời bạn tham gia vào đội bóng " + req.NameTeam,
 		Icon:      "",
 		GeneralID: req.TeamId,
 		UserId:    req.UserId,
@@ -296,7 +339,7 @@ func (t *TeamHandler) DeleteMember(c echo.Context) error {
 		Type: "DELETE_MEMBER",
 		Body: model.BodyNotification{
 			Title:     "Mời rời đội bóng",
-			Content:   req.NameTeam + " đã xoá bạn ra khỏi đội bóng",
+			Content:   req.NameUser + " đã xóa bạn ra khỏi đội bóng " + req.NameTeam,
 			GeneralId: req.TeamId,
 		},
 	}, tokens,
@@ -305,7 +348,7 @@ func (t *TeamHandler) DeleteMember(c echo.Context) error {
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "DELETE_MEMBER",
 		Title:     "Mời rời đội bóng",
-		Content:   req.NameTeam + " đã xoá bạn ra khỏi đội bóng",
+		Content:   req.NameUser + " đã xóa bạn ra khỏi đội bóng " + req.NameTeam,
 		Icon:      "",
 		GeneralID: req.TeamId,
 		UserId:    req.UserId,
@@ -444,8 +487,8 @@ func (t *TeamHandler) AcceptInvite(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "ACCEPT_INVITE",
 		Body: model.BodyNotification{
-			Title:     "Chấp nhận lời mời",
-			Content:   req.NameUser + " chấp nhận tham gia đội bóng",
+			Title:     "Tham gia đội bóng",
+			Content:   req.NameUser + " chấp nhận tham gia đội bóng " + req.NameTeam,
 			GeneralId: req.TeamId,
 		},
 	}, tokens,
@@ -454,7 +497,7 @@ func (t *TeamHandler) AcceptInvite(c echo.Context) error {
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "ACCEPT_INVITE",
 		Title:     "Chấp nhận lời mời",
-		Content:   req.NameUser + " chấp nhận tham gia đội bóng",
+		Content:   req.NameUser + " chấp nhận tham gia đội bóng " + req.NameTeam,
 		Icon:      "",
 		GeneralID: req.TeamId,
 		UserId:    team.LeaderId,
@@ -482,7 +525,6 @@ func (t *TeamHandler) CancelInvite(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return err
 	}
-
 
 	err := t.TeamRepo.CancelInvite(c.Request().Context(), req)
 	if err != nil {
@@ -520,8 +562,8 @@ func (t *TeamHandler) CancelInvite(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "CANCEL_MEMBER",
 		Body: model.BodyNotification{
-			Title:     "Từ chối lời mời",
-			Content:   req.NameUser + " từ chối tham gia đội bóng",
+			Title:     "Tham gia đội bóng",
+			Content:   req.NameUser + " đã từ chối tham gia vào đội bóng " + req.NameTeam,
 			GeneralId: req.TeamId,
 		},
 	}, tokens,
@@ -529,14 +571,78 @@ func (t *TeamHandler) CancelInvite(c echo.Context) error {
 	_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "CANCEL_MEMBER",
-		Title:     "Từ chối lời mời",
-		Content:   req.NameUser + " từ chối tham gia đội bóng",
+		Title:     "Tham gia đội bóng",
+		Content:   req.NameUser + " đã từ chối tham gia vào đội bóng " + req.NameTeam,
 		Icon:      "",
 		GeneralID: req.TeamId,
 		UserId:    team.LeaderId,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
+
+	if err != nil {
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    err.Error(),
+			Data:       nil,
+		})
+	}
+	return c.JSON(http.StatusOK, model.Response{
+		StatusCode: http.StatusOK,
+		Message:    "Xử lý thành công",
+		Data:       nil,
+	})
+}
+
+func (t *TeamHandler) OutTeam(c echo.Context) error {
+
+	req := model.TeamDetails{}
+	if err := c.Bind(&req); err != nil {
+		return err
+	}
+
+	err := t.TeamRepo.CancelInvite(c.Request().Context(), req)
+
+	users, errToken := t.UserRepo.GetTokenForTeam(c.Request().Context(), req.TeamId) // id guest
+	if errToken != nil {
+		log.Error(errToken)
+		return c.JSON(http.StatusOK, model.Response{
+			StatusCode: http.StatusConflict,
+			Message:    errToken.Error(),
+			Data:       nil,
+		})
+	}
+	var tokens []string
+	for _, user := range users {
+		tokens = append(tokens, user.TokenNotify)
+		_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+			NotifyID:  uuid.NewV1().String(),
+			Key:       "OUT_TEAM",
+			Title:     "Rời đội bóng",
+			Content:   req.NameUser + " đã rời đội bóng " + req.NameTeam,
+			Icon:      "",
+			GeneralID: req.TeamId,
+			UserId:    user.UserId,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		})
+		if err != nil {
+			return c.JSON(http.StatusOK, model.Response{
+				StatusCode: http.StatusConflict,
+				Message:    err.Error(),
+				Data:       nil,
+			})
+		}
+	}
+	service.PushNotification(c, model.DataNotification{
+		Type: "OUT_TEAM",
+		Body: model.BodyNotification{
+			Title:     "Rời đội bóng",
+			Content:   req.NameUser + " đã rời đội bóng " + req.NameTeam,
+			GeneralId: req.TeamId,
+		},
+	}, tokens,
+	)
 
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
