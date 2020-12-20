@@ -262,7 +262,7 @@ func (g *GameRepoImpl) GetGame(context context.Context, gameId string) (interfac
 	inviteTeam := game.TeamIdGuest == ""
 	if inviteTeam {
 		var inviteTeams = []TeamTemp{}
-		sqlGetTeamInvite := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp 
+		sqlGetTeamInvite := `SELECT team.team_id AS team_id_temp,team.name AS team_name_temp,team.avatar AS team_avatar_temp, team.leader_id as leader_id_temp 
 	FROM public.game_temp INNER JOIN team ON team.team_id = game_temp.team_id WHERE game_id =$1;`
 
 		err := g.sql.Db.SelectContext(context, &inviteTeams, sqlGetTeamInvite, gameId)
@@ -366,6 +366,7 @@ type TeamGuest struct {
 }
 
 type TeamTemp struct {
+	LeaderId string `json:"leaderIdTemp,omitempty" db:"leader_id_temp,omitempty"`
 	TeamId string `json:"teamIdTemp,omitempty" db:"team_id_temp,omitempty"`
 	Name   string `json:"teamNameTemp,omitempty" db:"team_name_temp,omitempty"`
 	Avatar string `json:"teamAvatarTemp,omitempty" db:"team_avatar_temp,omitempty"`
