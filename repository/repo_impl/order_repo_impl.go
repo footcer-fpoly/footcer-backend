@@ -181,7 +181,7 @@ func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (int
 	sqlStatement := `
 	SELECT orders.*,
 	users.user_id,users.display_name,users.avatar, users.phone,
-	users_stadium.user_id as user_id_stadium, users_stadium.display_name as user_display_name_stadium, 
+	users_stadium.user_id as user_id_stadium, users_stadium.display_name as user_display_name_stadium, users_stadium.phone as user_phone_stadium ,
 	stadium_collage.name_stadium_collage,stadium_collage.amount_people,
 	stadium.name_stadium, stadium.image , stadium.latitude, stadium.longitude ,stadium.address,stadium.category, stadium.stadium_id, 
 	stadium_details.price , stadium_details.start_time_detail , stadium_details.end_time_detail, orders_status.*
@@ -206,5 +206,5 @@ func (o OrderRepoImpl) OrderDetail(context context.Context, orderId string) (int
 type userStadium struct {
 	UserId      string `json:"userId,omitempty" db:"user_id_stadium,omitempty"`
 	DisplayName string `json:"displayName,omitempty" db:"user_display_name_stadium,omitempty"`
-	//Phone       string `json:"phone,omitempty" db:"user_phone_stadium,omitempty"`
+	Phone       string `json:"phone,omitempty" db:"user_phone_stadium,omitempty"`
 }

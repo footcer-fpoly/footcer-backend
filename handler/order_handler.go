@@ -140,7 +140,7 @@ func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
 		} else {
 			//noti den chu san
 			title = "Huỷ đặt sân"
-			content =  claims.UserName + " đã đã hủy lịch đặt sân vì " + req.Reason
+			content = claims.UserName + " đã đã hủy lịch đặt sân vì " + req.Reason
 		}
 
 	} else if req.Status == "FINISH" {
