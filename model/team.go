@@ -17,4 +17,7 @@ type Team struct {
 	//User        `json:"user,omitempty"`
 	Folder      string    `json:"folder,omitempty" validate:"required"`
 
+	NameUser string `json:"nameUser,omitempty"`
+
+
 }

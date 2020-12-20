@@ -8,4 +8,5 @@ type GameTemp struct {
 	UserNotifyId string `json:"userNotifyId,omitempty" db:"-,omitempty"`
 	NameHost     string `json:"nameHost,omitempty" db:"-,omitempty"`
 	NameInvite   string `json:"nameInvite,omitempty" db:"-,omitempty"`
+	DateGame   string `json:"dateGame,omitempty" db:"-,omitempty"`
 }

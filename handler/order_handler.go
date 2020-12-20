@@ -60,8 +60,8 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 	service.PushNotification(c, model.DataNotification{
 		Type: "ADD_ORDER",
 		Body: model.BodyNotification{
-			Title:     "Yêu cầu đặt sân",
-			Content:   claims.UserName + " đã yêu cầu đặt sân của bạn vào lúc " + time.Now().String(),
+			Title:     "Đặt sân",
+			Content:   claims.UserName + " đề nghị đặt sân  " + req.StadiumName + " ngày " + req.Time + " vào lúc " + req.StadiumTime,
 			GeneralId: req.OrderId,
 		},
 	}, tokens,
@@ -69,8 +69,8 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 	_, err = o.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "ADD_ORDER",
-		Title:     "Mời rời đội bóng",
-		Content:   claims.UserName + " đã yêu cầu đặt sân của bạn vào lúc " + time.Now().String(),
+		Title:     "Đặt sân",
+		Content:   claims.UserName + " đề nghị đặt sân  " + req.StadiumName + " ngày " + req.Time + " vào lúc " + req.StadiumTime,
 		Icon:      "",
 		GeneralID: req.OrderId,
 		UserId:    req.StadiumUserId,
@@ -130,23 +130,23 @@ func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
 	title := ""
 	content := ""
 	if req.Status == "ACCEPT" {
-		title = "Chấp nhận đặt sân"
-		content = "Sân " + req.Name + " đã chấp nhận yêu cầu đặt sân của bạn"
-	}else if req.Status =="REJECT"{
+		title = "Đặt sân"
+		content = "Đơn đặt sân " + req.StadiumName + " của bạn đã được chấp nhận"
+	} else if req.Status == "REJECT" {
 		if req.IsUser {
 			//noti den user
-			title = "Từ chối đặt sân"
-			content = "Sân " + req.Name + " đã từ chối yêu cầu đặt sân của bạn"
-		}else{
+			title = "Đặt sân"
+			content = "Đơn đặt sân " + req.StadiumName + " của bạn đã bị từ chối vì " + req.Reason
+		} else {
 			//noti den chu san
 			title = "Huỷ đặt sân"
-			content =   req.Name + " đã huỷ yêu cầu đặt sân của bạn"
+			content =  claims.UserName + " đã đã hủy lịch đặt sân vì " + req.Reason
 		}
 
-	}else if req.Status == "FINISH"{
+	} else if req.Status == "FINISH" {
 		//noti user
-		title = "Hoàn thành đặt sân"
-		content =   "Hãy đánh giá sân " + req.Name
+		title = "Đánh giá sân"
+		content = "Lịch đặt sân đã hoàn thành, hãy đánh giá sân " + req.StadiumName
 	}
 
 	var tokens []string
@@ -179,8 +179,6 @@ func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
 			Data:       nil,
 		})
 	}
-
-
 
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,

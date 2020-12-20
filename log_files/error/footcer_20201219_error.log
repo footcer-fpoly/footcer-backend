@@ -1,0 +1,22 @@
+time="2020-12-19T23:42:35.746437+07:00" level=error msg="pq: missing FROM-clause entry for table \"stadium\"" file=/Users/pro/footcer-backend/repository/repo_impl/order_repo_impl.go line=200
+time="2020-12-19T23:43:03.135458+07:00" level=error msg="missing destination name display_name in *repo_impl.listOrders" file=/Users/pro/footcer-backend/repository/repo_impl/order_repo_impl.go line=200
+time="2020-12-19T23:48:39.667684+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/order_repo_impl.go line=200
+time="2020-12-20T00:10:48.425841+07:00" level=error msg="pq: time zone displacement out of range: \" 16:00 -  17:30\"" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=33
+time="2020-12-20T00:13:58.311752+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:13:58.312935+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:15:21.090136+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:15:21.091341+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:20:24.528135+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:20:24.529304+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:20:36.518749+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:20:36.519924+07:00" level=error msg="expected slice but got int" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:22:25.232226+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:22:25.233817+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=325
+time="2020-12-20T00:23:00.962728+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:23:00.965853+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:24:45.169747+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:24:45.172374+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:26:57.193711+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:26:57.196145+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:27:32.167468+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326
+time="2020-12-20T00:27:32.168804+07:00" level=error msg="expected slice but got struct" file=/Users/pro/footcer-backend/repository/repo_impl/game_repo_impl.go line=326

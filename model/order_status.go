@@ -11,7 +11,6 @@ type OrderStatus struct {
 	CreatedAt     time.Time `json:"-" db:"created_at,omitempty"`
 	UpdatedAt     time.Time `json:"-" db:"updated_at, omitempty"`
 
-	UserId string `json:"userId" db:"-,omitempty"`
-	Name string `json:"name" db:"-,omitempty"`
-
+	UserId      string `json:"userNotifyId" db:"-,omitempty"`
+	StadiumName string `json:"stadiumName" db:"-,omitempty"`
 }

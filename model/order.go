@@ -14,4 +14,6 @@ type Order struct {
 	UpdatedAt        time.Time `json:"updatedAt" db:"order_updated_at, omitempty"`
 
 	StadiumUserId string `json:"stadiumUserId" db:"-,omitempty"`
+	StadiumName string `json:"stadiumName" db:"-,omitempty"`
+	StadiumTime string `json:"stadiumTime" db:"-,omitempty"`
 }

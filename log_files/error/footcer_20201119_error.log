@@ -1,4 +1,0 @@
-time="2020-11-19T14:14:03.950832+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=451
-time="2020-11-19T15:36:17.753803+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=47
-time="2020-11-19T15:37:13.516072+07:00" level=error msg="pq: duplicate key value violates unique constraint \"users_phone_key\"" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=148
-time="2020-11-19T15:38:44.44385+07:00" level=error msg="pq: duplicate key value violates unique constraint \"images_pkey\"" file=/Users/pro/footcer-backend/repository/repo_impl/stadium_repo_impl.go line=577
