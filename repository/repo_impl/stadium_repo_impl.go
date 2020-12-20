@@ -111,8 +111,8 @@ FROM public.review INNER JOIN users ON review.user_id = users.user_id WHERE revi
 
 	//stadium image
 	var stadiumImage = []model.Images{}
-	queryImage := `SELECT img.* FROM images as img INNER JOIN stadium as s ON  s.stadium_id = img.general_id WHERE s.stadium_id = $1`
-	errImage := s.sql.Db.SelectContext(context, &stadiumImage, queryImage, stadium.StadiumId)
+	queryImage := `SELECT img.* FROM images as img INNER JOIN stadium as s ON  s.stadium_id = img.general_id WHERE s.stadium_id = $1 LIMIT $2`
+	errImage := s.sql.Db.SelectContext(context, &stadiumImage, queryImage, stadium.StadiumId, 5)
 	if errImage != nil {
 		if errImage == sql.ErrNoRows {
 			log.Error(errImage.Error())

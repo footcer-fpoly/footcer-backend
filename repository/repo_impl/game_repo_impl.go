@@ -107,17 +107,17 @@ func (g *GameRepoImpl) JoinGame(context context.Context, gameTemp model.GameTemp
 }
 
 func (g *GameRepoImpl) AcceptJoin(context context.Context, gameTemp model.GameTemp) error {
-	queryDelete := `DELETE FROM public.game_temp
-	WHERE game_id = $1;`
-	row, err := g.sql.Db.ExecContext(context, queryDelete, gameTemp.GameId)
-	if err != nil {
-		log.Error(err.Error())
-		return message.SomeWentWrong
-	}
-	count, _ := row.RowsAffected()
-	if count == 0 {
-		return message.SomeWentWrong
-	}
+	//queryDelete := `DELETE FROM public.game_temp
+	//WHERE game_id = $1;`
+	//row, err := g.sql.Db.ExecContext(context, queryDelete, gameTemp.GameId)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//	return message.SomeWentWrong
+	//}
+	//count, _ := row.RowsAffected()
+	//if count == 0 {
+	//	return message.SomeWentWrong
+	//}
 	var game = model.Game{}
 	game.GameId = gameTemp.GameId
 	game.TeamIdGuest = gameTemp.TeamId

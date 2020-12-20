@@ -8,6 +8,7 @@ import (
 	"footcer-backend/service"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+	"github.com/nleeper/goment"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
 	"time"
@@ -36,6 +37,8 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 	req.CreatedAt = time.Now()
 	req.UpdatedAt = time.Now()
 
+	g, _ := goment.New(req.Time, "YYYY-MM-DD")
+
 	teamDetails, err := o.OrderRepo.AddOrder(c.Request().Context(), req)
 	if err != nil {
 		return c.JSON(http.StatusOK, model.Response{
@@ -61,7 +64,7 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 		Type: "ADD_ORDER",
 		Body: model.BodyNotification{
 			Title:     "Đặt sân",
-			Content:   claims.UserName + " đề nghị đặt sân  " + req.StadiumName + " ngày " + req.Time + " vào lúc " + req.StadiumTime,
+			Content:   claims.UserName + " đề nghị đặt sân  " + req.StadiumName + " ngày " + g.Format("DD-MM-YYYY") + " vào lúc " + req.StadiumTime,
 			GeneralId: req.OrderId,
 		},
 	}, tokens,
@@ -70,7 +73,7 @@ func (o *OrderHandler) AddOrder(c echo.Context) error {
 		NotifyID:  uuid.NewV1().String(),
 		Key:       "ADD_ORDER",
 		Title:     "Đặt sân",
-		Content:   claims.UserName + " đề nghị đặt sân  " + req.StadiumName + " ngày " + req.Time + " vào lúc " + req.StadiumTime,
+		Content:   claims.UserName + " đề nghị đặt sân  " + req.StadiumName + " ngày " + g.Format("DD-MM-YYYY") + " vào lúc " + req.StadiumTime,
 		Icon:      "",
 		GeneralID: req.OrderId,
 		UserId:    req.StadiumUserId,
@@ -135,12 +138,12 @@ func (o *OrderHandler) UpdateStatusOrder(c echo.Context) error {
 	} else if req.Status == "REJECT" {
 		if req.IsUser {
 			//noti den user
-			title = "Đặt sân"
+			title = "Huỷ đặt sân"
 			content = "Đơn đặt sân " + req.StadiumName + " của bạn đã bị từ chối vì " + req.Reason
 		} else {
 			//noti den chu san
 			title = "Huỷ đặt sân"
-			content =  claims.UserName + " đã đã hủy lịch đặt sân vì " + req.Reason
+			content = "Lịch đặt sân " +req.StadiumName + "của bạn không được chủ sân chấp nhận vì " + req.Reason
 		}
 
 	} else if req.Status == "FINISH" {
