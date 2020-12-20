@@ -84,7 +84,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		Level:       req.Level,
 		LeaderId:    claims.UserId,
 		MemberList:  req.MemberList,
-		NameUser:  req.NameUser,
+		NameUser:    req.NameUser,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
@@ -110,25 +110,28 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 
 	var tokens []string
 	for _, user := range users {
-		tokens = append(tokens, user.TokenNotify)
-		_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
-			NotifyID:  uuid.NewV1().String(),
-			Key:       "ADD_MEMBER",
-			Title:     "Tham gia đội bóng",
-			Content:   req.NameUser + " mời bạn tham gia vào đội bóng " + req.Name,
-			Icon:      "",
-			GeneralID: req.TeamId,
-			UserId:    user.UserId,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		})
-		if err != nil {
-			return c.JSON(http.StatusOK, model.Response{
-				StatusCode: http.StatusConflict,
-				Message:    err.Error(),
-				Data:       nil,
+		if user.UserId != req.LeaderId {
+			tokens = append(tokens, user.TokenNotify)
+			_, err = t.NotifyRepo.AddNotification(c.Request().Context(), model.Notification{
+				NotifyID:  uuid.NewV1().String(),
+				Key:       "ADD_MEMBER",
+				Title:     "Tham gia đội bóng",
+				Content:   req.NameUser + " mời bạn tham gia vào đội bóng " + req.Name,
+				Icon:      "",
+				GeneralID: req.TeamId,
+				UserId:    user.UserId,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
 			})
+			if err != nil {
+				return c.JSON(http.StatusOK, model.Response{
+					StatusCode: http.StatusConflict,
+					Message:    err.Error(),
+					Data:       nil,
+				})
+			}
 		}
+
 	}
 	service.PushNotification(c, model.DataNotification{
 		Type: "ADD_MEMBER",
