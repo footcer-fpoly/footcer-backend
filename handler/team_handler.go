@@ -84,6 +84,7 @@ func (t *TeamHandler) AddTeam(c echo.Context) error {
 		Level:       req.Level,
 		LeaderId:    claims.UserId,
 		MemberList:  req.MemberList,
+		NameUser:  req.NameUser,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
