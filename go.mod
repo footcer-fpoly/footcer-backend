@@ -9,7 +9,6 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.3.0
-	github.com/go-shadow/moment v0.0.0-20140422073900-e837f27dad94
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jmoiron/sqlx v1.2.0
@@ -22,11 +21,11 @@ require (
 	github.com/lib/pq v1.1.1
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mattn/go-sqlite3 v1.14.0 // indirect
+	github.com/nleeper/goment v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.6.0
-	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/tebeka/strftime v0.1.4 // indirect
 	github.com/valyala/fasttemplate v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20200709230013-948cd5f35899

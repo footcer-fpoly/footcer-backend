@@ -18,3 +18,9 @@ time="2020-12-20T12:53:01.354384+07:00" level=error msg="sql: no rows in result 
 time="2020-12-20T12:53:01.355333+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/order_handler.go line=54
 time="2020-12-20T12:54:18.783279+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=441
 time="2020-12-20T12:54:18.784665+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/order_handler.go line=54
+time="2020-12-20T16:40:24.752004+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=441
+time="2020-12-20T16:40:24.753042+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/order_handler.go line=60
+time="2020-12-20T16:45:15.932986+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=441
+time="2020-12-20T16:45:15.933887+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/order_handler.go line=60
+time="2020-12-20T16:59:10.447869+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/repository/repo_impl/user_repo_impl.go line=441
+time="2020-12-20T16:59:10.448591+07:00" level=error msg="sql: no rows in result set" file=/Users/pro/footcer-backend/handler/order_handler.go line=55
