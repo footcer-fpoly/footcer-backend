@@ -308,6 +308,9 @@ func (g *GameHandler) AcceptJoin(c echo.Context) error {
 	}, tokens,
 	)
 
+	// tu choi game
+
+
 	return c.JSON(http.StatusOK, model.Response{
 		StatusCode: http.StatusOK,
 		Message:    "Xử lý thành công",
